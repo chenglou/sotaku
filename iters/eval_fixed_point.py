@@ -9,6 +9,7 @@ import argparse
 import importlib
 import time
 from datasets import load_dataset
+from output_logging import start_stdout_tee
 
 torch.set_float32_matmul_precision('high')
 
@@ -21,8 +22,9 @@ RATING_BUCKETS = [
 ]
 
 
-def evaluate(model_path, exp_module='exp_faster_2drope', n_repeat_iters=10,
-             max_test=5000, device='cuda'):
+def evaluate(model_path, exp_module='iters.exp_baseline_lr2e3', n_repeat_iters=10,
+             max_test=5000, device='cuda', output_dir=None):
+    restore_stdout = start_stdout_tee(output_dir, model_path, "fixed_point")
     mod = importlib.import_module(exp_module)
     device = torch.device(device if torch.cuda.is_available() else 'cpu')
 
@@ -224,15 +226,17 @@ def evaluate(model_path, exp_module='exp_faster_2drope', n_repeat_iters=10,
         solved = (per_puzzle_correct == per_puzzle_total)
         n_solved = solved.sum().item()
         print(f"  {t:5d} | {n_correct:>10}/{total_empty} ({100*n_correct/total_empty:5.1f}%) | {n_solved:>10}/{n_total} ({100*n_solved/n_total:5.1f}%)")
+    restore_stdout()
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("model_path", help="Path to model .pt file")
-    parser.add_argument("--exp", default="exp_faster_2drope")
+    parser.add_argument("--exp", default="iters.exp_baseline_lr2e3")
     parser.add_argument("--n-iters", type=int, default=10,
                         help="Number of iterations to run from the correct solution")
     parser.add_argument("--max-test", type=int, default=5000)
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--output-dir", default=None, help="Optional directory for tee'd log output")
     args = parser.parse_args()
-    evaluate(args.model_path, args.exp, args.n_iters, args.max_test, args.device)
+    evaluate(args.model_path, args.exp, args.n_iters, args.max_test, args.device, args.output_dir)

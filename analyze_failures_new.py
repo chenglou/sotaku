@@ -3,7 +3,7 @@
 # and would more iterations help?
 #
 # Works with any experiment module via --exp flag.
-# Currently tested on exp_faster_2drope (2D RoPE baseline).
+# Current default targets the SOTA 2D RoPE model in iters/exp_baseline_lr2e3.py.
 
 import torch
 import torch.nn.functional as F
@@ -12,6 +12,7 @@ import argparse
 import importlib
 import time
 from datasets import load_dataset
+from output_logging import tee_stdout_to_log
 
 torch.set_float32_matmul_precision('high')
 
@@ -40,101 +41,103 @@ def check_constraints(grid):
     return violations
 
 
-def analyze(model_path, exp_module='exp_faster_2drope', max_test=5000, device='cuda'):
-    # Import experiment module for model class and data encoding
-    mod = importlib.import_module(exp_module)
+def analyze(model_path, exp_module='iters.exp_baseline_lr2e3', max_test=5000,
+            device='cuda', output_dir=None):
+    with tee_stdout_to_log(output_dir, model_path, "analyze"):
+        # Import experiment module for model class and data encoding
+        mod = importlib.import_module(exp_module)
 
-    device = torch.device(device if torch.cuda.is_available() else 'cpu')
+        device = torch.device(device if torch.cuda.is_available() else 'cpu')
 
-    # Load model
-    model = mod.SudokuTransformer().to(device)
-    state = torch.load(model_path, map_location=device, weights_only=True)
-    if 'model_state_dict' in state:
-        state = state['model_state_dict']
-    model.load_state_dict(state)
-    model.eval()
+        # Load model
+        model = mod.SudokuTransformer().to(device)
+        state = torch.load(model_path, map_location=device, weights_only=True)
+        if 'model_state_dict' in state:
+            state = state['model_state_dict']
+        model.load_state_dict(state)
+        model.eval()
 
-    n_iters = mod.n_iterations
+        n_iters = mod.n_iterations
 
-    # Load test data
-    print("Loading test data...")
-    test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
+        # Load test data
+        print("Loading test data...")
+        test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
 
-    # Group by rating
-    buckets = {}
-    for i in range(len(test_dataset)):
-        r = test_dataset[i]['rating']
-        for min_r, max_r, name in RATING_BUCKETS:
-            if min_r <= r <= max_r:
-                if name not in buckets:
-                    buckets[name] = []
-                buckets[name].append(i)
-                break
+        # Group by rating
+        buckets = {}
+        for i in range(len(test_dataset)):
+            r = test_dataset[i]['rating']
+            for min_r, max_r, name in RATING_BUCKETS:
+                if min_r <= r <= max_r:
+                    if name not in buckets:
+                        buckets[name] = []
+                    buckets[name].append(i)
+                    break
 
-    # Cap per bucket
-    for name in buckets:
-        if len(buckets[name]) > max_test:
-            import random
-            random.seed(42)
-            buckets[name] = random.sample(buckets[name], max_test)
+        # Cap per bucket
+        for name in buckets:
+            if len(buckets[name]) > max_test:
+                import random
+                random.seed(42)
+                buckets[name] = random.sample(buckets[name], max_test)
 
-    all_puzzles = []
-    all_solutions = []
-    all_ratings = []
-    all_bucket_names = []
-    for name in sorted(buckets.keys(), key=lambda n: [b[2] for b in RATING_BUCKETS].index(n)):
-        for idx in buckets[name]:
-            all_puzzles.append(test_dataset[idx]['question'])
-            all_solutions.append(test_dataset[idx]['answer'])
-            all_ratings.append(test_dataset[idx]['rating'])
-            all_bucket_names.append(name)
+        all_puzzles = []
+        all_solutions = []
+        all_ratings = []
+        all_bucket_names = []
+        for name in sorted(buckets.keys(), key=lambda n: [b[2] for b in RATING_BUCKETS].index(n)):
+            for idx in buckets[name]:
+                all_puzzles.append(test_dataset[idx]['question'])
+                all_solutions.append(test_dataset[idx]['answer'])
+                all_ratings.append(test_dataset[idx]['rating'])
+                all_bucket_names.append(name)
 
-    x_all = mod.encode_puzzles(all_puzzles).to(device)
-    n_total = len(all_puzzles)
-    print(f"Total test puzzles: {n_total}")
+        x_all = mod.encode_puzzles(all_puzzles).to(device)
+        n_total = len(all_puzzles)
+        print(f"Total test puzzles: {n_total}")
 
-    # Run model and collect per-iteration predictions
-    # all_iter_preds[iter][puzzle] = (81,) predicted digits 1-9
-    all_iter_preds = [[] for _ in range(n_iters)]
-    all_iter_confidence = [[] for _ in range(n_iters)]
+        # Run model and collect per-iteration predictions
+        # all_iter_preds[iter][puzzle] = (81,) predicted digits 1-9
+        all_iter_preds = [[] for _ in range(n_iters)]
+        all_iter_confidence = [[] for _ in range(n_iters)]
 
-    batch_size = 256
-    print("Running inference...")
-    t_start = time.time()
-    use_autocast = device.type == 'cuda'
-    ctx = torch.autocast(device.type, dtype=torch.bfloat16) if use_autocast else torch.no_grad()
-    with torch.no_grad(), ctx:
-        for start in range(0, n_total, batch_size):
-            end = min(start + batch_size, n_total)
-            batch_x = x_all[start:end]
-            all_logits = model(batch_x, return_all=True)  # list of n_iters tensors
+        batch_size = 256
+        print("Running inference...")
+        t_start = time.time()
+        use_autocast = device.type == 'cuda'
+        ctx = torch.autocast(device.type, dtype=torch.bfloat16) if use_autocast else torch.no_grad()
+        with torch.no_grad(), ctx:
+            for start in range(0, n_total, batch_size):
+                end = min(start + batch_size, n_total)
+                batch_x = x_all[start:end]
+                all_logits = model(batch_x, return_all=True)  # list of n_iters tensors
 
-            for it, logits in enumerate(all_logits):
-                probs = F.softmax(logits.float(), dim=-1)
-                preds = logits.argmax(dim=-1).cpu()  # (B, 81), values 0-8
-                confidence = probs.max(dim=-1).values.cpu()  # (B, 81)
-                all_iter_preds[it].append(preds)
-                all_iter_confidence[it].append(confidence)
-    t_inference = time.time() - t_start
-    print(f"Inference time: {t_inference:.1f}s ({n_total} puzzles, {n_total/t_inference:.0f} puzzles/s)")
+                for it, logits in enumerate(all_logits):
+                    probs = F.softmax(logits.float(), dim=-1)
+                    preds = logits.argmax(dim=-1).cpu()  # (B, 81), values 0-8
+                    confidence = probs.max(dim=-1).values.cpu()  # (B, 81)
+                    all_iter_preds[it].append(preds)
+                    all_iter_confidence[it].append(confidence)
+        t_inference = time.time() - t_start
+        print(f"Inference time: {t_inference:.1f}s ({n_total} puzzles, {n_total/t_inference:.0f} puzzles/s)")
 
-    # Stack everything
-    for it in range(n_iters):
-        all_iter_preds[it] = torch.cat(all_iter_preds[it], dim=0)  # (N, 81)
-        all_iter_confidence[it] = torch.cat(all_iter_confidence[it], dim=0)  # (N, 81)
+        # Stack everything
+        for it in range(n_iters):
+            all_iter_preds[it] = torch.cat(all_iter_preds[it], dim=0)  # (N, 81)
+            all_iter_confidence[it] = torch.cat(all_iter_confidence[it], dim=0)  # (N, 81)
 
-    # Build empty cell masks and solution targets
-    empty_masks = []
-    solution_targets = []  # 0-indexed (0-8)
-    for i in range(n_total):
-        puzzle = all_puzzles[i]
-        solution = all_solutions[i]
-        mask = [puzzle[j] == '.' for j in range(81)]
-        target = [int(solution[j]) - 1 for j in range(81)]
-        empty_masks.append(mask)
-        solution_targets.append(target)
-    empty_masks = torch.tensor(empty_masks)  # (N, 81) bool
-    solution_targets = torch.tensor(solution_targets)  # (N, 81) 0-8
+        # Build empty cell masks and solution targets
+        empty_masks = []
+        solution_targets = []  # 0-indexed (0-8)
+        for i in range(n_total):
+            puzzle = all_puzzles[i]
+            solution = all_solutions[i]
+            mask = [puzzle[j] == '.' for j in range(81)]
+            target = [int(solution[j]) - 1 for j in range(81)]
+            empty_masks.append(mask)
+            solution_targets.append(target)
+        empty_masks = torch.tensor(empty_masks)  # (N, 81) bool
+        solution_targets = torch.tensor(solution_targets)  # (N, 81) 0-8
 
     # ============================================================
     # 1. Per-iteration cell accuracy and puzzle solve rate
@@ -383,14 +386,15 @@ def analyze(model_path, exp_module='exp_faster_2drope', max_test=5000, device='c
             print(f"\nIteration progression ({total_empty} empty cells):")
             print(f"  {' '.join(f'{c:3d}' for c in iter_correct)}")
 
-    print("\nDone.")
+        print("\nDone.")
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("model_path", help="Path to model .pt file")
-    parser.add_argument("--exp", default="exp_faster_2drope", help="Experiment module name")
+    parser.add_argument("--exp", default="iters.exp_baseline_lr2e3", help="Experiment module name")
     parser.add_argument("--max-test", type=int, default=5000, help="Max puzzles per rating bucket")
     parser.add_argument("--device", default="cuda")
+    parser.add_argument("--output-dir", default=None, help="Optional directory for tee'd log output")
     args = parser.parse_args()
-    analyze(args.model_path, args.exp, args.max_test, args.device)
+    analyze(args.model_path, args.exp, args.max_test, args.device, args.output_dir)

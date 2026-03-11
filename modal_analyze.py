@@ -1,4 +1,9 @@
-"""Modal wrapper for running analyze_failures_new.py on GPU."""
+"""Modal wrapper for running analysis scripts on the current sudoku-extreme models.
+
+Usage:
+    modal run --detach modal_analyze.py --mode analyze
+    modal run --detach modal_analyze.py --mode more_iters --iters 16,32,64,128,256,512,1024
+"""
 
 import modal
 
@@ -10,7 +15,7 @@ outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__", "*.pyc", ".git/", "logs/", "*.log"])
+    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__", "*.pyc", ".git/", "logs/", "runs/", "runs_modal/", "*.pt", "*.log"])
 )
 
 
@@ -35,7 +40,7 @@ def run_analysis(exp_name: str, model_filename: str):
     from analyze_failures_new import analyze
 
     model_path = f"/outputs/{model_filename}"
-    analyze(model_path, exp_module=exp_name, device='cuda')
+    analyze(model_path, exp_module=exp_name, device='cuda', output_dir="/outputs")
 
 
 @app.function(
@@ -60,7 +65,7 @@ def run_more_iters(exp_name: str, model_filename: str, iters: str):
 
     iter_counts = [int(x) for x in iters.split(",")]
     model_path = f"/outputs/{model_filename}"
-    evaluate(model_path, exp_module=exp_name, iter_counts=iter_counts, device='cuda')
+    evaluate(model_path, exp_module=exp_name, iter_counts=iter_counts, device='cuda', output_dir="/outputs")
 
 
 @app.function(
@@ -84,7 +89,7 @@ def run_confidence_stop(exp_name: str, model_filename: str, max_iters: int):
     from iters.eval_confidence_stop import evaluate
 
     model_path = f"/outputs/{model_filename}"
-    evaluate(model_path, exp_module=exp_name, max_iters=max_iters, device='cuda')
+    evaluate(model_path, exp_module=exp_name, max_iters=max_iters, device='cuda', output_dir="/outputs")
 
 
 @app.function(
@@ -108,13 +113,13 @@ def run_fixed_point(exp_name: str, model_filename: str, n_iters: int):
     from iters.eval_fixed_point import evaluate
 
     model_path = f"/outputs/{model_filename}"
-    evaluate(model_path, exp_module=exp_name, n_repeat_iters=n_iters, device='cuda')
+    evaluate(model_path, exp_module=exp_name, n_repeat_iters=n_iters, device='cuda', output_dir="/outputs")
 
 
 @app.local_entrypoint()
 def main(
-    exp: str = "exp_faster_2drope",
-    model: str = "model_faster_2drope.pt",
+    exp: str = "iters.exp_baseline_lr2e3",
+    model: str = "model_baseline_lr2e3.pt",
     mode: str = "analyze",
     iters: str = "16,32,48,64,96,128",
     max_iters: int = 64,

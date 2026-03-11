@@ -2,8 +2,8 @@
 Modal wrapper for running eval_more_iters on GPU.
 
 Usage:
-    modal run modal_eval.py --exp iters.exp_bs2048_baseline --model model_bs2048_baseline.pt
-    modal run modal_eval.py --exp iters.exp_wider_6h --model model_wider_6h.pt --iters '16,32,64,128,256,512,1024'
+    modal run --detach modal_eval.py --exp iters.exp_baseline_lr2e3 --model model_baseline_lr2e3.pt
+    modal run --detach modal_eval.py --exp iters.exp_wider_6h --model model_wider_6h.pt --iters '16,32,64,128,256,512,1024'
 """
 
 import modal
@@ -16,7 +16,7 @@ outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "*.pt", "*.log"])
+    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/", "runs_modal/", "*.pt", "*.log"])
 )
 
 
@@ -48,8 +48,8 @@ def run_eval(exp_name: str, model_name: str, iter_counts_str: str = "16,32,64,12
 
 @app.local_entrypoint()
 def main(
-    exp: str = "iters.exp_bs2048_baseline",
-    model: str = "model_bs2048_baseline.pt",
+    exp: str = "iters.exp_baseline_lr2e3",
+    model: str = "model_baseline_lr2e3.pt",
     iters: str = "16,32,64,128,256,512,1024",
 ):
     print(f"Evaluating {model} with exp={exp}, iters={iters}")
