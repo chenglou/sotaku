@@ -1,3 +1,7 @@
+# ARCHIVED SCRIPT
+# Targets the older row+col+box model (`model_curriculum_reverse.pt`), not the current SOTA.
+# Kept for historical reference only.
+
 # Evaluate our model on the sudoku-extreme benchmark
 # https://huggingface.co/datasets/sapientinc/sudoku-extreme
 

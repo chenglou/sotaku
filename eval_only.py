@@ -1,3 +1,7 @@
+# ARCHIVED SCRIPT
+# Targets the older Kaggle-era row+col+box model family, not the current SOTA.
+# Kept for historical reference only.
+
 # Eval-only script - loads saved model and evaluates on all difficulties
 # Usage: python eval_only.py model_sam_bs512.pt
 

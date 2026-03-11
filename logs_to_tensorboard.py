@@ -1,4 +1,4 @@
-# Convert existing experiment logs to TensorBoard format
+# Convert historical experiment logs to TensorBoard format.
 # Usage: python logs_to_tensorboard.py
 # Then: tensorboard --logdir runs/
 
@@ -15,7 +15,7 @@ LOG_FILES = [
     ("logs/exp_scale_wide.log", "scale_wide"),
     ("logs/exp_scale_up_big_gpu.log", "scale_up"),
     ("logs/exp_warmup.log", "warmup"),
-    ("logs/exp_cosine.log", "cosine"),  # NEW SOTA 84.0%
+    ("logs/exp_cosine.log", "cosine"),
     ("logs/exp_ema.log", "ema"),
 ]
 

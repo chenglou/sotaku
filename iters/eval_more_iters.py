@@ -20,7 +20,7 @@ RATING_BUCKETS = [
 ]
 
 
-def evaluate(model_path, exp_module='exp_faster_2drope', iter_counts=[16, 32, 64, 128],
+def evaluate(model_path, exp_module='iters.exp_baseline_lr2e3', iter_counts=[16, 32, 64, 128],
              max_test=5000, device='cuda', output_dir=None):
     import os
 
@@ -161,7 +161,7 @@ def evaluate(model_path, exp_module='exp_faster_2drope', iter_counts=[16, 32, 64
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("model_path", help="Path to model .pt file")
-    parser.add_argument("--exp", default="exp_faster_2drope")
+    parser.add_argument("--exp", default="iters.exp_baseline_lr2e3")
     parser.add_argument("--iters", type=int, nargs="+", default=[16, 32, 48, 64, 96, 128])
     parser.add_argument("--max-test", type=int, default=5000)
     parser.add_argument("--device", default="cuda")

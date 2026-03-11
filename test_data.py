@@ -1,5 +1,6 @@
-# Shared test data loading - matches nano-trm's approach exactly
-# Uses test.csv directly for fair comparison
+# Auxiliary comparison helper for nano-trm-style evaluation.
+# The canonical repo benchmark path uses load_dataset(..., split="test");
+# this script exists only for direct test.csv comparisons.
 
 import csv
 import torch

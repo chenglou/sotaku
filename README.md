@@ -1,6 +1,16 @@
 # Neural Sudoku Solver
 
-Experiments on various architectures to solve sudoku
+From-scratch experiments on iterative neural Sudoku solvers, with the current best model in `iters/exp_baseline_lr2e3.py`.
+
+## Current Status
+
+- **SOTA model:** `iters/exp_baseline_lr2e3.py`
+- **Benchmark:** `sapientinc/sudoku-extreme` via `load_dataset(..., split="test")`
+- **Best result:** **98.9%** puzzle accuracy at 1024 test-time iterations
+- **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
+- **Training setup:** BS=2048, LR=2e-3, 16 training iterations, cosine decay, reverse curriculum
+
+The headline number is a best-run result from an unseeded training run. Evaluation from a fixed checkpoint uses deterministic test subsampling in `iters/eval_more_iters.py`.
 
 ## Setup
 
@@ -9,78 +19,46 @@ python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 
-# Train SOTA model (auto-downloads sudoku-extreme from HuggingFace)
+# Train the current SOTA model
 python iters/exp_baseline_lr2e3.py
 
-# Evaluate at 1024 test-time iterations (98.9%)
+# Evaluate the trained checkpoint at 1024 test-time iterations
 python -c "from iters.eval_more_iters import evaluate; evaluate('model_baseline_lr2e3.pt', exp_module='iters.exp_baseline_lr2e3', iter_counts=[1024])"
 ```
 
-The training code can run on any GPU and provider, agnostically. I'm personally using Modal, with a small wrapper script (`modal_run.py`) that you don't have to use.
-
 ## Modal (Optional)
 
-For running on Modal's cloud GPUs:
+The core training code is provider-agnostic. For Modal:
 
 ```sh
 pip install modal
-modal token new  # authenticate (one-time)
+modal token new
 
-# Train SOTA (detached so it survives terminal close)
+# Train on Modal and keep the job alive if your client disconnects
 modal run --detach modal_run.py --exp iters.exp_baseline_lr2e3
 
-# Check outputs (modal app logs only works while app is active)
-modal volume ls sudoku-outputs
-
-# Download logs and outputs
+# Inspect outputs on the volume
 modal volume ls sudoku-outputs
 modal volume get sudoku-outputs model_baseline_lr2e3.pt .
 
-# Evaluate at 1024 test-time iterations
+# Evaluate the saved model
 modal run modal_eval.py --exp iters.exp_baseline_lr2e3 --model model_baseline_lr2e3.pt --iters 1024
 ```
 
-Experiments must have a `train(output_dir=".")` function. Modal deps are in `requirements-modal.txt` (minimal, no local CUDA).
+Experiments must expose `train(output_dir=".")`. Modal-specific deps are in `requirements-modal.txt`.
 
-## TensorBoard
+## Blessed Entry Points
 
-Convert experiment logs to TensorBoard format:
+- `iters/exp_baseline_lr2e3.py` - current SOTA training script
+- `iters/eval_more_iters.py` - canonical evaluation across test-time iteration counts
+- `analyze_failures_new.py` - per-iteration failure analysis for current models
+- `checkpoint_utils.py` - checkpoint discovery and config-checked resume
+- `modal_run.py` - minimal Modal training wrapper
+- `modal_eval.py` - Modal wrapper for `iters/eval_more_iters.py`
+- `modal_analyze.py` - Modal wrapper for analysis utilities
+- `iters/EXPERIMENTS_ITERS.md` - current source of truth for iteration-scaling results
 
-```sh
-python logs_to_tensorboard.py
-tensorboard --logdir runs/
-# Open http://localhost:6006
-```
-
-## Key Files
-
-- `iters/exp_baseline_lr2e3.py` - **SOTA**: 2D RoPE, 800K params, BS=2048, LR=2e-3 (98.9% at 1024 test iters)
-- `checkpoint_utils.py` - Checkpoint save/resume utilities (Modal preemption-safe)
-- `eval_extreme.py` - Evaluate on sudoku-extreme benchmark
-- `iters/` - Iteration experiments: scaling, interventions, spectral radius analysis, and [results](iters/EXPERIMENTS_ITERS.md)
-- `viz/` - Visualizations: attention patterns, head specialization, confidence/entropy evolution, collapse diagnostics across models, iteration scaling curves
-- `analyze_failures_new.py` - Per-iteration failure analysis (convergence, oscillation, per-position stats)
-- `test_data.py` - Test data loader using test.csv (matches nano-trm for fair comparison)
-- `EXPERIMENTS.md` - Full experiment log and results
-- `pos_embedding/` - Positional encoding experiments and [results](pos_embedding/EXPERIMENTS_POS.md)
-- `muon/` - Muon optimizer experiments and [results](muon/EXPERIMENTS_MUON.md)
-- `modal_run.py` - (Optional) Modal wrapper for running experiments on Modal GPUs
-- `modal_analyze.py` - (Optional) Modal wrapper for analysis/eval scripts
-- `requirements-modal.txt` - Minimal deps for Modal (no local CUDA libraries)
-- `logs_to_tensorboard.py` - Convert experiment logs to TensorBoard format (post-hoc)
-- `tensorboard_utils.py` - Real-time TensorBoard logging utility for experiments
-
-## Test Data
-
-For fair comparison with nano-trm, use `test_data.py` which loads test.csv directly:
-
-```python
-from test_data import load_test_csv
-test_data = load_test_csv(max_per_bucket=5000, device=device)
-# Returns dict: {'0': {'x': tensor, 'puzzles': [...], 'solutions': [...]}, '1-2': {...}, ...}
-```
-
-## Results (sudoku-extreme benchmark)
+## Results
 
 | Model | Params | Training Time | Accuracy |
 |-------|--------|---------------|----------|
@@ -88,4 +66,22 @@ test_data = load_test_csv(max_per_bucket=5000, device=device)
 | exp_baseline_lr2e3 (16 test iters) | 800K | ~2h40m (H200) | 81.8% |
 | [TRM](https://github.com/SamsungSAILMontreal/TinyRecursiveModels) (reference) | 7M | ~18h (L40S) | ~87% |
 
-The model uses sudoku-agnostic 2D RoPE (only knows it's a grid, no constraint structure). Training with BS=2048 produces a model that scales monotonically with test-time iterations — running 1024 iterations at test time (vs 16 during training) yields **98.9%** with no retraining and no collapse. LR=2e-3 is the sharp optimum: higher LRs (2.5e-3, 3e-3) cause oscillatory collapse, lower LRs (1e-3) stagnate at suboptimal fixed points. Jacobian spectral radius is >> 1 for all models including the stable one — convergence is entirely nonlinear (basin of attraction, not linear contractivity). See [iters/](iters/EXPERIMENTS_ITERS.md) for the full iteration scaling table, [EXPERIMENTS.md](EXPERIMENTS.md) for detailed analysis, [pos_embedding/](pos_embedding/EXPERIMENTS_POS.md) for positional encoding comparisons.
+The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row/col/box constraint embedding, just 2D RoPE in attention. Running more test-time iterations than used during training is the key result: 16 training iterations scales cleanly to 1024 evaluation iterations. Full scaling tables, stability analysis, interventions, and ablations live in [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
+
+## Auxiliary Utilities
+
+- `test_data.py` - comparison helper for loading `test.csv` directly; not the canonical benchmark path
+- `logs_to_tensorboard.py` - historical log conversion helper
+- `tensorboard_utils.py` - lightweight TensorBoard logger used by a few older experiments
+- `viz/` - plotting and visualization scripts for model behavior
+
+## Historical / Archived Code
+
+Older Kaggle and pre-`sudoku-extreme` experiments are preserved for reference, but they are not the current public path:
+
+- `STALE_EXPERIMENTS_DOC.md` - archived chronological experiment log
+- `arch/`, `recur/`, `curriculum/`, `misc/` - older experiment families
+- `pos_embedding/EXPERIMENTS_POS.md` - 2D RoPE introduction and positional-encoding ablations
+- `muon/EXPERIMENTS_MUON.md` - Muon optimizer experiments
+- `rrn/RRN_EXPERIMENTS.md` - RRN experiments
+- root-level scripts such as `eval_extreme.py`, `eval_only.py`, and `eval_difficulties.py` - archival only

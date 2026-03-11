@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+# ARCHIVED SCRIPT
+# Kaggle dataset download helper for the older local `data/sudoku-3m.csv` workflow.
+# The current repo uses `sapientinc/sudoku-extreme` from Hugging Face instead.
+
 import subprocess
 import os
 

@@ -2,7 +2,8 @@
 
 Experiments on test-time iteration scaling, adaptive stopping, and confound isolation.
 
-See the main [EXPERIMENTS.md](../EXPERIMENTS.md) for full results.
+This file is the current source of truth for sudoku-extreme iteration results.
+Older pre-sudoku-extreme experiments live in `../STALE_EXPERIMENTS_DOC.md`.
 
 ## Key Files
 

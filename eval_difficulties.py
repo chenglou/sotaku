@@ -1,3 +1,7 @@
+# ARCHIVED SCRIPT
+# Kaggle-era training/eval workflow kept for historical reference only.
+# Not part of the current sudoku-extreme SOTA path.
+
 # Zero-shot evaluation: Train on easy (difficulty 0), test on all difficulties
 # Uses our best config: SAM + BS=512
 

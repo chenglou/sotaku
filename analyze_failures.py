@@ -1,3 +1,7 @@
+# ARCHIVED SCRIPT
+# Failure analysis for the older `model_curriculum_reverse.pt` checkpoint.
+# Not part of the current sudoku-extreme SOTA workflow.
+
 # Failure analysis: What puzzles does the model get wrong and why?
 
 import torch
