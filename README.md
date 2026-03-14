@@ -1,6 +1,6 @@
-# Neural Sudoku Solver
+# Sotaku
 
-From-scratch experiments on iterative neural Sudoku solvers, with the current best model in `iters/exp_baseline_lr2e3.py`.
+From-scratch experiments on iterative neural Sudoku solvers. See [post](https://x.com/_chenglou/status/2032615500065419763)
 
 ## Current Status
 
