@@ -26,6 +26,18 @@ python iters/exp_baseline_lr2e3.py
 python -c "from iters.eval_more_iters import evaluate; evaluate('model_baseline_lr2e3.pt', exp_module='iters.exp_baseline_lr2e3', iter_counts=[1024])"
 ```
 
+## Reproduce The Released Checkpoint
+
+If you want the published 98.9% result without retraining:
+
+```sh
+gh release download baseline-lr2e3-checkpoint --pattern model_baseline_lr2e3.pt
+
+python -c "from iters.eval_more_iters import evaluate; evaluate('model_baseline_lr2e3.pt', exp_module='iters.exp_baseline_lr2e3', iter_counts=[1024])"
+```
+
+Expected result: `24728/25000` solved, or `98.9%`, at `1024` test-time iterations.
+
 ## Modal (Optional)
 
 The core training code is provider-agnostic. For Modal:
@@ -47,6 +59,33 @@ modal run modal_eval.py --exp iters.exp_baseline_lr2e3 --model model_baseline_lr
 
 Experiments must expose `train(output_dir=".")`. Modal-specific deps are in `requirements-modal.txt`.
 
+## Visualizations
+
+Main figure entry points:
+
+```sh
+# Attention maps, confidence evolution, entropy, head specialization
+python viz/visualize.py model_baseline_lr2e3.pt --exp iters.exp_baseline_lr2e3 --device cuda --n-iters 32
+
+# Iteration-scaling summary plots from the recorded experiment tables
+python viz/plot_iteration_scaling.py
+
+# Collapse diagnostics comparing multiple checkpoints
+python viz/plot_collapse_diagnostics.py \
+  model_baseline_lr2e3.pt model_baseline_lr3e3.pt model_baseline_lr1e3.pt \
+  --exps iters.exp_baseline_lr2e3 iters.exp_baseline_lr3e3 iters.exp_baseline_lr1e3 \
+  --output-dir viz/output
+```
+
+Outputs go to `viz/output/`.
+
+For GPU-backed collapse diagnostics on Modal:
+
+```sh
+modal run --detach viz/modal_viz.py
+modal volume get sudoku-outputs viz_diagnostics/ viz/output/
+```
+
 ## Blessed Entry Points
 
 - `iters/exp_baseline_lr2e3.py` - current SOTA training script
@@ -56,6 +95,9 @@ Experiments must expose `train(output_dir=".")`. Modal-specific deps are in `req
 - `modal_run.py` - minimal Modal training wrapper
 - `modal_eval.py` - Modal wrapper for `iters/eval_more_iters.py`
 - `modal_analyze.py` - Modal wrapper for analysis utilities
+- `viz/visualize.py` - attention/confidence/head-specialization figures for current models
+- `viz/plot_collapse_diagnostics.py` - hidden-state and prediction-stability diagnostics
+- `viz/plot_iteration_scaling.py` - static summary plots from the documented scaling tables
 - `iters/EXPERIMENTS_ITERS.md` - current source of truth for iteration-scaling results
 
 ## Results

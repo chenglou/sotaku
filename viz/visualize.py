@@ -1,7 +1,7 @@
 # Visualization of attention patterns, confidence evolution, and head specialization
 # for the iterative sudoku transformer.
 #
-# Usage: python viz/visualize.py model_bs2048_baseline.pt --exp iters.exp_bs2048_baseline
+# Usage: python viz/visualize.py model_baseline_lr2e3.pt --exp iters.exp_baseline_lr2e3
 #
 # Generates figures in viz/output/
 
@@ -353,7 +353,7 @@ def plot_attention_across_iterations(all_attention, query_cell, puzzle_str, solu
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('model_path', help='Path to model .pt file')
-    parser.add_argument('--exp', default='iters.exp_bs2048_baseline')
+    parser.add_argument('--exp', default='iters.exp_baseline_lr2e3')
     parser.add_argument('--n-iters', type=int, default=16, help='Number of iterations to run')
     parser.add_argument('--n-puzzles', type=int, default=20, help='Puzzles for head specialization')
     parser.add_argument('--device', default='cpu')
