@@ -423,4 +423,18 @@ B200 gpu_seconds: 172
 
 That control means the Viridian eval harness is not the problem. The Viridian-trained checkpoint learned the 16-iteration task about as expected, improved at 128 iterations, but collapsed by 1024 iterations. The likely problem is the custom Viridian training wrapper, which reimplements the training loop instead of calling the blessed `iters.exp_baseline_lr2e3.train()` path that reproduces on Modal.
 
+The pre-resume checkpoint already had the 1024-iteration collapse, so the guarded resume was not the cause:
+
+```text
+job: job_01KWFT6ADAMPY7D2VF7AH9BK90
+prefix: viridian-runner-probes/runs/sotaku-eval-step46297-quick-20260701-214333/
+checkpoint step: 46,297
+sample: 500 puzzles per rating bucket, 2,500 total
+16 iters: 1,984 / 2,500 solved = 79.36%
+128 iters: 1,993 / 2,500 solved = 79.72%
+1024 iters: 139 / 2,500 solved = 5.56%
+```
+
+The replacement path is `viridian/sotaku_serious_probe/repo/train_canonical.py` plus `viridian/sotaku_serious_probe/presign_canonical_train_r2.py`. That runner calls `iters.exp_baseline_lr2e3.train(output_dir=...)` directly and only handles Viridian/R2 concerns outside the training loop: slot claiming, optional checkpoint download for resume, background upload of the canonical log/checkpoints/final model, status, and duplicate-attempt skipping. This removes the custom training-loop fork as a variable. If canonical Viridian training still fails after that, the remaining suspect is a runtime/platform difference, e.g. the torch/CUDA/compiler stack.
+
 The Viridian eval harness now lives in `viridian/sotaku_serious_probe/repo/eval_sudoku_extreme.py`, with presigned-R2 job generation in `viridian/sotaku_serious_probe/presign_eval_r2.py`. It downloads the final checkpoint and SHA sidecar, verifies the SHA-256 before loading, runs the same bucketed test selection as `iters/eval_more_iters.py`, and writes compact `status.json`, `report.jsonl`, and `latest.json` objects under per-attempt R2 slots. Private presigned manifests and local job-spec temp dirs were deleted after the eval jobs finished.

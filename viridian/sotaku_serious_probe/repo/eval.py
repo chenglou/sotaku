@@ -232,6 +232,7 @@ def claim_artifact_slot(args, report_path):
         args.artifact_slot = None
         args.primary_status_get_url = ""
         args.checkpoint_uploads = None
+        args.artifact_uploads = []
         args.checkpoint_upload_index = 0
         return
 
@@ -266,6 +267,7 @@ def claim_artifact_slot(args, report_path):
         args.report_put_url = slot["report_put_url"]
         args.latest_put_url = slot["latest_put_url"]
         args.checkpoint_uploads = slot["checkpoints"]
+        args.artifact_uploads = slot.get("uploads", [])
         args.checkpoint_upload_index = 0
         append_event(
             report_path,
