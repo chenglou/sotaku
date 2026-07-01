@@ -1,0 +1,38 @@
+{
+  "customer": "self",
+  "baseline": {
+    "stack": {
+      "stack": [
+        {
+          "gen": 0,
+          "job": "seed",
+          "bytes": 0,
+          "parent": null,
+          "digest": "sha256:30d25828206fa95d60dcae88384d3ad0a1e5b7f2f89f0d7bf6e22e94d356beb4"
+        }
+      ]
+    }
+  },
+  "contract": {
+    "eval_cmd": "python3 eval.py",
+    "metric": "split_line_count",
+    "direction": "max"
+  },
+  "gpu_tier": "l4",
+  "agents": 0,
+  "margin": 0.0001,
+  "limits": {
+    "max_gens": 1,
+    "budget": 1000000,
+    "turn_timeout_s": 60,
+    "gpu_timeout_s": 30
+  },
+  "data": {
+    "split": {
+      "dataset": "ds_01KWE9EE4XGYF1M5H1V43FRF5R",
+      "val": 0.2,
+      "test": 0.2,
+      "seed": 7
+    }
+  }
+}

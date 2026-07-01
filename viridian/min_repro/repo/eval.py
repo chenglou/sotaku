@@ -1,0 +1,1 @@
+print("METRIC: 1")

@@ -1,0 +1,41 @@
+{
+  "customer": "self",
+  "baseline": {
+    "stack": {
+      "stack": [
+        {
+          "gen": 0,
+          "job": "seed",
+          "bytes": 0,
+          "parent": null,
+          "digest": "sha256:2275b61551bf5973df82c52b5c3920514c119ab47a6b00a5c1fae865e17b74fe"
+        }
+      ]
+    }
+  },
+  "contract": {
+    "eval_cmd": "python3 viridian_probe.py --seconds 180 --checkpoint-every 30 --matrix-size 1024",
+    "metric": "completed_steps",
+    "direction": "max",
+    "proxy_frac": 0.1,
+    "env_locked": {},
+    "guards": {
+      "cmd": null,
+      "params_max": null
+    },
+    "locked_paths": [
+      "viridian_probe.py"
+    ]
+  },
+  "gpu_tier": "h100",
+  "agents": 0,
+  "margin": 0.0001,
+  "squash_every": 8,
+  "patience": 1,
+  "limits": {
+    "max_gens": 1,
+    "budget": 1000000,
+    "turn_timeout_s": 300,
+    "gpu_timeout_s": 240
+  }
+}

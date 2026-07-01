@@ -1,0 +1,41 @@
+{
+  "customer": "self",
+  "baseline": {
+    "stack": {
+      "stack": [
+        {
+          "gen": 0,
+          "job": "seed",
+          "bytes": 0,
+          "parent": null,
+          "digest": "sha256:9bc37fa2051309b9466f2005a5153721f8356e05d9c4794650c9b27ad1157945"
+        }
+      ]
+    }
+  },
+  "contract": {
+    "eval_cmd": "python3 eval.py",
+    "metric": "cuda_smoke",
+    "direction": "max",
+    "proxy_frac": 0.1,
+    "env_locked": {},
+    "guards": {
+      "cmd": null,
+      "params_max": null
+    },
+    "locked_paths": [
+      "eval.py"
+    ]
+  },
+  "gpu_tier": "l4",
+  "agents": 0,
+  "margin": 0.0001,
+  "squash_every": 8,
+  "patience": 1,
+  "limits": {
+    "max_gens": 1,
+    "budget": 1000000,
+    "turn_timeout_s": 120,
+    "gpu_timeout_s": 120
+  }
+}

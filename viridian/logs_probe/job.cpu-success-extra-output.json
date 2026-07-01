@@ -1,0 +1,30 @@
+{
+  "customer": "self",
+  "baseline": {
+    "stack": {
+      "stack": [
+        {
+          "gen": 0,
+          "job": "seed",
+          "bytes": 0,
+          "parent": null,
+          "digest": "sha256:dce11cbd09a1f43aa533a1ec4a501fb86715be792b537c71c693fd4aa42e8987"
+        }
+      ]
+    }
+  },
+  "contract": {
+    "eval_cmd": "bash -lc 'echo LOG_SUCCESS_STDOUT_20260630; echo LOG_SUCCESS_STDERR_20260630 >&2; echo METRIC: 123'",
+    "metric": "log_probe",
+    "direction": "max"
+  },
+  "gpu_tier": "cpu",
+  "agents": 0,
+  "margin": 0.0001,
+  "limits": {
+    "max_gens": 1,
+    "budget": 1000000,
+    "turn_timeout_s": 60,
+    "gpu_timeout_s": 10
+  }
+}
