@@ -1,0 +1,3 @@
+# Local job artifacts: baseline tarballs and job.json files containing live
+# presigned R2 URLs (24h PUT/GET grants) — never commit these.
+jobs/

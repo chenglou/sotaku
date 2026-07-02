@@ -34,7 +34,7 @@ The first longer B200 Sotaku pilot also proved the real Hugging Face path, but i
 r2:sotaku-viridian/viridian-runner-probes/runs/sotaku-serious-b200-20260701-101911/archive/pre-conflict-step-20198/
 ```
 
-For future long runs, use the `attempt-slots` layout in `sotaku_serious_probe/`. Each eval attempt claims a separate R2 slot with a conditional lease write, then writes reports and checkpoints under that slot. Treat any `latest` key as a convenience pointer, not the source of truth.
+The duplicate-evaluator platform bug behind that conflict is fixed (confirmed by the Viridian author), so the attempt-slot defense from `sotaku_serious_probe/` is retired. For training runs, use `viridian/train/submit.py`: one output prefix per job, step-specific checkpoint files with SHA-256 sidecars, and automatic resume from the newest verified checkpoint on restart. Treat any `latest` key as a convenience pointer, not the source of truth.
 
 ## Files
 
