@@ -126,6 +126,33 @@ Stable test-time iteration scaling (more iters → monotonically better accuracy
 
 The overall picture: stability comes from landing in a flat minimum where the nonlinear iteration dynamics converge (despite the Jacobian spectral radius being >> 1 everywhere — convergence is nonlinear, not linear). Gradient noise (BS), learning rate, and model capacity all control whether training finds that minimum. It's a narrow target — most hyperparameter changes break it.
 
+**Important caveat (July 2026):** these conditions are necessary but not sufficient. See the Reproducibility section below — with all six conditions satisfied, fresh runs settle only a fraction of the time.
+
+## Reproducibility (July 2026)
+
+A reproduction attempt on external GPUs collapsed at 1024 test iterations, which triggered a systematic study: 12 fresh runs of the two stable-band configs (exp_baseline_lr2e3 and exp_bs2048_baseline), across two platforms (Modal H200, Viridian B200), two training-loop implementations (the canonical `train()` and an independently recreated loop, proven mathematically identical in distribution), seeded and unseeded, interrupted-and-resumed and uninterrupted. Training data was digest-verified identical, and the Modal runs used the same cached image (torch 2.10.0) as the February originals.
+
+Results at 1024 test iterations (all runs scored ~81% at 16 iterations — the 16-iteration objective gives no signal about long-iteration fate):
+
+| run | config | platform | clean? | @1024 |
+|---|---|---|---|---|
+| Feb 2026 originals | lr2e3 / bs2048 / mixed / 3phase_40k | H200 | yes | **98.9 / 98.1 / 97.3 / 95.9** |
+| Mar 17 (undocumented until now) | lr2e3 + mixed sampling | H200 | resumed at 35K | 1.3% |
+| Jul: recreated loop | lr2e3 | B200 | resumed at 46K | 5.8% |
+| Jul: canonical loop | lr2e3 | B200 | resumed at 40K | **96.0%** |
+| Jul: rerun | lr2e3 | H200 | resumed at 45K | 0.2% |
+| Jul: rerun | bs2048 (1.5e-3) | H200 | resumed at 35K | 0.0% |
+| Jul: seeds 101/202/303 | lr2e3 | B200 | resumed at 45K | 3.0 / 0.1 / 0.0 |
+| Jul: seed 101 | bs2048 (1.5e-3) | B200 | resumed at 45K | 0.1% |
+| Jul: clean A / B | lr2e3 | H200 | yes | 5.4 / **92.3** |
+| Jul: clean A / B | bs2048 (1.5e-3) | H200 | yes | 31.2 / 1.2 |
+
+What this rules out: the recreated training loop (identical in law, and both loops appear in both outcome columns), the platform and torch version (both platforms appear in both columns), the learning rate within the stable band (1.5e-3 collapsed clean, twice), seeding, and mid-run interruption (clean runs collapse at the same rate as resumed ones). What remains: July 2026 fresh runs settle roughly 2 in 12 (~17%) with everything we control held fixed, versus February's 4 of 4. That February-vs-July split is the one statistically significant pattern (p≈0.008) and is unexplained — candidate causes are GPU-fleet changes between February and July (driver versions were never logged, so this is unrecoverable) or February being a lucky streak softened by its four runs being four different configs (exp_3phase_40k stops at 40K steps before the deep anneal and may be robust by construction; it was flat at 95.9% from 512 through 2048 iterations).
+
+Two facts about trajectories, from evaluating intermediate checkpoints of the July runs: the long-iteration property swings wildly during training while the training loss stays smooth (one collapsing run read 18% → 92.5% → 2.2% at 1024 iterations across steps 32K → 34K → 36K), and the final basin is not decided until the very end of annealing (the one settling B200 run read 7.2% at step 40K and finished at 96.0%).
+
+Practical recipe for reproducing a 98%-class model until the February-vs-July question is resolved: train several runs (each ~2h40m on H200), evaluate every 5K-step checkpoint at 1024 iterations during the anneal tail, and keep the best checkpoint rather than trusting the final one — collapsed runs routinely contain stable mid-anneal checkpoints (e.g. 92.5% at step 34K inside a run that finished at 5.8%). For an already-collapsed model, per-puzzle peak-confidence stopping recovers most of the loss (1.3% → 94.3% on the March run). Never launch training through a connection-holding client (see AGENTS.md on `spawn` vs `.remote()`), and expect any run interrupted by infrastructure to need its trajectory re-verified, not just resumed.
+
 ## Test-Time Interventions (No Retraining)
 
 Test-time modifications to the forward pass to see if iteration collapse can be fixed without retraining.
