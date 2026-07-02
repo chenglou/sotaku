@@ -10,7 +10,7 @@ From-scratch experiments on iterative neural Sudoku solvers. See [post](https://
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** BS=2048, LR=2e-3, 16 training iterations, cosine decay, reverse curriculum
 
-The headline number is a best-run result from an unseeded training run, and retraining does not reliably reproduce it: a 12-run study in July 2026 found fresh runs of this exact config (same code, data, and image) settle into stable 1024-iteration behavior only ~2 times in 12, with the rest collapsing at long test-time iteration despite normal 16-iteration accuracy. To reproduce a 98%-class model, train several runs and keep the best 1024-iteration checkpoint — see the Reproducibility section of `iters/EXPERIMENTS_ITERS.md` for the full study and recipe. Evaluation from a fixed checkpoint is deterministic and reproduces exactly (test subsampling in `iters/eval_more_iters.py`).
+The headline number came from the best of several unseeded training runs, and retraining does not reliably reproduce it. In a July 2026 study, 12 fresh runs of this exact configuration (same code, data, and dependencies) produced a model that stays accurate at 1024 test-time iterations only 2 times out of 12. The other runs looked completely normal at 16 iterations but degraded badly when iterated longer. To get a model above 98%, train several runs, evaluate each saved checkpoint at 1024 iterations, and keep the best checkpoint — the Reproducibility section of `iters/EXPERIMENTS_ITERS.md` has the full study and recipe. Evaluating a fixed checkpoint, on the other hand, is deterministic and reproduces exactly (test subsampling in `iters/eval_more_iters.py`).
 
 ## Setup
 
