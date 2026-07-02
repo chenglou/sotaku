@@ -29,7 +29,7 @@ From that point onward, new experiments were based on **SAM/AdamW** rather than 
 
 All runs: d_model=128, n_layers=4, n_iterations=16, batch_size=4096, cosine LR. Muon weight_decay=0.0 unless noted.
 
-- Reverse curriculum (hard→easy), all‑Muon, no grad clip: lr 1.5e‑3 (75.8%), 2e‑3 (78.8%), 3e‑3 (80.8%), 5e‑3 (82.9%), 7e‑3 (82.9%), 9e‑3 (running).
+- Reverse curriculum (hard→easy), all‑Muon, no grad clip: lr 1.5e‑3 (75.8%), 2e‑3 (78.8%), 3e‑3 (80.8%), 5e‑3 (82.9%), 7e‑3 (82.9%), 9e‑3 (diverged: NaN loss, 0%). An undocumented lr=2e‑2 no‑clip run also diverged with NaN around step 12.6K (exp_muon_lr02.log on the outputs volume).
 - Reverse curriculum, all‑Muon, grad clip=1.0: lr 2e‑2 (exploded).
 - Mixed sampling (no phases), all‑Muon, no grad clip: lr 1e‑2 and 2e‑2 (exploded).
 - Mixed sampling, all‑Muon, grad clip=1.0: lr 1e‑2 (exploded).
@@ -37,7 +37,7 @@ All runs: d_model=128, n_layers=4, n_iterations=16, batch_size=4096, cosine LR. 
 
 ## Current choice
 
-Reverse curriculum, all‑Muon, lr=5e‑3, no grad clip, no mixed, no split. lr=7e‑3 matched it; lr=9e‑3 still running.
+Reverse curriculum, all‑Muon, lr=5e‑3, no grad clip, no mixed, no split. lr=7e‑3 matched it; lr=9e‑3 diverged (NaN).
 
 ## Conclusion
 
