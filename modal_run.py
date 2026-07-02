@@ -29,6 +29,9 @@ image = (
     gpu="H200",
     cpu=8.0,  # more cores for data loading with mp.Pool
     timeout=24 * 60 * 60,  # 24 hours (max)
+    # Restart on worker loss instead of dying; experiments auto-resume from their
+    # latest checkpoint in /outputs at function start.
+    retries=modal.Retries(max_retries=3, initial_delay=10.0),
     volumes={
         "/hf_cache": hf_cache_volume,
         "/outputs": outputs_volume,
@@ -47,24 +50,35 @@ def run_training(
 
     sys.path.insert(0, "/root/project")
 
-    # Dynamically import the experiment module
-    exp_module = importlib.import_module(exp_name)
+    # A reused container (e.g. a retry after worker loss) needs an explicit refresh
+    # before find_latest_checkpoint() inspects the volume.
+    outputs_volume.reload()
+    try:
+        # Dynamically import the experiment module
+        exp_module = importlib.import_module(exp_name)
 
-    result = exp_module.train(output_dir="/outputs")
+        result = exp_module.train(output_dir="/outputs")
 
-    # Volumes auto-persist on function exit
-    print(f"\nResult: {result}")
-    print("\nOutputs saved to 'sudoku-outputs' volume.")
-    print("Run 'modal volume ls sudoku-outputs' to see files.")
-    print("Run 'modal volume get sudoku-outputs <filename>' to download.")
+        print(f"\nResult: {result}")
+        print("\nOutputs saved to 'sudoku-outputs' volume.")
+        print("Run 'modal volume ls sudoku-outputs' to see files.")
+        print("Run 'modal volume get sudoku-outputs <filename>' to download.")
 
-    return result
+        return result
+    finally:
+        # Persist the latest checkpoint/log writes promptly, including on errors.
+        outputs_volume.commit()
 
 
 @app.local_entrypoint()
 def main(
     exp: str = "iters.exp_baseline_lr2e3",
 ):
+    # spawn (fire-and-forget), not .remote(): a .remote() client holds a live connection
+    # for the whole run, and when that connection breaks (laptop sleep, network blip)
+    # the exiting client CANCELS the input — even under `modal run --detach`. Three
+    # training runs died this way on 2026-07-02. With spawn, no client needs to stay up.
     print(f"Running experiment: {exp}")
-    result = run_training.remote(exp_name=exp)
-    print(f"\nReturned from Modal: {result}")
+    call = run_training.spawn(exp_name=exp)
+    print(f"Spawned function call: {call.object_id}")
+    print("Training continues server-side; poll the experiment's .log on the sudoku-outputs volume for progress.")

@@ -1,7 +1,31 @@
 import os
 import re
 import glob
+import tempfile
 import torch
+
+
+def atomic_torch_save(data, path):
+    """Save a torch artifact without exposing a partially-written final path.
+
+    Writes to a temporary sibling file and renames only the complete snapshot into
+    place. Use this for checkpoints that a concurrent reader may consume mid-write,
+    e.g. an upload thread syncing output_dir to remote storage.
+    """
+    output_dir = os.path.dirname(path) or "."
+    os.makedirs(output_dir, exist_ok=True)
+    fd, temp_path = tempfile.mkstemp(
+        prefix=f".{os.path.basename(path)}.",
+        suffix=".tmp",
+        dir=output_dir,
+    )
+    os.close(fd)
+    try:
+        torch.save(data, temp_path)
+        os.replace(temp_path, path)
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
 
 def find_latest_checkpoint(output_dir, checkpoint_prefix):

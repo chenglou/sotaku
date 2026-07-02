@@ -10,7 +10,8 @@ See `README.md` for the current SOTA path, key files, and headline results.
 
 - Use `modal run --detach ...` for training so runs survive client disconnection.
 - `--detach` is also the safer default for longer eval and analysis runs.
-- Modal can preempt GPU workers at any time, and GPU jobs cannot opt out. Modal automatically restarts a preempted job with the same input, but design training to resume from checkpoints.
+- Modal can preempt GPU workers at any time, and GPU jobs cannot opt out. A preempted job restarts with the same input only when the function sets `retries=` (modal_run.py does), so design training to resume from checkpoints.
+- Launch training with the spawn-based entrypoint in modal_run.py plus `--detach`. A `.remote()`-style client holds a connection for the whole run and cancels the input if that connection breaks (laptop sleep, network blip) — this killed three runs on 2026-07-02 and looks deceptively like preemption in the logs.
 - Modal's default function timeout is 5 minutes, so set a longer timeout for training. In practice this repo uses the 24h maximum.
 - Volumes persist indefinitely without automatic eviction; treat the output volume as the source of truth for checkpoints and logs.
 - A local output stream can die while the Modal worker keeps running. Check `modal container list` and `modal volume ls` for true status.
