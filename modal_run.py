@@ -50,6 +50,20 @@ def run_training(
 
     sys.path.insert(0, "/root/project")
 
+    # Record the runtime environment durably on the volume: the February-vs-July 2026
+    # reproducibility question (iters/EXPERIMENTS_ITERS.md) was unanswerable because no
+    # run recorded its driver, and Modal's app logs are garbage-collected within months.
+    import datetime
+    import subprocess
+    import torch
+    smi = subprocess.run(["nvidia-smi"], capture_output=True, text=True).stdout
+    driver_line = next((l.strip() for l in smi.splitlines() if "Driver Version" in l), "nvidia-smi unavailable")
+    env_line = (f"{datetime.datetime.utcnow().isoformat()}Z | {exp_name} | "
+                f"torch {torch.__version__}, cuda {torch.version.cuda} | {driver_line}")
+    print(env_line)
+    with open("/outputs/env_runs.log", "a") as env_log:
+        env_log.write(env_line + "\n")
+
     # A reused container (e.g. a retry after worker loss) needs an explicit refresh
     # before find_latest_checkpoint() inspects the volume.
     outputs_volume.reload()
