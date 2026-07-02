@@ -1,51 +1,33 @@
 # Viridian Docs Issues
 
-Remaining issues after comparing the old notes with the newly downloaded docs on 2026-07-01. Resolved items were removed.
+Remaining issues after rechecking against the platform on 2026-07-02 (post the duplicate-evaluator fix). Resolved items were removed. Recheck jobs: failing-eval probe `job_01KWGHY2GNWQ4SQQMRZ2J4GC7K` (exit 7, CPU), plus `/logs` queries against running, succeeded, and killed jobs from 2026-07-01/02.
 
-## `/v1/jobs/{id}/logs` Does Not Show Eval Output
+Resolved since the 2026-07-01 pass:
 
-The docs say `GET /v1/jobs/{id}/logs` returns captured eval stdout/stderr and should help debug failed evals. I could not reproduce that behavior for runner jobs.
+- `/logs` now returns per-attempt stdout/stderr for failing evals, live during the retry window (entries appeared within 30s of the first attempt). The old "no early debug signal for failed runner jobs" issue is fixed.
+- `gpu_timeout_s` bounds are now documented: hard cap, clamped to a 2-hour platform max on the GPU plane, 50 minutes on `rtx6000`.
 
-Tested jobs:
+## `/v1/jobs/{id}/logs` Is Empty for Long-Running and Committed Evals
 
-- CPU success with stdout, stderr, and `METRIC`: `job_01KWE7MEGW8232JHTYWG9JJCXJ`
-- L4 success with stdout, stderr, and `METRIC`: `job_01KWE7ND4CVGY6T5X4NYEYMPBB`
-- CPU failure with stdout, stderr, and exit 7: `job_01KWE7GMTJK4ACE0FK13B5BK45`
-- L4 failure with stdout, stderr, and exit 7: `job_01KWE7QAT05WYQD2YCJE1T6QQX`
+Logs are captured per completed attempt. Two cases still return `{ "entries": [] }`:
 
-All four returned:
+- A long eval that is still executing (tested: a running ~2h B200 training job) — so you cannot tail a training run's stdout through `/logs`; exporting the log over the network from inside the eval remains the only live channel.
+- Succeeded evals after their result is committed (tested on several finished jobs, including one killed at the 2h cap that ended `converged` with score 0 — arguably a failure whose logs should persist per the docs).
 
-```json
-{ "entries": [] }
-```
+The docs say pruning applies to generations that *succeeded* and that "the logs that matter for debugging, the failing ones, persist". The 2h-killed job's logs did not persist. The docs should state precisely when logs appear (attempt completion) and when they are pruned.
 
-I rechecked this after the R2 resume probe on 2026-07-01. These current jobs also returned zero log entries:
+## 2-Hour GPU-Plane Cap: Docs, Author, and Behavior Disagree
 
-- R2 fresh checkpoint upload: `job_01KWECTGRT2BJ5JWQP76CNG2YR`
-- R2 checkpoint resume: `job_01KWECX497D4G7V9EZW25AZ2T9`
-- L4 success with stdout/stderr: `job_01KWE7ND4CVGY6T5X4NYEYMPBB`
-- B200 Sotaku tiny fresh: `job_01KWEENZVZJGB1VH31Z6007C6V`
-- B200 Sotaku tiny resume: `job_01KWEF5091J35YFCJA69EXBXEZ`
+Three sources conflict:
 
-So either logs are not wired up for runner evals, or the docs should say when logs are available.
+- The docs (fetched 2026-07-02) say `gpu_timeout_s` clamps to a 2-hour platform max on the GPU plane.
+- The platform author says the cap applies only to `rtx6000` (whose documented cap is 50 minutes, which is a further inconsistency).
+- Measured behavior before the duplicate-evaluator fix: two B200 training evals were killed at +7,175s and +7,195s after eval start (`job_01KWEQSQ66XJ1CBN1961Y9T2VA`, `job_01KWG0GXAEX9KC6KK60XTX3631`) — consistent with a 2h limit, possibly as a side effect of the abandoned synchronous-call pathology the fix addressed.
 
-## Failed Runner Jobs Still Have No Early Debug Signal
+Verified 2026-07-02 ~05:50 UTC: the cap is real and applies to `b200`, post-fix. All four B200 training jobs launched 03:38 UTC (after the duplicate-evaluator fix) died at ≈7,200s of eval time (last log lines at steps 45,700-46,400, ≈2h at ~6.3 steps/s; jobs `job_01KWGEGJH53BEEWRBPAGEMM1N0`, `job_01KWGEGMJMF6BYF9AV88QM173X`, `job_01KWGEGRBBPKAVVC2MNHDZ5ZVX`, `job_01KWGEGWP9SVJ0WMDBM6AMD3FN`). That makes six kills at 7,200±70s across two days. The docs' clamp language is accurate; the author's "rtx6000 only" statement is not. Likely home: a fixed timeout on the B200-plane Modal function.
 
-The failing CPU and L4 jobs stayed in this state during the early retry window:
+## Job Killed at the Cap Reports `converged` with Score 0 — or Never Flips at All
 
-```text
-status: running
-gen: 0
-score: null
-last_error: null
-spend: {}
-logs: []
-```
+The B200 job killed at +7,195s on 2026-07-02 ended as `converged` with score `0.0` (no `METRIC:` line was ever printed — the eval was killed mid-training). A kill with no metric should surface as `failed` (or a distinct timeout status), not `converged`; `converged` at score 0 reads like a successful run of a bad model.
 
-The docs now explain this state, which is useful. But without `/logs` or an early error message, users still cannot tell whether the command crashed, failed to print `METRIC:`, referenced a missing file, or hit some other eval setup problem.
-
-## `gpu_timeout_s` Bounds Are Still Unclear
-
-The docs say `gpu_timeout_s` is the per-eval timeout. They do not say whether there is a hard maximum or recommended range.
-
-For training-style jobs, users need to know whether setting `gpu_timeout_s` to hours or days is valid, or whether the intended pattern is to set a long timeout and cancel jobs manually.
+Worse, the four cap-killed jobs from later that day (ids above) never left `running`: 90+ minutes after their evals died, `GET /v1/jobs` still reported all four as `running` at gen 0. A customer watching job status has no signal that training is gone; the only tell is their own exported telemetry going stale.

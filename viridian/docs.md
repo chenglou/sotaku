@@ -101,8 +101,10 @@ The CPU tier also pins `OMP_NUM_THREADS` = `MKL_NUM_THREADS` = `OPENBLAS_NUM_THR
 
 ## Network access
 
-- **GPU tiers** (`l4`, `a100`, `h100`, `b200`) — your eval **has outbound network**. It can `curl` / `PUT` to your own storage; this is how you export checkpoints and logs.
+- **GPU tiers** (`l4`, `a100`, `rtx6000`, `h100`, `b200`) — your eval **has outbound network**. It can `curl` / `PUT` to your own storage; this is how you export checkpoints and logs.
 - **CPU tier** — the eval runs with **no network**. It can only read its inputs and print the metric.
+
+**Downloading inputs?** The worker runs from a datacenter IP with a default `Python-urllib` / `curl` User-Agent, and some file hosts (e.g. Filebin) serve a small bot-protection HTML page to those instead of the file. Set a normal browser User-Agent, follow redirects, and **verify the download** — check the byte size / content-type / magic bytes before using it — so a wrong body fails loudly instead of silently. Presigned S3/GCS URLs are the reliable choice.
 
 ## What is not persisted
 
@@ -134,7 +136,7 @@ or over the API:
 
 - `val` and `test` are **fractions** of the file's lines; `seed` seeds the split.
 - The split is **contiguous** to avoid leakage: train = the head, val = the next block, **test = the tail — and the test split is never placed in the sandbox.** Your eval sees only `data/train.txt` and `data/val.txt`.
-- Only `split` is supported today. `explicit` (separate train/val/test dataset ids) returns **501 Not Implemented**.
+- `split` derives train/val from one dataset; `explicit` takes three of your own dataset ids verbatim: `{"explicit": {"train": "ds_…", "val": "ds_…", "test": "ds_…"}}` — they land as `data/train.txt`, `data/val.txt`, `data/test.txt`. All three must be committed datasets you own.
 
 If your repo is self-contained (your eval brings its own data), **omit `data` entirely.**
 
@@ -157,14 +159,14 @@ The body of `POST /v1/jobs` (and the file `vd submit` sends). Every field:
   (Also accepts `{"git":{"git_url","rev"}}`, and `{"job":{"job":"job_…"}}` to fork another job.)
 - **`contract`** (required) — the eval contract (below).
 - **`agents`** (required, integer) — rollouts per generation. `0` = runner mode.
-- **`gpu_tier`** (required) — one of `cpu`, `l4`, `a100`, `h100`, `b200`.
+- **`gpu_tier`** (required) — one of `cpu`, `l4`, `a100`, `rtx6000`, `h100`, `b200`. (`rtx6000` = Blackwell workstation silicon on our GCP plane — budget Blackwell; its evals cap at 50 min.)
 - **`limits`** (required) — `{ turn_timeout_s, gpu_timeout_s, max_gens, budget }` (below).
 - **`margin`** (required, number) — smallest metric improvement worth promoting. `0` = promote on any improvement.
 - **`data`** (optional) — a dataset reference (see **Datasets**); omit for self-contained repos.
 - **`goal`** (optional) — the objective handed to the coding agent (optimizer mode). Omit for runner jobs.
 - **`patience`** (optional, default `5`) — consecutive generations with no promotion before `converged`. `0` = never converge on a plateau.
 - **`name`**, **`campaign`** (optional) — labels; metadata only, no effect on execution.
-- **`compute`** (optional) — the name of a BYO Slurm-over-SSH compute connection; omit to use Viridian's compute.
+- **`compute`** (optional) — the name of a BYO compute connection registered in your workspace (`POST /v1/compute`); the connection's own `type` decides the backend (`slurm-ssh` today, more types later). Omit to use Viridian's compute.
 - **`customer`** — ignored (taken from your key); send any placeholder such as `"self"`.
 
 ## `contract` (the eval contract)
@@ -182,7 +184,7 @@ There is no `train_cmd`. `proxy_frac` and `squash_every` are accepted for back-c
 ## `limits`
 
 - **`turn_timeout_s`** — per-agent-turn timeout, seconds (floored to a backend minimum).
-- **`gpu_timeout_s`** — per-eval timeout, seconds.
+- **`gpu_timeout_s`** — the per-eval **hard cap**, in seconds: the eval is killed if it runs longer. Honored up to a platform max of **2 hours (7200s)** on the GPU plane (larger values clamp there). For training that needs longer, checkpoint to your own storage and resume across jobs, or use a BYO compute connection.
 - **`max_gens`** — generation cap; hitting it → `maxed`. Use `1` for a one-shot runner job.
 - **`budget`** — spend cap in **micro-dollars** (`1000000` = one dollar). `0` = **uncapped** (runs until cancelled or converged).
 
@@ -206,7 +208,7 @@ There is no `train_cmd`. `proxy_frac` and `squash_every` are accepted for back-c
 
 ## Enum values
 
-- **`gpu_tier`**: `cpu` · `l4` · `a100` · `h100` · `b200`
+- **`gpu_tier`**: `cpu` · `l4` · `a100` · `rtx6000` · `h100` · `b200`
 - **`direction`**: `min` · `max`
 - **job `status`**: `pending` · `running` · `converged` · `maxed` · `budget_out` · `failed` · `cancelled`
 
@@ -247,8 +249,8 @@ A job `running` at **generation 0 with `score: null` and `spend: 0`** is stuck o
 
 What to check:
 
-- `GET /v1/jobs/{id}` → `current.last_error` carries the reason **once the job flips to `failed`**. Important: while it is *still* retrying at gen 0, `last_error` may be empty — the job sits at `running`, `score: null`, `spend: 0` until the failure window (≈ 30 minutes by default) elapses, then becomes `failed` with the error filled in. A stale, unchanging gen-0 job is the live "stuck" signal.
-- `GET /v1/jobs/{id}/logs` → your eval's captured stdout/stderr per generation. A stack trace or a missing `METRIC:` shows up here.
+- **`GET /v1/jobs/{id}/logs`** → your eval's own stdout/stderr, per generation — where a stack trace, a missing `METRIC:` line, a failed download, or a non-zero exit shows up. It's populated **as soon as the eval runs**, during the retry window (before the job flips to `failed`), and works for runner (`agents: 0`) jobs too. This is your primary debugging tool. (Scratch from generations that *succeeded* may be pruned once their result is committed — the logs that matter for debugging, the failing ones, persist.)
+- `GET /v1/jobs/{id}` → `current.last_error` carries a one-line reason, but only **once the job flips to `failed`**; while it's still retrying at gen 0 it sits at `running`, `score: null`, `spend: 0` with `last_error` empty — so use `/logs` above to see what's wrong during that window. A stale, unchanging gen-0 job is the live "stuck" signal.
 - Fastest check of all: run your `eval_cmd` yourself inside `repo/` and confirm it prints exactly one `METRIC: <number>` line and exits 0.
 
 ## Billing & budgets
@@ -258,18 +260,19 @@ Everything is priced in **micro-dollars** (µ$): `1000000` µ$ = one dollar.
 ## What you pay for
 
 - **GPU-seconds** — wall-clock time your `eval_cmd` runs on a GPU, per tier. This is the dominant cost for GPU jobs. It counts the eval subprocess's runtime (your `import torch`, model load, and compute) plus repo extraction. It does **not** count container cold-start, image pull, or teardown — those are on us. A transport-level retry (if a plane is unreachable) and evals that error after consuming GPU time both still count.
-- **Tokens** — for the coding agents (optimizer mode). Viridian's self-hosted policy model is **free**; a fraction of rollouts use a Claude teacher model billed at standard Anthropic rates. Runner jobs (`agents: 0`) spend **no** tokens.
-- **CPU tier** — bills **no** GPU-seconds, and policy tokens are free, so CPU runner jobs are effectively free.
+- **Tokens** — for the coding agents (optimizer mode). Viridian's self-hosted policy model bills at **GPU-time cost recovery**: ≈ $2 / Mtok in, ≈ $40 / Mtok out (the serving pool's hourly cost over its throughput). A fraction of rollouts use a Claude teacher model billed at standard Anthropic rates. Runner jobs (`agents: 0`) spend **no** tokens.
+- **CPU tier** — cheap, not free: eval seconds bill at the `cpu` rate below (a sandbox slot on our fleet).
 
-## Approximate GPU rates
+## Approximate compute rates
 
+- `cpu` — ≈ $0.11 / hr
 - `l4` — ≈ $0.80 / hr
 - `a100` — ≈ $2.50 / hr
+- `rtx6000` — ≈ $3.42 / hr
 - `h100` — ≈ $3.95 / hr
 - `b200` — ≈ $6.25 / hr
-- `cpu` — free
 
-GPU-seconds are truncated to whole seconds, so a sub-second eval bills 0. The live per-tier menu is `GET /v1/tiers`.
+GPU-seconds are truncated to whole seconds (CPU eval seconds round up). The live per-tier menu is `GET /v1/tiers`.
 
 ## Budgets
 
@@ -299,7 +302,7 @@ curl -fsS -T checkpoint.pt "https://<your-presigned-url>"
 # or, in Python:  requests.put(url, data=open("report.jsonl","rb"))
 ```
 
-- GPU tiers (`l4` / `a100` / `h100` / `b200`) have outbound network — use S3/GCS presigned URLs or your own endpoint.
+- GPU tiers (`l4` / `a100` / `rtx6000` / `h100` / `b200`) have outbound network — use S3/GCS presigned URLs or your own endpoint.
 - The **CPU tier has no network**, so it cannot upload; use a GPU tier for jobs that must export checkpoints.
 - There is no built-in artifact-upload hook — this pattern is the supported way to capture training outputs.
 
@@ -359,6 +362,73 @@ vd dataset rm <id>               delete a dataset
 
 Job actions that live only in the console/API (not the CLI): `cancel`, `logs`, `lineage`, `journal`, and API-key management. Use the console or the REST endpoints for those.
 
+## Viridian Workbench
+
+**Viridian Workbench** is a local-first research environment: an interactive multi-agent session that runs on **your** machine (macOS/Linux), works with your local data and compute, and uses Viridian as its sealed evaluation service. You chat with a coordinator agent; it delegates bounded work to specialist agents and passes every contract, claim, and report through an **adversarial reviewer** before you're asked to rely on it.
+
+## Install & log in
+
+```
+curl -fsSL https://console.viridianresear.ch/install.sh | sh -s -- workbench
+vd-workbench auth        # browser login — shared with the vd CLI
+vd-workbench             # start a session
+```
+
+The Workbench comes in two faces sharing one session format: the `vd-workbench` terminal REPL and the **desktop app** (sessions sidebar, chat with live tool activity, journal and artifact panels, command-approval dialogs). A session started in the terminal opens in the app and vice versa — the directory on disk is the truth.
+
+Everything a session produces lives in a directory on your machine (`~/.viridian/workbench/sessions/<id>/`): the transcript, a typed research **journal** (hypothesis → result → verdict, append-only), provenance-tracked **artifacts** (figures, tables, reports — every file hashed, every claim citing journal entries and job ids), and one folder per **experiment** holding the exact spec submitted plus everything Viridian said back (series, lineage, logs, the engine's own journal, the optimized repo).
+
+## How it uses Viridian
+
+The Workbench is a normal customer of this API — same key, same `/v1` endpoints, same billing. Its agents run on models behind the **inference proxy** (`POST /v1/inference/messages` for `claude-*`, `POST /v1/inference/chat/completions` for the self-hosted `policy-v*` coding policy), metered per token against your credit balance and itemized under Billing. When a hypothesis needs a number you could credibly cite, the session turns it into a job:
+
+- **Runner mode** (`agents: 0`) — Viridian as a trusted scorer: baselines, scoring locally-built candidates, measuring eval noise, scoring forecasts against a dataset committed before the outcome was knowable.
+- **Optimizer mode** (`agents` ≥ 1) — "how far can this metric be pushed" questions, with the engine's reward-hacking defenses and k-seed promotion doing the verifying.
+
+## Review gates
+
+Money and claims only move over reviewed material — the host enforces it, not just the prompt:
+
+- **Contract gate** — `vd_submit_job` refuses any spec without a passing reviewer audit of that exact json (metric validity, locked-path seal, data leakage, plausibility bounds, margin vs noise, cost sanity).
+- **Claim gate** — a journal VERDICT must cite both a RESULT (the raw numbers) and a REVIEW (the audit of the interpretation).
+- **Report gate** — a report artifact requires a passing review of the byte-identical draft. Edit one byte and the gate re-opens.
+
+A failed review can be rebutted once with new evidence; after that the dispute goes to you verbatim, and only your recorded decision overrides it.
+
+## One contract, many domains
+
+The Workbench has **no built-in domains** — a research area is just a way of filling in the same four contract fields (`eval_cmd`, `direction`, `locked_paths`, bounds):
+
+- **ML benchmark** — eval trains and prints the held-out loss; harness locked; data via a platform split; `metric_min: 0`; `guards.params_max` against "just make it bigger".
+- **Solver / heuristic** — eval runs the solver on held-out instances under a time cap and prints the objective; `metric_min` = known lower bound; `guards.cmd` runs a feasibility checker from the baseline copy.
+- **Forecasting** — commit the ground truth as an immutable dataset *before* the horizon closes; the eval scores a forecast file against the platform-held split. Runner mode as a notary.
+- **Formal proofs** — eval runs the proof checker and prints the fraction of targets closed; theorem statements and checker config locked; `metric_max: 1.0`.
+
+Same engine, same seal — a new domain is a new contract, not a new feature.
+
+## MCP server
+
+Drive Viridian from Claude Code, Claude Desktop, or any MCP client. The server wraps this same REST API as tools, so an agent can upload a baseline, launch a job, watch the score, read eval logs, and download the artifact — end to end.
+
+## Setup
+
+Create an API key (**API Keys** in the console), then register the server (it ships in the platform repo under `mcp/`):
+
+```
+claude mcp add viridian -e VD_API_KEY=vd_... -- uvx --from <viridian>/mcp viridian-mcp
+```
+
+`VD_API_URL` overrides the API base (defaults to this console's origin).
+
+## Tools
+
+- `list_tiers` — the compute tier catalog with rates.
+- `list_jobs` / `get_job` / `submit_job` / `cancel_job` / `delete_job` — the job lifecycle. `submit_job` takes a full job spec (see **Job spec reference**).
+- `job_logs` / `job_spend` / `job_series` — eval stdout/stderr, billing breakdown, metric curves.
+- `upload_baseline` — tars a local directory (or takes a ready `.tgz`) and uploads it → the content-addressed digest job specs reference.
+- `list_datasets` / `create_dataset` — dataset management; `create_dataset` does create + upload + commit in one call.
+- `download_artifact` — pull a finished job's optimized repo to a local file.
+
 ## API reference
 
 Everything in the console is a REST API. Create a key under **API Keys**, then send it on every request:
@@ -373,7 +443,7 @@ Errors come back as `{ "error": "<message>" }`. Amounts are micro-dollars. "Auth
 
 ## Jobs
 
-- **POST `/v1/jobs`** — create a job. Body: a job spec (see **Job spec reference**). → `{ "id": "job_…" }`. `400` if `eval_cmd` is empty; `402` if out of credits (when billing is enforced); `501` for an `explicit` dataset.
+- **POST `/v1/jobs`** — create a job. Body: a job spec (see **Job spec reference**). → `{ "id": "job_…" }`. `400` if `eval_cmd` is empty; `402` if out of credits (when billing is enforced).
 - **GET `/v1/jobs`** — your jobs → array of `{ id, status, gen, score, spend, tier, metric, budget, max_gens, name, campaign }`.
 - **GET `/v1/jobs/{id}`** — one job → `{ gen, status, current, spec, spend }`; `current` = `{ stack, score }`.
 - **DELETE `/v1/jobs/{id}`** — delete a **terminal** job. `409` if still running (cancel first).
@@ -382,7 +452,7 @@ Errors come back as `{ "error": "<message>" }`. Amounts are micro-dollars. "Auth
 - **GET `/v1/jobs/{id}/keys`** — the series keys available for this job.
 - **GET `/v1/jobs/{id}/spend`** — → `{ total, gpu_seconds, agent_seconds, agent_calls, tok_in, tok_out }`.
 - **GET `/v1/jobs/{id}/artifact`** — the result tar.gz (`application/gzip`). See **Results & artifacts**.
-- **GET `/v1/jobs/{id}/logs`** — captured eval transcripts → `{ job, entries: [{ gen, name, text }] }`.
+- **GET `/v1/jobs/{id}/logs`** — your eval's captured stdout/stderr, newest generations first → `{ job, entries: [{ gen, name, text }] }` (`name` is the log file, e.g. `<vm>.stdout.log`). Works for runner and optimizer jobs.
 - **GET `/v1/jobs/{id}/lineage`** — the per-generation attempt tree.
 - **GET `/v1/jobs/{id}/journal`** — the optimizer's markdown journal.
 - **GET `/v1/jobs/{id}/journal/summary`** — a model-written TL;DR of the journal.
@@ -429,4 +499,4 @@ A job id you don't own returns `404`, identical to a nonexistent one.
 
 ## GitHub app
 
-- **POST `/v1/github/connect`** → `{ url }` to install the app; **GET `/v1/github/installations`**; **POST `/v1/github/link`**. A push to a configured branch triggers a run from the repo's `.viridian.toml`.
+- **POST `/v1/github/connect`** → `{ url }` to install the app (GitHub bounces back and links the install to this workspace automatically); **GET `/v1/github/installations`** lists the installs linked here. A push to a configured branch triggers a run from the repo's `.viridian.toml`.
