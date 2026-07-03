@@ -34,6 +34,8 @@ from presign import build_train_manifest, presign_url, read_r2_config, shell_quo
 from r2_io import upload_bytes
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
+EXTRA_MODULE_NAME = ""
+SEED_MODEL_PATH = ""
 WRAPPER_DIR = Path(__file__).resolve().parent
 VD_BIN = REPO_ROOT / "viridian" / "bin" / "vd"
 
@@ -62,6 +64,22 @@ def expected_output_files(exp_module):
     ]
 
 
+def copy_module_into(staging, module_name, module_file):
+    parts = module_name.split(".")[:-1]
+    package_dir = staging
+    source_dir = module_file.parent
+    source_roots = [source_dir]
+    for _ in parts[1:]:
+        source_roots.insert(0, source_roots[0].parent)
+    for part, source_root in zip(parts, source_roots):
+        package_dir = package_dir / part
+        package_dir.mkdir(exist_ok=True)
+        init_file = source_root / "__init__.py"
+        if init_file.is_file() and not (package_dir / "__init__.py").exists():
+            shutil.copy2(init_file, package_dir / "__init__.py")
+    shutil.copy2(module_file, package_dir / module_file.name)
+
+
 def package_baseline(exp_name, exp_module, out_dir):
     """Assemble repo/{viridian_train.py, r2_io.py, checkpoint_utils.py, <exp package>}
     from the live repo files and return the .tgz path."""
@@ -73,25 +91,16 @@ def package_baseline(exp_name, exp_module, out_dir):
     shutil.copy2(REPO_ROOT / "checkpoint_utils.py", staging / "checkpoint_utils.py")
 
     exp_file = Path(exp_module.__file__).resolve()
-    package_name = exp_name.rsplit(".", 1)[0] if "." in exp_name else ""
-    if package_name:
-        # Recreate each package level with its __init__.py so nested experiment
-        # modules (e.g. pkg.sub.exp_x) import inside the job too.
-        package_dir = staging
-        source_dir = exp_file.parent
-        parts = package_name.split(".")
-        source_roots = [source_dir]
-        for _ in parts[1:]:
-            source_roots.insert(0, source_roots[0].parent)
-        for part, source_root in zip(parts, source_roots):
-            package_dir = package_dir / part
-            package_dir.mkdir()
-            init_file = source_root / "__init__.py"
-            if init_file.is_file():
-                shutil.copy2(init_file, package_dir / "__init__.py")
-        shutil.copy2(exp_file, package_dir / exp_file.name)
+    if "." in exp_name:
+        copy_module_into(staging, exp_name, exp_file)
     else:
         shutil.copy2(exp_file, staging / exp_file.name)
+
+    if EXTRA_MODULE_NAME:
+        extra_module = importlib.import_module(EXTRA_MODULE_NAME)
+        copy_module_into(staging, EXTRA_MODULE_NAME, Path(extra_module.__file__).resolve())
+    if SEED_MODEL_PATH:
+        shutil.copy2(SEED_MODEL_PATH, staging / "seed_model.pt")
 
     tgz_path = out_dir / "baseline.tgz"
     with tarfile.open(tgz_path, "w:gz") as tar:
@@ -153,6 +162,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--exp", default="iters.exp_baseline_lr2e3")
     parser.add_argument("--seed", type=int, default=None, help="passed through to viridian_train.py --seed")
+    parser.add_argument("--seed-model", default="", help="checkpoint file packaged into the job as seed_model.pt (for fine-tuning experiments)")
+    parser.add_argument("--extra-module", default="", help="additional module packaged alongside the experiment, e.g. iters.exp_baseline_lr2e3 when the experiment imports it")
     parser.add_argument("--gpu-tier", default="b200")
     parser.add_argument("--bucket", default="sotaku-viridian")
     parser.add_argument("--remote", default="r2")
@@ -178,6 +189,9 @@ def main():
     args = parser.parse_args()
 
     sys.path.insert(0, str(REPO_ROOT))
+    global EXTRA_MODULE_NAME, SEED_MODEL_PATH
+    EXTRA_MODULE_NAME = args.extra_module
+    SEED_MODEL_PATH = args.seed_model
     exp_module = importlib.import_module(args.exp)
     uploads = expected_output_files(exp_module)
 
