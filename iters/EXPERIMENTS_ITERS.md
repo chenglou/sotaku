@@ -157,6 +157,27 @@ Two facts from evaluating intermediate checkpoints of the July runs. First, a mo
 
 Practical recipe until the February-vs-July question is resolved. Success counts across every run on record, both eras: exp_baseline_lr2e3 produced a model at 92%+ in 3 of 9 runs (98.9 / 96.0 / 92.3); exp_bs2048_mixed reached 95%+ in 2 of 4 runs and never finished below 72%; exp_bs2048_baseline went 1 of 5 and exp_3phase_40k 1 of 4, both with hard failures. All four configs train 50K steps except exp_3phase_40k (40K); a 50K run takes about 2h40m on an H200. For the most dependable single run, use exp_bs2048_mixed. For the highest ceiling, train several runs of exp_baseline_lr2e3: train several runs (each ~2h40m on H200), evaluate every 5K-step checkpoint at 1024 iterations during the anneal tail, and keep the best checkpoint rather than trusting the final one — collapsed runs routinely contain stable mid-anneal checkpoints (e.g. 92.5% at step 34K inside a run that finished at 5.8%). For an already-collapsed model, per-puzzle peak-confidence stopping recovers most of the loss (1.3% → 94.3% on the March run). Never launch training through a connection-holding client (see AGENTS.md on `spawn` vs `.remote()`), and expect any run interrupted by infrastructure to need its trajectory re-verified, not just resumed.
 
+## Stabilization Study (July 2026, 20K-Step Testbed)
+
+The reproducibility study left training reliability at ~25% per run with no controllable cause. A follow-up searched for a training-time fix, using a faster experimental setup: exp_testbed_20k.py compresses the exp_baseline_lr2e3 schedule to 20K steps (~1 hour per run) and adds an in-training probe — every 1,000 steps, 128- and 1024-iteration accuracy on 1,000 fixed test puzzles. Three baseline runs confirmed the compressed schedule reproduces the instability (1 of 3 stable at the end), and the probe revealed it is far more violent than checkpoint-level sampling suggested: adjacent probes 1,000 steps apart flip between 2/1000 and 939/1000.
+
+Five arms, all runs unseeded (probe value is 1024-iteration accuracy out of 1,000; stable = final probe ≥ 800):
+
+| arm | change | stable at end | best probe ≥ 800 mid-run |
+|---|---|---|---|
+| baseline | none | 2 / 7 | 4 / 7 |
+| fast EMA | weight average, ~1K-step horizon, probed separately | 1 / 6 | 3 / 6 |
+| feedback noise | perturb fed-back logits (std 0.1) during training | 1 / 6 | 2 / 6 |
+| slow EMA | weight average, ~10K-step horizon | 0 / 4 | 1 / 4 |
+| burn-in 32 | 32 gradient-free iterations before the supervised window, 30% of steps | 0 / 4 | 2 / 4 |
+| **burn-in 128** | 128 gradient-free iterations, 20% of steps | **4 / 4** | 4 / 4 |
+
+Weight averaging failed at both horizons (the averaged weights track the live weights into collapse rather than resisting), and feedback noise did nothing. Burn-in showed a dose-response: at 32 iterations, every run kept excellent 128-iteration accuracy to the end (the only arm with no 128-iteration collapse) while 1024 stayed unprotected; at 128 iterations, all four runs ended stable at 1024. The mechanism reading: ordinary training never shows the model the states it reaches deep into its own trajectory, so behavior there is unconstrained — burn-in trains on those states directly, at forward-only cost (~20-50% extra time depending on the fraction of steps), and the protection extends several times past the trained horizon but not indefinitely.
+
+Full 25K-puzzle evaluation of the four burn-in-128 finals: 77-78% at 16 iterations (vs ~81% baseline — a real cost), 86-89% at 128 and 1024 (flat — stable), then degradation at 2048 (44-80%). So burn-in buys horizon-bounded reliability, not the unbounded convergence the naturally-stable runs have (February's models held 98.8% at 2048). Whether the 86-89% plateau is a burn-in cost or just the shorter 20K schedule is what the 50K confirmation runs test.
+
+The harvest statistic, across all 27 testbed runs of the first five arms: 12 of 27 passed through a mid-training checkpoint scoring 800+, versus 4 of 27 ending there. Whatever else is true, saving checkpoints against the probe and keeping the best roughly triples the yield of usable models — this works today on any config.
+
 ## Test-Time Interventions (No Retraining)
 
 Test-time modifications to the forward pass to see if iteration collapse can be fixed without retraining.
