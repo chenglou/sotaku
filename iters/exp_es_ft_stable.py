@@ -32,7 +32,7 @@ CONFIG = {
     'experiment': 'exp_es_ft_stable',
     'es_generations': 60,
     'population_pairs': 16,
-    'sigma': 1e-3,
+    'sigma': 'calibrated',
     'lr': 3e-4,
     'anchor_lambda': 1e-3,
     'fitness_puzzles': 384,
@@ -42,7 +42,10 @@ CONFIG = {
 total_steps = 60          # generations; submit.py reads this for checkpoint names
 eval_every = 20           # checkpoint every N generations
 population_pairs = 16     # antithetic pairs per generation (32 evaluations)
-sigma = 1e-3              # perturbation scale (per-parameter Gaussian std)
+sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
+                                          # only mildly degrades fitness. At 1024
+                                          # iterations the model is extremely sensitive
+                                          # to weight noise (1e-3 zeroes a 96% model).
 lr = 3e-4                 # update step size
 anchor_lambda = 1e-3      # pull toward the seed weights each generation
 fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generation)
@@ -166,6 +169,27 @@ def train(output_dir="."):
     baseline_probe = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
     log(f"GEN {start_gen - 1:4d} | validation 1024-iter: {baseline_probe}/{len(probe_puzzles)} (starting point)")
 
+    # Calibrate the perturbation scale: pick the largest sigma whose perturbed model
+    # keeps at least half the unperturbed fitness. Too large and every member scores
+    # zero (no signal); too small and the finite-difference signal drowns in noise.
+    calib_x = pool_x[:fitness_puzzles]
+    calib_p = pool_puzzles[:fitness_puzzles]
+    calib_s = pool_solutions[:fitness_puzzles]
+    unperturbed = count_solved(model, calib_x, calib_p, calib_s, fitness_iters)
+    snapshot = [p.detach().clone() for p in model.parameters()]
+    sigma = sigma_ladder[-1]
+    for candidate in sigma_ladder:
+        perturb(list(model.parameters()), 777, candidate)
+        score = count_solved(model, calib_x, calib_p, calib_s, fitness_iters)
+        with torch.no_grad():
+            for p, s in zip(model.parameters(), snapshot):
+                p.copy_(s)
+        log(f"CALIBRATE sigma={candidate:.0e}: {score}/{fitness_puzzles} (unperturbed {unperturbed})")
+        if score >= unperturbed // 2:
+            sigma = candidate
+            break
+    log(f"CALIBRATE chose sigma={sigma:.0e}")
+
     rng = random.Random(1234 + start_gen)
     for gen in range(start_gen, total_steps):
         t0 = time.time()
@@ -191,23 +215,25 @@ def train(output_dir="."):
                 for p, s in zip(params, snapshot):
                     p.copy_(s)
 
-        # Rank-based weights: order all 2Z scores, map to [-0.5, 0.5], take the
-        # per-pair difference. Robust to fitness scale and outliers.
-        all_scores = scores_plus + scores_minus
-        order = np.argsort(np.argsort(all_scores))
-        utilities = (order / (len(all_scores) - 1)) - 0.5
-        u_plus, u_minus = utilities[:population_pairs], utilities[population_pairs:]
-
-        with torch.no_grad():
-            for i, seed in enumerate(seeds):
-                w = float(u_plus[i] - u_minus[i]) / (2 * population_pairs * sigma)
-                gen_t = torch.Generator(device=device)
-                gen_t.manual_seed(seed)
-                for p in params:
-                    z = torch.randn(p.shape, generator=gen_t, device=device, dtype=torch.float32)
-                    p.add_(z, alpha=lr * w)
-            for p, a in zip(params, anchor):
-                p.add_(p - a, alpha=-anchor_lambda)
+        # Score-normalized weights, tie-safe: a generation where every member scores
+        # the same (no signal) takes no step at all. The update direction is the
+        # fitness-weighted average of the unit-variance perturbation directions; sigma
+        # deliberately does not appear (it is absorbed into the effective step size).
+        all_scores = np.array(scores_plus + scores_minus, dtype=np.float64)
+        spread = all_scores.std()
+        if spread > 1e-9:
+            utilities = (all_scores - all_scores.mean()) / spread
+            u_plus, u_minus = utilities[:population_pairs], utilities[population_pairs:]
+            with torch.no_grad():
+                for i, seed in enumerate(seeds):
+                    w = float(u_plus[i] - u_minus[i]) / (2 * population_pairs)
+                    gen_t = torch.Generator(device=device)
+                    gen_t.manual_seed(seed)
+                    for p in params:
+                        z = torch.randn(p.shape, generator=gen_t, device=device, dtype=torch.float32)
+                        p.add_(z, alpha=lr * w)
+                for p, a in zip(params, anchor):
+                    p.add_(p - a, alpha=-anchor_lambda)
 
         probe_solved = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
         log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.1f}/{fitness_puzzles} "
