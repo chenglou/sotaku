@@ -182,6 +182,21 @@ Current training recommendation, combining everything: train exp_baseline_lr2e3 
 
 The harvest statistic, across all 27 testbed runs of the first five arms: 12 of 27 passed through a mid-training checkpoint scoring 800+, versus 4 of 27 ending there. Whatever else is true, saving checkpoints against the probe and keeping the best roughly triples the yield of usable models — this works today on any config.
 
+## Evolution-Strategies Fine-Tuning (July 2026)
+
+Backprop cannot reach the deployment horizon: differentiating through 1024 iterations is memory-impossible, and with the Jacobian spectral radius measured at 14-88 the gradients would explode into noise anyway. Evolution strategies need neither — perturb the weights, count solved puzzles, move toward the perturbations that scored best. Following the argument in apaz.dev's "Scaling To Unfathomable Depth" (the projection noise floor scales with parameter count, and at 800K parameters we are far below the regime where ES fine-tuning is known to work), exp_es_finetune.py fine-tunes a trained checkpoint directly on the 1024-iteration solve rate: 16 antithetic perturbation pairs per generation, perturbation scale calibrated at startup, rank-weighted updates, weight decay anchored to the seed, fitness on fresh train-split puzzles beyond the 2.7M training cut (rotated per generation, same slice for all members).
+
+Two pilots, 120 generations each (~2 B200-hours per 60-generation job, chained across the platform's 2-hour limit):
+
+| seed | @1024 before | @1024 after | @2048 after |
+|---|---|---|---|
+| collapsed clean run (5.4%) | 63/1000 probe | **96.2%** full set | 81.5% |
+| stable B200 canonical (96.0%) | 961/1000 probe | **96.5%** full set | **96.5%** |
+
+The collapsed model recovered completely — 5.4% to 96.2% at 1024 iterations in roughly seven forward-only GPU-hours, past every training-time intervention tested above. The stable model gained half a point and now holds flat through 2048 iterations, beyond its tuned horizon; the repaired model softens there (81.5%), so a freshly-carved basin appears shallower past the tuned horizon than a naturally-deep one. Two measurements along the way: the fitness landscape at 1024 iterations tolerates per-weight perturbations of 3e-4 almost without loss (357/384 vs 358 unperturbed) but is destroyed at 1e-3 — a remarkably sharp cliff — and a buggy first pilot that took thousand-fold-too-large steps zeroed both seeds within one generation, which is the same cliff seen from the other side.
+
+Practical upshot: any collapsed checkpoint is salvageable for about the cost of a training run, and ES is the only tool in the repo that optimizes the deployment metric itself. Open directions: tune at 2048+ to deepen the repaired basin, ES on top of burn-in models, and whether ES alone can lift a stable model past February's 98.9%.
+
 ## Test-Time Interventions (No Retraining)
 
 Test-time modifications to the forward pass to see if iteration collapse can be fixed without retraining.
