@@ -8,6 +8,8 @@ See `README.md` for the current SOTA path, key files, and headline results.
 
 ## Modal
 
+The general, project-independent version of these rules lives in the public template repo [tips-for-running-modal](https://github.com/chenglou/tips-for-running-modal), which was extracted from this project. When you learn a new general Modal lesson, add it there; keep this section to the rules an agent needs in-context while operating this repo.
+
 - Use `modal run --detach ...` for training so runs survive client disconnection.
 - `--detach` is also the safer default for longer eval and analysis runs.
 - Modal can preempt GPU workers at any time, and GPU jobs cannot opt out. A preempted job restarts with the same input only when the function sets `retries=` (modal_run.py does), so design training to resume from checkpoints.
