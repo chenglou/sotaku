@@ -54,3 +54,21 @@ A ladder of runs seeded from progressively earlier checkpoints of one trajectory
 The reading: backprop's role is carrying the network into territory where ES has a slope to climb. From random weights, sixty generations never solved a single puzzle and the cell-level fitness never left chance — there is no local slope toward solving at this population size. But one tenth of the training schedule already hands ES a workable seed (286/1000, lifted to 69% and still climbing when the budget ran out), and each additional block of backprop buys a higher landing point along a smooth gradient — no cliff anywhere between 5K and 50K. The step-10K seed is the same non-monotonic mid-training turbulence seen everywhere else in this project (it probes far below the *earlier* step-5K seed) and ES recovers it too, just more slowly.
 
 Two caveats. The early rungs' iteration profiles still peak at 128 and decay after (they gained enormously at 1024 but are not monotonic like the step-35K rescue above), and their 2048 behavior is weak — these are partial models, not finished ones. And the ladder holds population and generations fixed; whether more ES budget, larger populations, or a fitness schedule that starts at short horizons closes the remaining gap from below is untested. As it stands, the cheapest route to a strong model is still moderate backprop plus ES (20-40K steps, then fine-tune), but the zero-rung's hard failure and the 5K rung's partial success bracket where "how much backprop do we actually need" lives: more than zero, possibly much less than the full schedule.
+
+## Performance (July 2026)
+
+The generation loop was profiled on a real seed model (es/bench_es.py, H200, 32 members × 384 puzzles × 1024 iterations):
+
+| variant | 32 members | fidelity vs production |
+|---|---|---|
+| sequential eager, 256-puzzle chunks (production) | 117.3s | — |
+| sequential eager, one 384 batch | 64.8s | bit-exact (0 cells differ) |
+| sequential + compiled 32-iteration block | **34.7s** | ~1-3% of cells land differently |
+| batched population (vmap), eager | 96.6s | ~1-3% |
+| batched population + compiled | 36.7s | ~1-3% |
+
+Two findings shaped the fold. Removing the chunking is free — per-puzzle results don't depend on batch composition, so the counts match bit for bit. And batching the whole population, the presumed big win, adds nothing over compilation alone: the compiled kernels already saturate the GPU at batch 384, so the simpler sequential-member loop stays. The compiled path's ~1-3% cell differences are not errors — reduction-order changes compound over 1024 iterations, the same magnitude of divergence seen when moving a checkpoint between GPU models.
+
+What shipped in exp_es_finetune.py: fitness evaluation runs the compiled full-batch path (~3x cheaper generations, 43s/generation on H200 including the probe — a 120-generation fine-tune now fits one 2-hour job); the validation probe keeps the untouched eager path so probe values stay comparable across the project's history. An 8-generation live run from the 96.0% seed validated the fold: starting probe 958/1000 (historical: 961), fitness in the historical 330-370/384 band, probe stable across generations.
+
+Also measured but deferred: per-puzzle early exit. On the healthy seed, half of all puzzles reach their final answer by iteration 7 (mean 63 of 1024) — but 4.2% never settle at all, and that fraction matches the model's failure rate: non-convergence at the fixed point identifies exactly the puzzles the model gets wrong. Early exit would cut fitness cost several times more, but it changes what fitness measures (settled answer vs answer-at-1024), so it stays out until the compiled path's headroom is exhausted. Deployment is untouched by all of this: the model ships as plain weights evaluated at a fixed iteration count, per the no-inference-time-tricks rule.
