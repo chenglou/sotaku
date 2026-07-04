@@ -27,11 +27,11 @@ from iters.exp_baseline_lr2e3 import (
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_finetune_checkpoint_step"
+CHECKPOINT_PREFIX = "es_ft_r3ph2_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_finetune',
-    'es_generations': 120,
+    'experiment': 'exp_es_ft_r3ph2',
+    'es_generations': 60,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
@@ -40,7 +40,7 @@ CONFIG = {
     'fitness_iters': 1024,
 }
 
-total_steps = 120         # generations; submit.py reads this for checkpoint names
+total_steps = 60          # generations; submit.py reads this for checkpoint names
 eval_every = 20           # checkpoint every N generations
 population_pairs = 16     # antithetic pairs per generation (32 evaluations)
 sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
@@ -53,7 +53,7 @@ fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generati
 fitness_iters = 1024      # the deployment horizon — the point of all this
 fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
 fitness_pool_size = 20_000
-log_name = "exp_es_finetune.log"
+log_name = "exp_es_ft_r3ph2.log"
 
 
 def run_iterations(model, x, n_iters):
@@ -259,7 +259,7 @@ def train(output_dir="."):
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_finetune.pt")
+    final_path = os.path.join(output_dir, "model_es_ft_r3ph2.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
