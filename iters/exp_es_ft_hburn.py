@@ -37,7 +37,7 @@ CHECKPOINT_PREFIX = "es_ft_hburn_checkpoint_step"
 
 CONFIG = {
     'experiment': 'exp_es_ft_hburn',
-    'es_generations': 60,
+    'es_generations': 120,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
@@ -46,7 +46,7 @@ CONFIG = {
     'fitness_iters': 1024,
 }
 
-total_steps = 60          # generations; submit.py reads this for checkpoint names
+total_steps = 120         # generations; submit.py reads this for checkpoint names
 eval_every = 20           # checkpoint every N generations
 population_pairs = 16     # antithetic pairs per generation (32 evaluations)
 sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
