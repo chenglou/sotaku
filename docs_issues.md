@@ -31,3 +31,9 @@ Verified 2026-07-02 ~05:50 UTC: the cap is real and applies to `b200`, post-fix.
 The B200 job killed at +7,195s on 2026-07-02 ended as `converged` with score `0.0` (no `METRIC:` line was ever printed — the eval was killed mid-training). A kill with no metric should surface as `failed` (or a distinct timeout status), not `converged`; `converged` at score 0 reads like a successful run of a bad model.
 
 Worse, the four cap-killed jobs from later that day (ids above) never left `running`: 90+ minutes after their evals died, `GET /v1/jobs` still reported all four as `running` at gen 0. A customer watching job status has no signal that training is gone; the only tell is their own exported telemetry going stale.
+
+Partial improvement observed 2026-07-04: a cap-killed B200 job (`job_01KWNZJYNP9SD92E3KADQBKRXF`) surfaced as failed with an explicit `last_error` of "timed out after 7200 seconds" — exactly the signal the earlier kills lacked. If this is now the consistent behavior, this status issue is fixed (the 2-hour cap itself remains).
+
+## `last_error` Embeds a Live Presigned URL
+
+The same job's `last_error` field reproduces the killed eval command verbatim, including the full presigned GET URL for the job's artifact manifest (7-day expiry, `X-Amz-Signature` and all) — and that manifest in turn contains presigned upload URLs. Only the job owner can read the job detail, so exposure is limited, but error messages would ideally truncate or redact signed query strings rather than store live credentials.
