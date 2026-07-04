@@ -4,7 +4,8 @@
 # Plain antithetic ES: perturb weights with seeded Gaussian noise, score each
 # perturbation by solved puzzles, update along the rank-weighted average direction.
 # Starts from ./seed_model.pt (packaged into the job by submit.py --seed-model).
-# One run = 60 generations (~1.7h on B200, fits the platform's 2h limit).
+# Generations chain across jobs: each ~2h job runs what fits, checkpoints every 20
+# generations, and a resubmit with --resume-checkpoint-key continues from there.
 
 import os
 import random
@@ -30,7 +31,7 @@ CHECKPOINT_PREFIX = "es_ft_collapsed_checkpoint_step"
 
 CONFIG = {
     'experiment': 'exp_es_ft_collapsed',
-    'es_generations': 60,
+    'es_generations': 120,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
@@ -39,7 +40,7 @@ CONFIG = {
     'fitness_iters': 1024,
 }
 
-total_steps = 60          # generations; submit.py reads this for checkpoint names
+total_steps = 120         # generations; submit.py reads this for checkpoint names
 eval_every = 20           # checkpoint every N generations
 population_pairs = 16     # antithetic pairs per generation (32 evaluations)
 sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
