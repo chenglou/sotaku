@@ -36,6 +36,15 @@ r2:sotaku-viridian/viridian-runner-probes/runs/sotaku-serious-b200-20260701-1019
 
 The duplicate-evaluator platform bug behind that conflict is fixed (confirmed by the Viridian author), so the attempt-slot defense from `sotaku_serious_probe/` is retired. For training runs, use `viridian/train/submit.py`: one output prefix per job, step-specific checkpoint files with SHA-256 sidecars, and automatic resume from the newest verified checkpoint on restart. Treat any `latest` key as a convenience pointer, not the source of truth.
 
+## Setup
+
+The `vd` CLI is not checked in (it is a ~2.5MB binary). Install it into the path `viridian/train/submit.py` expects:
+
+```sh
+VD_BIN="$(pwd)/viridian/bin" sh viridian/raw/install.sh
+./viridian/bin/vd auth
+```
+
 ## Files
 
 - `docs.md` and `raw/` are the current downloaded Viridian docs.

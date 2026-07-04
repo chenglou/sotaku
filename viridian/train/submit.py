@@ -109,6 +109,11 @@ def package_baseline(exp_name, exp_module, out_dir):
 
 
 def upload_baseline(tgz_path):
+    if not VD_BIN.is_file():
+        raise SystemExit(
+            f"vd CLI not found at {VD_BIN} — install it with:\n"
+            f'  VD_BIN="{VD_BIN.parent}" sh viridian/raw/install.sh && {VD_BIN} auth'
+        )
     completed = subprocess.run([str(VD_BIN), "baseline", str(tgz_path)], text=True, capture_output=True, check=False)
     lines = completed.stdout.strip().splitlines()
     if completed.returncode != 0 or not lines or not lines[-1].startswith("sha256:"):
