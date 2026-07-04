@@ -27,10 +27,10 @@ from iters.exp_baseline_lr2e3 import (
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_finetune_checkpoint_step"
+CHECKPOINT_PREFIX = "es_valfold_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_finetune',
+    'experiment': 'exp_es_valfold',
     'es_generations': 120,
     'population_pairs': 16,
     'sigma': 'calibrated',
@@ -41,7 +41,7 @@ CONFIG = {
     'fitness_iters': 1024,
 }
 
-total_steps = 120         # generations; submit.py reads this for checkpoint names
+total_steps = 8           # validation run for the compiled fitness path
 eval_every = 20           # checkpoint every N generations
 population_pairs = 16     # antithetic pairs per generation (32 evaluations)
 sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
@@ -50,14 +50,14 @@ sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale
                                           # to weight noise (1e-3 zeroes a 96% model).
 lr = 3e-4                 # update step size
 anchor_lambda = 1e-3      # pull toward the seed weights each generation
-fitness_dense = True      # dense cell-level fitness gives near-collapsed seeds a usable
+fitness_dense = False     # dense cell-level fitness gives near-collapsed seeds a usable
                           # slope; solved-puzzle fitness matches the deployment metric
                           # exactly and is fine for any seed that already solves some
 fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generation)
 fitness_iters = 1024      # the deployment horizon — the point of all this
 fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
 fitness_pool_size = 20_000
-log_name = "exp_es_finetune.log"
+log_name = "exp_es_valfold.log"
 
 
 COMPILE_CHUNK = 32   # iterations per compiled block; fitness_iters must divide evenly
@@ -183,7 +183,7 @@ def train(output_dir="."):
         start_gen = ckpt['step'] + 1
         print(f"Resumed ES state from generation {ckpt['step']}")
     else:
-        seed_path = os.path.join(os.getcwd(), "seed_model.pt")
+        seed_path = os.path.join(output_dir, "model_viridian_canonical_final50k.pt")
         state = torch.load(seed_path, map_location=device, weights_only=True)
         if 'model_state_dict' in state:
             state = state['model_state_dict']
@@ -299,7 +299,7 @@ def train(output_dir="."):
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_finetune.pt")
+    final_path = os.path.join(output_dir, "model_es_valfold.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
