@@ -41,3 +41,7 @@ The stored spec filled defaults back in server-side: `env_locked: {}`, `guards: 
   - L4 failure with stdout, stderr, and exit 7: `job_01KWE7QAT05WYQD2YCJE1T6QQX`
   All four returned `entries: []` from `/v1/jobs/{id}/logs`. The failing jobs stayed `running` at gen 0 with `score: null`, `last_error: null`, and empty spend during the early retry window, then I cancelled them. So the endpoint exists, but I could not verify the docs' claim that it exposes useful eval stdout/stderr.
 - The docs cover `gpu_timeout_s` as a per-eval timeout but do not state whether there is a hard maximum or recommended upper bound. For our use, the practical answer still appears to be: set a long enough timeout and cancel jobs ourselves.
+
+## Refetch 2026-07-04
+
+Re-downloaded the docs (console bundle `index-B8ozy92R.js`, previously `index-BxlIwdQY.js`) and diffed the embedded docs text. Changes since 2026-07-01: a new **Installed packages** section (GPU tiers: Python 3.11 + torch CUDA 12.8 + numpy + scipy, network available; CPU tier: torch CPU + numpy, no network), a new **`ultra`** job option (stronger frontier model for optimizer-mode agents; no effect on runner jobs), and a reworded Workbench section. Nothing touching the open items in docs_issues.md — the 2-hour clamp language, `/logs` behavior, and status semantics are unchanged.

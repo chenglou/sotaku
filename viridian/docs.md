@@ -99,6 +99,10 @@ Set only when the job references a dataset:
 
 The CPU tier also pins `OMP_NUM_THREADS` = `MKL_NUM_THREADS` = `OPENBLAS_NUM_THREADS` = `1`.
 
+## Installed packages
+
+The GPU tiers run Python 3.11 with **`torch` (CUDA 12.8), `numpy`, and `scipy`** preinstalled — nothing else. Any other dependency must be vendored into your repo or installed by your `eval_cmd` (e.g. `pip install einops && python eval.py` — GPU tiers have network). An import of a missing package fails the eval with its traceback in the job's logs. The CPU tier ships `torch` (CPU) + `numpy`, and has no network to install more.
+
 ## Network access
 
 - **GPU tiers** (`l4`, `a100`, `rtx6000`, `h100`, `b200`) — your eval **has outbound network**. It can `curl` / `PUT` to your own storage; this is how you export checkpoints and logs.
@@ -167,6 +171,7 @@ The body of `POST /v1/jobs` (and the file `vd submit` sends). Every field:
 - **`patience`** (optional, default `5`) — consecutive generations with no promotion before `converged`. `0` = never converge on a plateau.
 - **`name`**, **`campaign`** (optional) — labels; metadata only, no effect on execution.
 - **`compute`** (optional) — the name of a BYO compute connection registered in your workspace (`POST /v1/compute`); the connection's own `type` decides the backend (`slurm-ssh` today, more types later). Omit to use Viridian's compute.
+- **`ultra`** (optional, default `false`) — ultra mode: drives the coding agents with our strongest frontier model. More capable exploration per generation, billed at that model's (higher) per-token rate. No effect on runner jobs (`agents: 0`).
 - **`customer`** — ignored (taken from your key); send any placeholder such as `"self"`.
 
 ## `contract` (the eval contract)
@@ -204,7 +209,7 @@ There is no `train_cmd`. `proxy_frac` and `squash_every` are accepted for back-c
 }
 ```
 
-**Runner variant:** set `"agents": 0` and `"max_gens": 1`. Everything not shown above (`data`, `goal`, `name`, `campaign`, `patience`, `compute`, and the contract's `locked_paths` / `metric_max` / `metric_min` / `guards`) is optional.
+**Runner variant:** set `"agents": 0` and `"max_gens": 1`. Everything not shown above (`data`, `goal`, `name`, `campaign`, `patience`, `compute`, `ultra`, and the contract's `locked_paths` / `metric_max` / `metric_min` / `guards`) is optional.
 
 ## Enum values
 
@@ -364,7 +369,7 @@ Job actions that live only in the console/API (not the CLI): `cancel`, `logs`, `
 
 ## Viridian Workbench
 
-**Viridian Workbench** is a local-first research environment: an interactive multi-agent session that runs on **your** machine (macOS/Linux), works with your local data and compute, and uses Viridian as its sealed evaluation service. You chat with a coordinator agent; it delegates bounded work to specialist agents and passes every contract, claim, and report through an **adversarial reviewer** before you're asked to rely on it.
+**Viridian Workbench** is a local-first environment for optimizing things: an interactive multi-agent session that runs on **your** machine (macOS/Linux). You bring something you want made better — an architecture, a kernel, a solver, a pipeline — and the coordinator agent turns it into a fast, sealed **proxy eval** (a miniature of your setup that scores in minutes), baselines it, and points Viridian's optimizer at it. It delegates bounded work to specialist agents and passes every contract, claim, and report through an **adversarial reviewer** — including whether the proxy is faithful enough for improvements to transfer — before you're asked to rely on it.
 
 ## Install & log in
 
