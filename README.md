@@ -10,7 +10,7 @@ From-scratch experiments on iterative neural Sudoku solvers. See [post](https://
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** BS=2048, LR=2e-3, 16 training iterations, cosine decay, reverse curriculum
 
-The headline number is a best-of-several-runs result. Training this config is noisy: with identical code and data, only about 1 run in 4 ends up stable at 1024 test-time iterations, and the rest degrade at long iteration counts despite normal 16-iteration accuracy. If you're retraining, `iters/EXPERIMENTS_ITERS.md` (Reproducibility, Stabilization, and Evolution-Strategies sections) has the details and the current recipe: keep the run's best mid-training checkpoint (evaluated at long iteration counts during the learning-rate decay tail), then fine-tune that checkpoint with a short evolution-strategies run on the 1024-iteration solve rate itself — this landed at 94-95% even on runs whose final weights had fully collapsed. Evaluating a fixed checkpoint, on the other hand, is deterministic and reproduces exactly (test subsampling in `iters/eval_more_iters.py`).
+The headline number is a best-of-several-runs result. Training this config is noisy: with identical code and data, only about 1 run in 4 ends up stable at 1024 test-time iterations, and the rest degrade at long iteration counts despite normal 16-iteration accuracy. If you're retraining, `iters/EXPERIMENTS_ITERS.md` (Reproducibility section), `stabilize/EXPERIMENTS_STABILIZE.md`, and `es/EXPERIMENTS_ES.md` have the details and the current recipe: keep the run's best mid-training checkpoint (evaluated at long iteration counts during the learning-rate decay tail), then fine-tune that checkpoint with a short evolution-strategies run on the 1024-iteration solve rate itself — this landed at 94-95% even on runs whose final weights had fully collapsed. Evaluating a fixed checkpoint, on the other hand, is deterministic and reproduces exactly (test subsampling in `iters/eval_more_iters.py`).
 
 ## Setup
 
@@ -99,6 +99,8 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 - `viz/plot_collapse_diagnostics.py` - hidden-state and prediction-stability diagnostics
 - `viz/plot_iteration_scaling.py` - static summary plots from the documented scaling tables
 - `iters/EXPERIMENTS_ITERS.md` - current source of truth for iteration-scaling results
+- `es/exp_es_finetune.py` + `es/EXPERIMENTS_ES.md` - evolution-strategies fine-tuning on the 1024-iteration solve rate (the current retraining recipe's second stage)
+- `stabilize/EXPERIMENTS_STABILIZE.md` - training-time stabilization study (burn-in, weight averaging, feedback noise)
 
 ## Results
 

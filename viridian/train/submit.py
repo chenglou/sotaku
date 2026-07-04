@@ -2,7 +2,7 @@
 
 Usage (from the repo root, venv active):
     python viridian/train/submit.py                          # train iters.exp_baseline_lr2e3 on B200
-    python viridian/train/submit.py --exp iters.exp_baseline_lr2e3_rerun
+    python viridian/train/submit.py --exp iters.exp_bs2048_mixed
     python viridian/train/submit.py --dry-run                # package + presign + write job.json, no submit
     python viridian/train/submit.py --resume-checkpoint-key <r2 key> --resume-checkpoint-sha-key <r2 key>
 

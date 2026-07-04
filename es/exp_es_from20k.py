@@ -6,6 +6,12 @@
 # Starts from ./seed_model.pt (packaged into the job by submit.py --seed-model).
 # Generations chain across jobs: each ~2h job runs what fits, checkpoints every 20
 # generations, and a resubmit with --resume-checkpoint-key continues from there.
+#
+# Ladder rung: how early in first-order training can ES take over? Seed is
+# bs2048_baseline_clean_a's checkpoint at step 20,000 (two fifths of the schedule) — the same
+# trajectory whose step-40,000 checkpoint ES lifted to 95.2% (es_ft_hbs in
+# EXPERIMENTS_ES.md). Dense cell-level fitness, since early checkpoints solve
+# nothing outright.
 
 import os
 import random
@@ -27,15 +33,16 @@ from iters.exp_baseline_lr2e3 import (
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_ft_r1012_checkpoint_step"
+CHECKPOINT_PREFIX = "es_from20k_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_ft_r1012',
+    'experiment': 'exp_es_from20k',
     'es_generations': 60,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
     'anchor_lambda': 1e-3,
+    'fitness': 'dense_cells',
     'fitness_puzzles': 384,
     'fitness_iters': 1024,
 }
@@ -49,11 +56,14 @@ sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale
                                           # to weight noise (1e-3 zeroes a 96% model).
 lr = 3e-4                 # update step size
 anchor_lambda = 1e-3      # pull toward the seed weights each generation
+fitness_dense = True      # dense cell-level fitness gives near-collapsed seeds a usable
+                          # slope; solved-puzzle fitness matches the deployment metric
+                          # exactly and is fine for any seed that already solves some
 fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generation)
 fitness_iters = 1024      # the deployment horizon — the point of all this
 fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
 fitness_pool_size = 20_000
-log_name = "exp_es_ft_r1012.log"
+log_name = "exp_es_from20k.log"
 
 
 def run_iterations(model, x, n_iters):
@@ -182,25 +192,30 @@ def train(output_dir="."):
         }, path)
         log(f"Checkpoint saved: {path}")
 
+    def score_slice(lo):
+        fx = pool_x[lo:lo + fitness_puzzles]
+        if fitness_dense:
+            return count_correct_cells(model, fx, pool_targets[lo:lo + fitness_puzzles],
+                                       pool_empty[lo:lo + fitness_puzzles], fitness_iters)
+        return count_solved(model, fx, pool_puzzles[lo:lo + fitness_puzzles],
+                            pool_solutions[lo:lo + fitness_puzzles], fitness_iters)
+
     baseline_probe = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
     log(f"GEN {start_gen - 1:4d} | validation 1024-iter: {baseline_probe}/{len(probe_puzzles)} (starting point)")
 
     # Calibrate the perturbation scale: pick the largest sigma whose perturbed model
     # keeps at least half the unperturbed fitness. Too large and every member scores
     # zero (no signal); too small and the finite-difference signal drowns in noise.
-    calib_x = pool_x[:fitness_puzzles]
-    calib_t = pool_targets[:fitness_puzzles]
-    calib_m = pool_empty[:fitness_puzzles]
-    unperturbed = count_correct_cells(model, calib_x, calib_t, calib_m, fitness_iters)
+    unperturbed = score_slice(0)
     snapshot = [p.detach().clone() for p in model.parameters()]
     sigma = sigma_ladder[-1]
     for candidate in sigma_ladder:
         perturb(list(model.parameters()), 777, candidate)
-        score = count_correct_cells(model, calib_x, calib_t, calib_m, fitness_iters)
+        score = score_slice(0)
         with torch.no_grad():
             for p, s in zip(model.parameters(), snapshot):
                 p.copy_(s)
-        log(f"CALIBRATE sigma={candidate:.0e}: {score} cells (unperturbed {unperturbed})")
+        log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
         if score >= unperturbed // 2:
             sigma = candidate
             break
@@ -212,21 +227,18 @@ def train(output_dir="."):
         # Same probe slice for every population member (common random numbers),
         # rotated each generation so we don't overfit one subset.
         lo = (gen * fitness_puzzles) % (fitness_pool_size - fitness_puzzles)
-        fx = pool_x[lo:lo + fitness_puzzles]
-        ft = pool_targets[lo:lo + fitness_puzzles]
-        fm = pool_empty[lo:lo + fitness_puzzles]
 
         snapshot = [p.detach().clone() for p in params]
         seeds = [rng.randrange(2**62) for _ in range(population_pairs)]
         scores_plus, scores_minus = [], []
         for seed in seeds:
             perturb(params, seed, sigma)
-            scores_plus.append(count_correct_cells(model, fx, ft, fm, fitness_iters))
+            scores_plus.append(score_slice(lo))
             with torch.no_grad():
                 for p, s in zip(params, snapshot):
                     p.copy_(s)
             perturb(params, seed, -sigma)
-            scores_minus.append(count_correct_cells(model, fx, ft, fm, fitness_iters))
+            scores_minus.append(score_slice(lo))
             with torch.no_grad():
                 for p, s in zip(params, snapshot):
                     p.copy_(s)
@@ -252,14 +264,14 @@ def train(output_dir="."):
                     p.add_(p - a, alpha=-anchor_lambda)
 
         probe_solved = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-        log(f"GEN {gen:4d} | cell fitness mean {np.mean(all_scores):.0f} "
+        log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} "
             f"best {max(all_scores):.0f} | validation 1024-iter: {probe_solved}/{len(probe_puzzles)} "
             f"| {time.time() - t0:.0f}s")
 
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_ft_r1012.pt")
+    final_path = os.path.join(output_dir, "model_es_from20k.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()

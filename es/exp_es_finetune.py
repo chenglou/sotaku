@@ -6,12 +6,6 @@
 # Starts from ./seed_model.pt (packaged into the job by submit.py --seed-model).
 # Generations chain across jobs: each ~2h job runs what fits, checkpoints every 20
 # generations, and a resubmit with --resume-checkpoint-key continues from there.
-#
-# Seed: lr2e3_burnin128_c_checkpoint_step25000.pt — the checkpoint nearest the best
-# in-training probe (843/1000 at step 24,000) of the one burn-in run that ended soft
-# (40.3% at 1024 iterations). Tests whether ES lifts a harvested burn-in checkpoint
-# toward the mid-90s, i.e. whether harvest-plus-ES removes the burn-in recipe's
-# plateau near 90%.
 
 import os
 import random
@@ -33,15 +27,16 @@ from iters.exp_baseline_lr2e3 import (
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_ft_hburn_checkpoint_step"
+CHECKPOINT_PREFIX = "es_finetune_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_ft_hburn',
+    'experiment': 'exp_es_finetune',
     'es_generations': 120,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
     'anchor_lambda': 1e-3,
+    'fitness': 'dense_cells',
     'fitness_puzzles': 384,
     'fitness_iters': 1024,
 }
@@ -55,11 +50,14 @@ sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale
                                           # to weight noise (1e-3 zeroes a 96% model).
 lr = 3e-4                 # update step size
 anchor_lambda = 1e-3      # pull toward the seed weights each generation
+fitness_dense = True      # dense cell-level fitness gives near-collapsed seeds a usable
+                          # slope; solved-puzzle fitness matches the deployment metric
+                          # exactly and is fine for any seed that already solves some
 fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generation)
 fitness_iters = 1024      # the deployment horizon — the point of all this
 fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
 fitness_pool_size = 20_000
-log_name = "exp_es_ft_hburn.log"
+log_name = "exp_es_finetune.log"
 
 
 def run_iterations(model, x, n_iters):
@@ -76,6 +74,16 @@ def run_iterations(model, x, n_iters):
         h_prev = h
         preds = F.softmax(model.output_head(h), dim=-1)
     return model.output_head(h_prev)
+
+
+def count_correct_cells(model, x, targets, empty_mask, n_iters):
+    correct = 0
+    with torch.no_grad(), torch.autocast('cuda', dtype=torch.bfloat16):
+        for start in range(0, x.size(0), 256):
+            final = run_iterations(model, x[start:start + 256], n_iters).argmax(dim=-1)
+            hits = (final == targets[start:start + 256]) & empty_mask[start:start + 256]
+            correct += int(hits.sum().item())
+    return correct
 
 
 def count_solved(model, x, puzzles, solutions, n_iters):
@@ -113,6 +121,11 @@ def train(output_dir="."):
     pool_puzzles = pool_rows["question"]
     pool_solutions = pool_rows["answer"]
     pool_x = encode_puzzles(pool_puzzles).to(device)
+    # Dense fitness needs per-cell targets and the empty-cell mask: counting only
+    # fully-solved puzzles gives near-collapsed seeds a flat fitness landscape (every
+    # perturbation scores ~0), while correct-cell counts differ everywhere.
+    pool_targets = torch.tensor([[int(s[j]) - 1 for j in range(81)] for s in pool_solutions], device=device)
+    pool_empty = torch.tensor([[p[j] == '.' for j in range(81)] for p in pool_puzzles], device=device)
     print(f"Fitness pool: {len(pool_puzzles)} puzzles")
 
     print("Loading validation probe (test split, 200 per rating bucket)...")
@@ -173,25 +186,30 @@ def train(output_dir="."):
         }, path)
         log(f"Checkpoint saved: {path}")
 
+    def score_slice(lo):
+        fx = pool_x[lo:lo + fitness_puzzles]
+        if fitness_dense:
+            return count_correct_cells(model, fx, pool_targets[lo:lo + fitness_puzzles],
+                                       pool_empty[lo:lo + fitness_puzzles], fitness_iters)
+        return count_solved(model, fx, pool_puzzles[lo:lo + fitness_puzzles],
+                            pool_solutions[lo:lo + fitness_puzzles], fitness_iters)
+
     baseline_probe = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
     log(f"GEN {start_gen - 1:4d} | validation 1024-iter: {baseline_probe}/{len(probe_puzzles)} (starting point)")
 
     # Calibrate the perturbation scale: pick the largest sigma whose perturbed model
     # keeps at least half the unperturbed fitness. Too large and every member scores
     # zero (no signal); too small and the finite-difference signal drowns in noise.
-    calib_x = pool_x[:fitness_puzzles]
-    calib_p = pool_puzzles[:fitness_puzzles]
-    calib_s = pool_solutions[:fitness_puzzles]
-    unperturbed = count_solved(model, calib_x, calib_p, calib_s, fitness_iters)
+    unperturbed = score_slice(0)
     snapshot = [p.detach().clone() for p in model.parameters()]
     sigma = sigma_ladder[-1]
     for candidate in sigma_ladder:
         perturb(list(model.parameters()), 777, candidate)
-        score = count_solved(model, calib_x, calib_p, calib_s, fitness_iters)
+        score = score_slice(0)
         with torch.no_grad():
             for p, s in zip(model.parameters(), snapshot):
                 p.copy_(s)
-        log(f"CALIBRATE sigma={candidate:.0e}: {score}/{fitness_puzzles} (unperturbed {unperturbed})")
+        log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
         if score >= unperturbed // 2:
             sigma = candidate
             break
@@ -203,21 +221,18 @@ def train(output_dir="."):
         # Same probe slice for every population member (common random numbers),
         # rotated each generation so we don't overfit one subset.
         lo = (gen * fitness_puzzles) % (fitness_pool_size - fitness_puzzles)
-        fx = pool_x[lo:lo + fitness_puzzles]
-        fp = pool_puzzles[lo:lo + fitness_puzzles]
-        fs = pool_solutions[lo:lo + fitness_puzzles]
 
         snapshot = [p.detach().clone() for p in params]
         seeds = [rng.randrange(2**62) for _ in range(population_pairs)]
         scores_plus, scores_minus = [], []
         for seed in seeds:
             perturb(params, seed, sigma)
-            scores_plus.append(count_solved(model, fx, fp, fs, fitness_iters))
+            scores_plus.append(score_slice(lo))
             with torch.no_grad():
                 for p, s in zip(params, snapshot):
                     p.copy_(s)
             perturb(params, seed, -sigma)
-            scores_minus.append(count_solved(model, fx, fp, fs, fitness_iters))
+            scores_minus.append(score_slice(lo))
             with torch.no_grad():
                 for p, s in zip(params, snapshot):
                     p.copy_(s)
@@ -243,14 +258,14 @@ def train(output_dir="."):
                     p.add_(p - a, alpha=-anchor_lambda)
 
         probe_solved = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-        log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.1f}/{fitness_puzzles} "
-            f"best {max(all_scores)}/{fitness_puzzles} | validation 1024-iter: {probe_solved}/{len(probe_puzzles)} "
+        log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} "
+            f"best {max(all_scores):.0f} | validation 1024-iter: {probe_solved}/{len(probe_puzzles)} "
             f"| {time.time() - t0:.0f}s")
 
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_ft_hburn.pt")
+    final_path = os.path.join(output_dir, "model_es_finetune.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
