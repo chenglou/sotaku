@@ -38,6 +38,19 @@ The other two arms of the batch. exp_es_ft_hbs.py, seeded from bs2048_baseline_c
 
 Practical upshot, current form: train plain runs (no burn-in), evaluate checkpoints at long iteration counts during the anneal tail, pick any checkpoint with healthy 128-iteration accuracy, and fine-tune it with ES for 60 generations (~1.5 forward-only GPU-hours). Both failed runs given this treatment came out at 94.6% and 95.2% — how the run itself ended barely matters. Still open: tune at 2048+ (now more motivated by the basin-depth inversion), and whether ES can lift a stable model past February's 98.9%.
 
-## In Flight: How Early Can ES Take Over? (launched 2026-07-04)
+## How Early Can ES Take Over? (July 2026)
 
-Four 60-generation runs seeded from progressively earlier checkpoints of the same trajectory (bs2048_baseline_clean_a, whose step-40K rung is the successful es_ft_hbs above): step 0, 5K, 10K, and 20K (exp_es_from0/5k/10k/20k.py, dense fitness). The question: at what point in first-order training does the network become something ES can carry the rest of the way? The answer bounds how much backprop this architecture actually needs.
+A ladder of runs seeded from progressively earlier checkpoints of one trajectory (bs2048_baseline_clean_a), asking at what point in first-order training the network becomes something ES can carry the rest of the way (exp_es_from0/5k/10k/20k.py, dense cell-level fitness). Full-set results, with the later rungs from the sections above for comparison:
+
+| backprop steps before ES | ES gens | probe trajectory | @16 | @128 | @1024 | @2048 |
+|---|---|---|---|---|---|---|
+| 0 (near-random weights) | 60 | 0 → 0, cell fitness pinned at chance | — | — | 0% | — |
+| 5,000 (a tenth) | 120 | 286 → 647, still rising | 63.1% | 75.3% | **69.0%** | 36.9% |
+| 10,000 | 120 | 2 → 371, still rising | 69.1% | 78.0% | 39.7% | 0.1% |
+| 20,000 | 60 | 785 → 824 | 73.6% | 90.3% | **84.7%** | 50.0% |
+| 40,000 (es_ft_hbs) | 60 | 922 → 958 | 80.6% | 95.5% | **95.2%** | 59.0% |
+| 50,000 + ES polish (es_ft_stable) | 120 | 961 → 965 | — | — | **96.5%** | 96.5% |
+
+The reading: backprop's role is carrying the network into territory where ES has a slope to climb. From random weights, sixty generations never solved a single puzzle and the cell-level fitness never left chance — there is no local slope toward solving at this population size. But one tenth of the training schedule already hands ES a workable seed (286/1000, lifted to 69% and still climbing when the budget ran out), and each additional block of backprop buys a higher landing point along a smooth gradient — no cliff anywhere between 5K and 50K. The step-10K seed is the same non-monotonic mid-training turbulence seen everywhere else in this project (it probes far below the *earlier* step-5K seed) and ES recovers it too, just more slowly.
+
+Two caveats. The early rungs' iteration profiles still peak at 128 and decay after (they gained enormously at 1024 but are not monotonic like the step-35K rescue above), and their 2048 behavior is weak — these are partial models, not finished ones. And the ladder holds population and generations fixed; whether more ES budget, larger populations, or a fitness schedule that starts at short horizons closes the remaining gap from below is untested. As it stands, the cheapest route to a strong model is still moderate backprop plus ES (20-40K steps, then fine-tune), but the zero-rung's hard failure and the 5K rung's partial success bracket where "how much backprop do we actually need" lives: more than zero, possibly much less than the full schedule.
