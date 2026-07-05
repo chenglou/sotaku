@@ -2,6 +2,8 @@
 
 This folder keeps the current Viridian docs snapshot and the small probes that matter for using Viridian as a Sotaku training runner.
 
+The general, project-independent version of the runner machinery lives in the private template repo [tips-for-running-viridian](https://github.com/chenglou/tips-for-running-viridian), extracted from `viridian/train/`. When you learn a new general Viridian lesson, add it there; keep this folder to what is Sotaku-specific.
+
 ## Current End-to-End Path
 
 Use Viridian runner jobs, not optimizer jobs:
