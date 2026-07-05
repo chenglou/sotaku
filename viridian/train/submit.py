@@ -34,7 +34,7 @@ from presign import build_train_manifest, presign_url, read_r2_config, shell_quo
 from r2_io import upload_bytes
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-EXTRA_MODULE_NAME = ""
+EXTRA_MODULE_NAMES = []
 SEED_MODEL_PATH = ""
 WRAPPER_DIR = Path(__file__).resolve().parent
 VD_BIN = REPO_ROOT / "viridian" / "bin" / "vd"
@@ -96,9 +96,9 @@ def package_baseline(exp_name, exp_module, out_dir):
     else:
         shutil.copy2(exp_file, staging / exp_file.name)
 
-    if EXTRA_MODULE_NAME:
-        extra_module = importlib.import_module(EXTRA_MODULE_NAME)
-        copy_module_into(staging, EXTRA_MODULE_NAME, Path(extra_module.__file__).resolve())
+    for extra_name in EXTRA_MODULE_NAMES:
+        extra_module = importlib.import_module(extra_name)
+        copy_module_into(staging, extra_name, Path(extra_module.__file__).resolve())
     if SEED_MODEL_PATH:
         shutil.copy2(SEED_MODEL_PATH, staging / "seed_model.pt")
 
@@ -168,7 +168,7 @@ def main():
     parser.add_argument("--exp", default="iters.exp_baseline_lr2e3")
     parser.add_argument("--seed", type=int, default=None, help="passed through to viridian_train.py --seed")
     parser.add_argument("--seed-model", default="", help="checkpoint file packaged into the job as seed_model.pt (for fine-tuning experiments)")
-    parser.add_argument("--extra-module", default="", help="additional module packaged alongside the experiment, e.g. iters.exp_baseline_lr2e3 when the experiment imports it")
+    parser.add_argument("--extra-module", action="append", default=[], help="additional module packaged alongside the experiment, e.g. iters.exp_baseline_lr2e3 when the experiment imports it; repeatable")
     parser.add_argument("--gpu-tier", default="b200")
     parser.add_argument("--bucket", default="sotaku-viridian")
     parser.add_argument("--remote", default="r2")
@@ -194,8 +194,8 @@ def main():
     args = parser.parse_args()
 
     sys.path.insert(0, str(REPO_ROOT))
-    global EXTRA_MODULE_NAME, SEED_MODEL_PATH
-    EXTRA_MODULE_NAME = args.extra_module
+    global EXTRA_MODULE_NAMES, SEED_MODEL_PATH
+    EXTRA_MODULE_NAMES = args.extra_module
     SEED_MODEL_PATH = args.seed_model
     exp_module = importlib.import_module(args.exp)
     uploads = expected_output_files(exp_module)
