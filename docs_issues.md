@@ -1,6 +1,6 @@
 # Viridian Platform Issues
 
-Findings from running ~40 training and fine-tuning jobs on the `b200` plane between 2026-07-01 and 2026-07-04. Job ids are included as evidence for each item. Resolved items are at the end so the current state is clear at a glance.
+Findings from running ~40 training and fine-tuning jobs on the `b200` plane between 2026-07-01 and 2026-07-04. Job ids are included as evidence for each item.
 
 ## Open: 2-Hour Cap on GPU-Plane Evals
 
@@ -24,13 +24,3 @@ The docs say pruning applies to generations that *succeeded* and that "the logs 
 ## Open: `last_error` Embeds a Live Presigned URL
 
 The `last_error` field of a failed job reproduces the killed eval command verbatim, including the full presigned GET URL for the job's artifact manifest (7-day expiry, `X-Amz-Signature` and all) — and that manifest in turn contains presigned upload URLs (observed on `job_01KWNZJYNP9SD92E3KADQBKRXF`, 2026-07-04). Only the job owner can read the job detail, so exposure is limited, but error messages would ideally truncate or redact signed query strings rather than store live credentials.
-
-## Feature Request: Live Metric Series for Long Evals
-
-An eval can effectively report only one score: when it prints multiple `METRIC:` lines, the last one wins (tested empirically). For multi-hour training evals there is no way to expose a live curve through the platform — we presign R2 upload URLs and push logs from inside the eval, which works, but every customer running long jobs would have to reinvent that plumbing. Persisting every `METRIC:` line with timestamps (or a dedicated series channel) would cover it.
-
-## Resolved (verified against the platform)
-
-- `/logs` now returns per-attempt stdout/stderr for failing evals, live during the retry window — entries appeared within 30s of the first attempt (verified 2026-07-02, probe `job_01KWGHY2GNWQ4SQQMRZ2J4GC7K`).
-- `gpu_timeout_s` bounds are now documented: hard cap, 2-hour clamp on the GPU plane, 50 minutes on `rtx6000` (verified 2026-07-02).
-- Cap-killed jobs now surface as **failed** with an explicit `last_error` of "timed out after 7200 seconds" (`job_01KWNZJYNP9SD92E3KADQBKRXF`, 2026-07-04). Previously they ended `converged` with score 0, or sat at `running` indefinitely — the four post-fix kills from 2026-07-02 were still `running` at gen 0 more than 90 minutes after their evals died. If the new behavior is consistent, the status-reporting issue is fixed; the cap itself remains (above).
