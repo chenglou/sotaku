@@ -1,17 +1,10 @@
-# ES at an INTERMEDIATE horizon: fitness graded at 64 iterations, transfer watched
-# at 1024. Backprop's training horizon is pinned near 16 by compounding gradients and
-# memory (32-iteration training already collapses); ES has neither constraint, so the
-# training-time horizon is a free knob — and grading at 64 costs 16x less per
-# generation than grading at 1024. The seed is the same 6.7%-at-1024 checkpoint that
-# ES-at-1024 lifted to 94.6% (es_ft_hbsb), so this run answers directly whether the
-# long-horizon property can be trained at a shorter, cheaper horizon (burn-in's
-# dose-response — depth 128 protecting depth 1024 — says protection reaches several
-# times past the trained depth).
-# Plain antithetic ES: perturb weights with seeded Gaussian noise, score each
-# perturbation by solved puzzles, update along the rank-weighted average direction.
-# Starts from ./seed_model.pt (packaged into the job by submit.py --seed-model).
-# Generations chain across jobs: each ~2h job runs what fits, checkpoints every 20
-# generations, and a resubmit with --resume-checkpoint-key continues from there.
+# ES at an INTERMEDIATE horizon, take two: fitness graded at 256 iterations — where
+# the seed is actually weak. The 64-iteration take failed by design: the seed already
+# solved 891/1000 at 64, so fitness had no pressure and nothing transferred (480 gens
+# ended 898@64 / 108@1024, vs the same seed reaching ~940@1024 in 60 gens under
+# 1024-graded fitness). This seed's profile is 89% at 128 and 6.7% at 1024, so 256
+# sits on its breaking slope. Grading at 256 costs a quarter of grading at 1024;
+# the every-20-generations 1024-iteration probe is the transfer signal.
 
 import os
 import random
@@ -33,22 +26,22 @@ from iters.exp_baseline_lr2e3 import (
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_h64_checkpoint_step"
+CHECKPOINT_PREFIX = "es_h256_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_h64',
-    'es_generations': 480,
+    'experiment': 'exp_es_h256',
+    'es_generations': 240,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
     'anchor_lambda': 1e-3,
     'fitness': 'solved',
     'fitness_puzzles': 384,
-    'fitness_iters': 64,
+    'fitness_iters': 256,
 }
 
-total_steps = 480         # generations; cheap at 64 iterations
-eval_every = 60           # checkpoint every N generations
+total_steps = 240         # generations; 256-iteration fitness costs 4x the 64 version
+eval_every = 30           # checkpoint every N generations
 population_pairs = 16     # antithetic pairs per generation (32 evaluations)
 sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
                                           # only mildly degrades fitness. At 1024
@@ -60,10 +53,10 @@ fitness_dense = False      # dense cell-level fitness gives near-collapsed seeds
                           # slope; solved-puzzle fitness matches the deployment metric
                           # exactly and is fine for any seed that already solves some
 fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generation)
-fitness_iters = 64        # the trained horizon; deployment stays 1024 (watched below)
+fitness_iters = 256       # the trained horizon; deployment stays 1024 (watched below)
 fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
 fitness_pool_size = 20_000
-log_name = "exp_es_h64.log"
+log_name = "exp_es_h256.log"
 
 
 COMPILE_CHUNK = 32   # iterations per compiled block; fitness_iters must divide evenly
@@ -234,9 +227,9 @@ def train(output_dir="."):
         # A puzzle is solved when every empty cell is correct (givens always match).
         return int((hits | ~fm).all(dim=1).sum().item())
 
-    baseline_64 = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
+    baseline_256 = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
     baseline_1024 = count_solved(model, probe_x, probe_puzzles, probe_solutions, 1024)
-    log(f"GEN {start_gen - 1:4d} | validation 64-iter: {baseline_64}/{len(probe_puzzles)} | "
+    log(f"GEN {start_gen - 1:4d} | validation 256-iter: {baseline_256}/{len(probe_puzzles)} | "
         f"1024-iter: {baseline_1024}/{len(probe_puzzles)} (starting point)")
 
     # Calibrate the perturbation scale: pick the largest sigma whose perturbed model
@@ -261,7 +254,7 @@ def train(output_dir="."):
         # Resuming from the final checkpoint: the run is already complete. Save the
         # final model and exit cleanly — without this, the loop below never runs and
         # the return would crash on loop-local variables, failing every retry.
-        final_path = os.path.join(output_dir, "model_es_h64.pt")
+        final_path = os.path.join(output_dir, "model_es_h256.pt")
         torch.save(model.state_dict(), final_path)
         log(f"Run already complete at generation {start_gen - 1}; final model saved: {final_path}")
         log_file.close()
@@ -309,23 +302,23 @@ def train(output_dir="."):
                 for p, a in zip(params, anchor):
                     p.add_(p - a, alpha=-anchor_lambda)
 
-        probe_64 = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
+        probe_256 = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
         transfer = ""
         if gen % 20 == 0 or gen == total_steps - 1:
             probe_1024 = count_solved(model, probe_x, probe_puzzles, probe_solutions, 1024)
             transfer = f" | 1024-iter: {probe_1024}/{len(probe_puzzles)}"
         log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} "
-            f"best {max(all_scores):.0f} | validation 64-iter: {probe_64}/{len(probe_puzzles)}"
+            f"best {max(all_scores):.0f} | validation 256-iter: {probe_256}/{len(probe_puzzles)}"
             f"{transfer} | {time.time() - t0:.0f}s")
 
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_h64.pt")
+    final_path = os.path.join(output_dir, "model_es_h256.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
-    return {'final_validation': probe_64}
+    return {'final_validation': probe_256}
 
 
 if __name__ == "__main__":

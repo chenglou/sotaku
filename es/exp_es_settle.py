@@ -1,17 +1,12 @@
-# ES from scratch on a TINY network at a SHORT horizon — the growth-program pilot.
-# The step-0 ladder rung (800K params, 1024-iteration fitness) was completely flat:
-# a 32-member population learns too little about too many parameters, judged through
-# too many scrambling iterations. This pilot shrinks both at once: d_model=32
-# (~60K params, ~13x fewer) and fitness at 16 iterations (~64x cheaper per eval,
-# so 2,000 generations fit one job). The question is binary: does fitness climb off
-# chance (~2,000 cells on 384 puzzles) at all? If yes, function-preserving growth
-# (widen d_ff / add heads at fitness plateaus) is the next step; if no, the
-# from-scratch deadness is not about size and the growth idea loses its premise.
-#
-# Differences from exp_es_finetune.py besides size/horizon: no anchor pull
-# (anchoring to a random init would fight progress), and the sigma ladder extends
-# upward (the sharp 1e-3 cliff was measured on a trained model at 1024 iterations;
-# a random net at 16 iterations has no such cliff).
+# ES on SETTLEDNESS at 2048 iterations: fitness counts puzzles that are solved AND
+# whose answer stopped changing over the last 128 iterations. Every model fine-tuned
+# at 1024 softens or collapses at 2048 (95.2% -> 59.0%, 94.6% -> 89.5%) — they were
+# only ever graded on a snapshot. This grades the settling behavior itself, at a
+# horizon beyond deployment. Seed: the 96.5% record model (es_ft_stable final), the
+# only one that currently holds 2048; the question is whether rewarding stopping
+# deepens its basin further and generalizes past the graded horizon (probe logs
+# solved and settled separately at 2048). Per the train/deploy-consistency rule,
+# a model trained this way would also legitimize run-until-settled deployment.
 
 import os
 import random
@@ -19,102 +14,56 @@ import time
 
 import numpy as np
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from datasets import load_dataset
 
 from checkpoint_utils import find_latest_checkpoint
 from iters.exp_baseline_lr2e3 import (
-    COL_IDX,
     RATING_BUCKETS,
-    ROW_IDX,
-    RoPETransformerLayer,
+    ROPE_COS,
+    ROPE_SIN,
+    SudokuTransformer,
     encode_puzzles,
 )
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_tiny_checkpoint_step"
+CHECKPOINT_PREFIX = "es_settle_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_tiny',
-    'd_model': 32,
-    'n_heads': 4,
-    'd_ff': 128,
-    'n_layers': 4,
-    'es_generations': 2000,
+    'experiment': 'exp_es_settle',
+    'es_generations': 60,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
-    'anchor_lambda': 0.0,
-    'fitness': 'dense_cells',
+    'anchor_lambda': 1e-3,
+    'fitness': 'solved_and_settled',
     'fitness_puzzles': 384,
-    'fitness_iters': 16,
+    'fitness_iters': 2048,
+    'settle_window': 128,
 }
 
-total_steps = 2000        # generations; submit.py reads this for checkpoint names
-eval_every = 200          # checkpoint every N generations
-population_pairs = 16     # antithetic pairs per generation (32 evaluations)
-sigma_ladder = [3e-3, 1e-3, 3e-4, 1e-4]
-lr = 3e-4                 # update step size
-fitness_dense = True
+total_steps = 60
+eval_every = 20
+population_pairs = 16
+sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]
+lr = 3e-4
+anchor_lambda = 1e-3
 fitness_puzzles = 384
-fitness_iters = 16        # short horizon: un-scramble the fitness signal for a random net
+fitness_iters = 2048
+SETTLE_WINDOW = 128       # answer must be unchanged from iteration 1920 to 2048
 fitness_pool_offset = 2_700_000
 fitness_pool_size = 20_000
-log_name = "exp_es_tiny.log"
+log_name = "exp_es_settle.log"
 
-d_model = 32
-n_heads = 4
-d_ff = 128
-n_layers = 4
-
-COMPILE_CHUNK = 16   # one compiled block covers the whole 16-iteration horizon
-
-# 2D RoPE tables for the tiny head size (head_dim 8: 2 frequency pairs per axis)
-head_dim = d_model // n_heads
-rope_half = head_dim // 2
-rope_pairs = rope_half // 2
-rope_base = 10.0
-_freqs = 1.0 / (rope_base ** (torch.arange(rope_pairs).float() * 2 / rope_half))
-_row_angles = ROW_IDX.float().unsqueeze(1) * _freqs.unsqueeze(0)
-_col_angles = COL_IDX.float().unsqueeze(1) * _freqs.unsqueeze(0)
-_angles = torch.cat([_row_angles, _col_angles], dim=-1)
-TINY_ROPE_COS = _angles.cos()
-TINY_ROPE_SIN = _angles.sin()
+COMPILE_CHUNK = 32
 
 
-class TinySudokuTransformer(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.initial_encoder = nn.Linear(10, d_model)
-        self.pred_proj = nn.Linear(9, d_model)
-        self.layers = nn.ModuleList([
-            RoPETransformerLayer(d_model, n_heads, d_ff)
-            for _ in range(n_layers)
-        ])
-        self.output_head = nn.Linear(d_model, 9)
-
-
-def run_iterations(model, x, n_iters):
-    """Forward-only iterative refinement, eager mode (probe path)."""
-    device = x.device
-    rope_cos = TINY_ROPE_COS.to(device)
-    rope_sin = TINY_ROPE_SIN.to(device)
-    h_prev = model.initial_encoder(x)
-    preds = torch.zeros(x.size(0), 81, 9, device=device)
-    for _ in range(n_iters):
-        h = h_prev + model.pred_proj(preds)
-        for layer in model.layers:
-            h = layer(h, rope_cos, rope_sin)
-        h_prev = h
-        preds = F.softmax(model.output_head(h), dim=-1)
-    return model.output_head(h_prev)
-
-
-def make_compiled_runner(model, device):
-    rope_cos = TINY_ROPE_COS.to(device)
-    rope_sin = TINY_ROPE_SIN.to(device)
+def make_two_phase_runner(model, device):
+    """Compiled runner that returns the answer at (n_total - window) and at n_total,
+    so settledness is one extra argmax instead of a second full run."""
+    rope_cos = ROPE_COS.to(device)
+    rope_sin = ROPE_SIN.to(device)
 
     def iter_block(h_prev, preds):
         for _ in range(COMPILE_CHUNK):
@@ -127,35 +76,22 @@ def make_compiled_runner(model, device):
 
     compiled_block = torch.compile(iter_block, dynamic=False)
 
-    def run(x, n_iters):
-        assert n_iters % COMPILE_CHUNK == 0, f"{n_iters} not a multiple of {COMPILE_CHUNK}"
+    def run(x, n_total, window):
+        assert n_total % COMPILE_CHUNK == 0 and window % COMPILE_CHUNK == 0
         h_prev = model.initial_encoder(x)
         preds = torch.zeros(x.size(0), 81, 9, device=device)
-        for _ in range(n_iters // COMPILE_CHUNK):
+        for _ in range((n_total - window) // COMPILE_CHUNK):
             h_prev, preds = compiled_block(h_prev, preds)
-        return model.output_head(h_prev)
+        answer_early = model.output_head(h_prev).argmax(dim=-1)
+        for _ in range(window // COMPILE_CHUNK):
+            h_prev, preds = compiled_block(h_prev, preds)
+        answer_final = model.output_head(h_prev).argmax(dim=-1)
+        return answer_early, answer_final
 
     return run
 
 
-def count_solved(model, x, puzzles, solutions, n_iters):
-    solved = 0
-    with torch.no_grad(), torch.autocast('cuda', dtype=torch.bfloat16):
-        for start in range(0, x.size(0), 256):
-            batch_x = x[start:start + 256]
-            final = run_iterations(model, batch_x, n_iters).argmax(dim=-1).cpu()
-            for b, (puzzle, solution) in enumerate(zip(puzzles[start:start + 256], solutions[start:start + 256])):
-                pred = list(puzzle)
-                for i in range(81):
-                    if puzzle[i] == '.':
-                        pred[i] = str(final[b, i].item() + 1)
-                if ''.join(pred) == solution:
-                    solved += 1
-    return solved
-
-
 def perturb(params, seed, scale):
-    """Add scale * z to every parameter, z regenerated from the seed (never stored)."""
     gen = torch.Generator(device=params[0].device)
     gen.manual_seed(seed)
     with torch.no_grad():
@@ -167,7 +103,7 @@ def perturb(params, seed, scale):
 def train(output_dir="."):
     device = torch.device("cuda")
 
-    print("Loading fitness pool (train rows beyond the first-order training cut)...")
+    print("Loading fitness pool...")
     dataset = load_dataset("sapientinc/sudoku-extreme", split="train")
     pool_rows = dataset[fitness_pool_offset:fitness_pool_offset + fitness_pool_size]
     pool_puzzles = pool_rows["question"]
@@ -177,7 +113,7 @@ def train(output_dir="."):
     pool_empty = torch.tensor([[p[j] == '.' for j in range(81)] for p in pool_puzzles], device=device)
     print(f"Fitness pool: {len(pool_puzzles)} puzzles")
 
-    print("Loading validation probe (test split, 200 per rating bucket)...")
+    print("Loading validation probe...")
     test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
     probe_idx = []
     per_bucket = {name: 0 for _, _, name in RATING_BUCKETS}
@@ -190,19 +126,18 @@ def train(output_dir="."):
                 break
         if len(probe_idx) >= 1000:
             break
-    probe_puzzles = [test_dataset[i]['question'] for i in probe_idx]
-    probe_solutions = [test_dataset[i]['answer'] for i in probe_idx]
-    probe_x = encode_puzzles(probe_puzzles).to(device)
-    print(f"Validation probe: {len(probe_puzzles)} puzzles")
+    probe_x = encode_puzzles([test_dataset[i]['question'] for i in probe_idx]).to(device)
+    probe_targets = torch.tensor([[int(test_dataset[i]['answer'][j]) - 1 for j in range(81)] for i in probe_idx], device=device)
+    probe_empty = torch.tensor([[test_dataset[i]['question'][j] == '.' for j in range(81)] for i in probe_idx], device=device)
+    print(f"Validation probe: {probe_x.size(0)} puzzles")
 
-    model = TinySudokuTransformer().to(device)
-    n_params = sum(p.numel() for p in model.parameters())
-    print(f"Tiny model: {n_params} parameters")
+    model = SudokuTransformer().to(device)
 
-    checkpoint_path, start_gen = find_latest_checkpoint(output_dir, CHECKPOINT_PREFIX)
+    checkpoint_path, _ = find_latest_checkpoint(output_dir, CHECKPOINT_PREFIX)
     if checkpoint_path:
         ckpt = torch.load(checkpoint_path, map_location=device, weights_only=True)
         model.load_state_dict(ckpt['model_state_dict'])
+        anchor = [t.to(device) for t in ckpt['anchor']]
         start_gen = ckpt['step'] + 1
         print(f"Resumed ES state from generation {ckpt['step']}")
     else:
@@ -211,12 +146,13 @@ def train(output_dir="."):
         if 'model_state_dict' in state:
             state = state['model_state_dict']
         model.load_state_dict(state)
+        anchor = [p.detach().clone() for p in model.parameters()]
         start_gen = 0
         print(f"Loaded seed model from {seed_path}")
 
     model.eval()
     params = list(model.parameters())
-    run_compiled = make_compiled_runner(model, device)
+    run_two = make_two_phase_runner(model, device)
 
     log_path = os.path.join(output_dir, log_name)
     log_file = open(log_path, "a")
@@ -231,24 +167,38 @@ def train(output_dir="."):
         torch.save({
             'step': gen,
             'model_state_dict': model.state_dict(),
+            'anchor': [t.cpu() for t in anchor],
             'config': CONFIG,
         }, path)
         log(f"Checkpoint saved: {path}")
 
-    def score_slice(lo):
-        fx = pool_x[lo:lo + fitness_puzzles]
-        ft = pool_targets[lo:lo + fitness_puzzles]
-        fm = pool_empty[lo:lo + fitness_puzzles]
+    def solved_settled(x, targets, empty, chunk):
+        """Counts over one batch set: (solved, settled, both). Settledness is judged
+        on empty cells only — given cells' predictions are irrelevant to the answer."""
+        solved = settled = both = 0
         with torch.no_grad(), torch.autocast('cuda', dtype=torch.bfloat16):
-            final = run_compiled(fx, fitness_iters).argmax(dim=-1)
-        hits = (final == ft) & fm
-        if fitness_dense:
-            return int(hits.sum().item())
-        return int((hits | ~fm).all(dim=1).sum().item())
+            for start in range(0, x.size(0), chunk):
+                a_early, a_final = run_two(x[start:start + chunk], fitness_iters, SETTLE_WINDOW)
+                tb = targets[start:start + chunk]
+                eb = empty[start:start + chunk]
+                ok = (((a_final == tb) & eb) | ~eb).all(dim=1)
+                still = (((a_final == a_early) & eb) | ~eb).all(dim=1)
+                solved += int(ok.sum().item())
+                settled += int(still.sum().item())
+                both += int((ok & still).sum().item())
+        return solved, settled, both
 
-    baseline_probe = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-    log(f"GEN {start_gen - 1:4d} | {n_params} params | validation {fitness_iters}-iter: "
-        f"{baseline_probe}/{len(probe_puzzles)} (starting point)")
+    def score_slice(lo):
+        _, _, both = solved_settled(
+            pool_x[lo:lo + fitness_puzzles],
+            pool_targets[lo:lo + fitness_puzzles],
+            pool_empty[lo:lo + fitness_puzzles],
+            fitness_puzzles,
+        )
+        return both
+
+    s0, t0_, b0 = solved_settled(probe_x, probe_targets, probe_empty, 500)
+    log(f"GEN {start_gen - 1:4d} | validation 2048-iter: solved {s0}/1000, settled {t0_}/1000, both {b0}/1000 (starting point)")
 
     unperturbed = score_slice(0)
     snapshot = [p.detach().clone() for p in model.parameters()]
@@ -269,7 +219,7 @@ def train(output_dir="."):
         # Resuming from the final checkpoint: the run is already complete. Save the
         # final model and exit cleanly — without this, the loop below never runs and
         # the return would crash on loop-local variables, failing every retry.
-        final_path = os.path.join(output_dir, "model_es_tiny.pt")
+        final_path = os.path.join(output_dir, "model_es_settle.pt")
         torch.save(model.state_dict(), final_path)
         log(f"Run already complete at generation {start_gen - 1}; final model saved: {final_path}")
         log_file.close()
@@ -308,21 +258,24 @@ def train(output_dir="."):
                     for p in params:
                         z = torch.randn(p.shape, generator=gen_t, device=device, dtype=torch.float32)
                         p.add_(z, alpha=lr * w)
+                for p, a in zip(params, anchor):
+                    p.add_(p - a, alpha=-anchor_lambda)
 
-        if gen % 10 == 0 or gen == total_steps - 1:
-            probe_solved = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-            log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} "
-                f"best {max(all_scores):.0f} | validation {fitness_iters}-iter: "
-                f"{probe_solved}/{len(probe_puzzles)} | {time.time() - t0:.1f}s")
+        if gen % 5 == 0 or gen == total_steps - 1:
+            s, t, b = solved_settled(probe_x, probe_targets, probe_empty, 500)
+            log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} best {max(all_scores):.0f} | "
+                f"validation 2048-iter: solved {s}/1000, settled {t}/1000, both {b}/1000 | {time.time() - t0:.0f}s")
+        else:
+            log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} best {max(all_scores):.0f} | {time.time() - t0:.0f}s")
 
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_tiny.pt")
+    final_path = os.path.join(output_dir, "model_es_settle.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
-    return {'final_fitness': float(np.mean(all_scores))}
+    return {'final_both': b}
 
 
 if __name__ == "__main__":

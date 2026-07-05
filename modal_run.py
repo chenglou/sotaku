@@ -61,7 +61,12 @@ def run_training(
     env_line = (f"{datetime.datetime.utcnow().isoformat()}Z | {exp_name} | "
                 f"torch {torch.__version__}, cuda {torch.version.cuda} | {driver_line}")
     print(env_line)
-    with open("/outputs/env_runs.log", "a") as env_log:
+    # One file per run: concurrent training containers each commit the shared volume
+    # with last-writer-wins semantics, so appending to one shared file loses lines.
+    import os
+    os.makedirs("/outputs/env_runs", exist_ok=True)
+    stamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    with open(f"/outputs/env_runs/{stamp}_{exp_name.rsplit('.', 1)[-1]}.log", "w") as env_log:
         env_log.write(env_line + "\n")
 
     # A reused container (e.g. a retry after worker loss) needs an explicit refresh

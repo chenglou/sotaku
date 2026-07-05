@@ -123,6 +123,15 @@ def train(output_dir="."):
                 solved += int((((final == tb) & eb) | ~eb).all(dim=1).sum().item())
         return solved
 
+    if start_step >= total_steps:
+        # Resuming from the final checkpoint: training is already complete. Save the
+        # final model and exit cleanly instead of crashing on loop-local variables.
+        final_path = os.path.join(output_dir, "model_tiny_bootstrap.pt")
+        torch.save(model.state_dict(), final_path)
+        log(f"Run already complete at step {start_step - 1}; final model saved: {final_path}")
+        log_file.close()
+        return {'already_complete': True}
+
     model.train()
     t0 = time.time()
     for step in range(start_step, total_steps):

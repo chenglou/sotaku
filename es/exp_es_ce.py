@@ -270,6 +270,16 @@ def train(output_dir="."):
             break
     log(f"CALIBRATE chose sigma={sigma:.0e}")
 
+    if start_gen >= total_steps:
+        # Resuming from the final checkpoint: the run is already complete. Save the
+        # final model and exit cleanly — without this, the loop below never runs and
+        # the return would crash on loop-local variables, failing every retry.
+        final_path = os.path.join(output_dir, "model_es_ce.pt")
+        torch.save(model.state_dict(), final_path)
+        log(f"Run already complete at generation {start_gen - 1}; final model saved: {final_path}")
+        log_file.close()
+        return {'already_complete': True}
+
     rng = random.Random(1234 + start_gen)
     for gen in range(start_gen, total_steps):
         t0 = time.time()

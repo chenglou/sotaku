@@ -205,10 +205,13 @@ def prepare_resume_checkpoint(args, exp_module, output_dir, report_path):
                 report_path,
                 source="auto_resume",
             )
-        except ValueError:
-            # Mid-upload race: sha sidecar and checkpoint bytes disagree. Try the next
-            # (older) candidate rather than failing the whole attempt.
-            append_event(report_path, {"event": "auto_resume_sha_mismatch", "step": step})
+        except (ValueError, RuntimeError, OSError) as error:
+            # ValueError: sha sidecar and checkpoint bytes disagree (mid-upload race).
+            # RuntimeError/OSError: torch.load on a checkpoint that was truncated at
+            # save time — its sha matches its own truncated bytes, so only the load
+            # fails. Either way, try the next (older) candidate rather than failing
+            # the whole attempt (and every retry after it) on one bad object.
+            append_event(report_path, {"event": "auto_resume_candidate_bad", "step": step, "error": repr(error)})
             continue
     return None
 

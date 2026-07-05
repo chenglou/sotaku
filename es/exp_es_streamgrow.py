@@ -1,17 +1,15 @@
-# ES from scratch on a TINY network at a SHORT horizon — the growth-program pilot.
-# The step-0 ladder rung (800K params, 1024-iteration fitness) was completely flat:
-# a 32-member population learns too little about too many parameters, judged through
-# too many scrambling iterations. This pilot shrinks both at once: d_model=32
-# (~60K params, ~13x fewer) and fitness at 16 iterations (~64x cheaper per eval,
-# so 2,000 generations fit one job). The question is binary: does fitness climb off
-# chance (~2,000 cells on 384 puzzles) at all? If yes, function-preserving growth
-# (widen d_ff / add heads at fitness plateaus) is the next step; if no, the
-# from-scratch deadness is not about size and the growth idea loses its premise.
-#
-# Differences from exp_es_finetune.py besides size/horizon: no anchor pull
-# (anchoring to a random init would fight progress), and the sigma ladder extends
-# upward (the sharp 1e-3 cliff was measured on a trained model at 1024 iterations;
-# a random net at 16 iterations has no such cliff).
+# Stream growth: the axis exp_es_grow left untested. That run widened d_ff (128->512)
+# function-preservingly and the learning slope did not change — the 32-dimensional
+# residual stream is the suspected bottleneck (the mipmap-down probe showed the full
+# model saturates all 128 of its stream dimensions). This run widens the STREAM:
+# d_model 32 -> 64 by duplicate-and-halve — every stream vector becomes [v, v], every
+# writer duplicates its output rows, every reader halves-and-duplicates its input
+# columns, and heads double (4 -> 8) at constant head_dim 8, so the per-head attention
+# geometry and the RoPE tables are untouched. LayerNorm survives duplication exactly
+# (duplicating values changes neither mean nor variance). Seed: model_es_streamgrow.pt is
+# NOT used — the seed is exp_es_grow's final model (d=32, d_ff=512, probe 260/1000 at
+# 128 iterations), so the pre-growth slope directly continues that run's and the
+# post-growth slope answers whether the stream was the constraint.
 
 import os
 import random
@@ -24,80 +22,103 @@ import torch.nn.functional as F
 from datasets import load_dataset
 
 from checkpoint_utils import find_latest_checkpoint
-from iters.exp_baseline_lr2e3 import (
-    COL_IDX,
-    RATING_BUCKETS,
-    ROW_IDX,
-    RoPETransformerLayer,
-    encode_puzzles,
-)
+from es.exp_es_tiny import TINY_ROPE_COS, TINY_ROPE_SIN
+from iters.exp_baseline_lr2e3 import RATING_BUCKETS, RoPETransformerLayer, encode_puzzles
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_tiny_checkpoint_step"
+CHECKPOINT_PREFIX = "es_streamgrow_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_tiny',
+    'experiment': 'exp_es_streamgrow',
     'd_model': 32,
     'n_heads': 4,
-    'd_ff': 128,
+    'd_model_small': 32,
+    'd_model_big': 64,
+    'd_ff': 512,
+    'grow_at_gen': 200,
     'n_layers': 4,
-    'es_generations': 2000,
+    'es_generations': 1000,
     'population_pairs': 16,
     'sigma': 'calibrated',
     'lr': 3e-4,
     'anchor_lambda': 0.0,
     'fitness': 'dense_cells',
     'fitness_puzzles': 384,
-    'fitness_iters': 16,
+    'fitness_iters': 128,
 }
 
-total_steps = 2000        # generations; submit.py reads this for checkpoint names
-eval_every = 200          # checkpoint every N generations
-population_pairs = 16     # antithetic pairs per generation (32 evaluations)
+total_steps = 1000
+eval_every = 100
+population_pairs = 16
 sigma_ladder = [3e-3, 1e-3, 3e-4, 1e-4]
-lr = 3e-4                 # update step size
-fitness_dense = True
+lr = 3e-4
 fitness_puzzles = 384
-fitness_iters = 16        # short horizon: un-scramble the fitness signal for a random net
+fitness_iters = 128
 fitness_pool_offset = 2_700_000
 fitness_pool_size = 20_000
-log_name = "exp_es_tiny.log"
+log_name = "exp_es_streamgrow.log"
 
-d_model = 32
-n_heads = 4
-d_ff = 128
+D_MODEL_SMALL = 32
+D_MODEL_BIG = 64
+HEAD_DIM = 8
+D_FF = 512
 n_layers = 4
+GROW_AT_GEN = 200
 
-COMPILE_CHUNK = 16   # one compiled block covers the whole 16-iteration horizon
-
-# 2D RoPE tables for the tiny head size (head_dim 8: 2 frequency pairs per axis)
-head_dim = d_model // n_heads
-rope_half = head_dim // 2
-rope_pairs = rope_half // 2
-rope_base = 10.0
-_freqs = 1.0 / (rope_base ** (torch.arange(rope_pairs).float() * 2 / rope_half))
-_row_angles = ROW_IDX.float().unsqueeze(1) * _freqs.unsqueeze(0)
-_col_angles = COL_IDX.float().unsqueeze(1) * _freqs.unsqueeze(0)
-_angles = torch.cat([_row_angles, _col_angles], dim=-1)
-TINY_ROPE_COS = _angles.cos()
-TINY_ROPE_SIN = _angles.sin()
+COMPILE_CHUNK = 32
 
 
-class TinySudokuTransformer(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.initial_encoder = nn.Linear(10, d_model)
-        self.pred_proj = nn.Linear(9, d_model)
-        self.layers = nn.ModuleList([
-            RoPETransformerLayer(d_model, n_heads, d_ff)
-            for _ in range(n_layers)
-        ])
-        self.output_head = nn.Linear(d_model, 9)
+def make_model(d_model):
+    n_heads = d_model // HEAD_DIM   # heads scale with width; head_dim stays 8
+    model = nn.Module()
+    model.initial_encoder = nn.Linear(10, d_model)
+    model.pred_proj = nn.Linear(9, d_model)
+    model.layers = nn.ModuleList([
+        RoPETransformerLayer(d_model, n_heads, D_FF)
+        for _ in range(n_layers)
+    ])
+    model.output_head = nn.Linear(d_model, 9)
+    return model
+
+
+def grown_state_dict(state):
+    """Duplicate-and-halve the residual stream, exactly function-preserving: stream
+    vectors become [v, v] (writers duplicate output rows; LayerNorm params duplicate —
+    duplication changes neither mean nor variance), and every reader becomes
+    [W/2, W/2] so it computes the same dot products from the duplicated input.
+    Heads double at constant head_dim, so per-head attention and RoPE are untouched."""
+    def dup_rows(w):    # stream writer: (d, in) -> (2d, in)
+        return torch.cat([w, w], dim=0)
+
+    def half_cols(w):   # stream reader: (out, d) -> (out, 2d)
+        return torch.cat([w / 2, w / 2], dim=1)
+
+    def dup_vec(v):
+        return torch.cat([v, v], dim=0)
+
+    new_state = {}
+    for key, w in state.items():
+        w = w.float().cpu()
+        if key.startswith('initial_encoder.') or key.startswith('pred_proj.'):
+            new_state[key] = dup_rows(w) if w.dim() == 2 else dup_vec(w)
+        elif key.startswith('output_head.'):
+            new_state[key] = half_cols(w) if w.dim() == 2 else w.clone()
+        elif '.norm' in key:
+            new_state[key] = dup_vec(w)
+        elif any(p in key for p in ('.q_proj.', '.k_proj.', '.v_proj.', '.out_proj.')):
+            new_state[key] = dup_rows(half_cols(w)) if w.dim() == 2 else dup_vec(w)
+        elif '.linear1.' in key:   # (d_ff, d): reader only
+            new_state[key] = half_cols(w) if w.dim() == 2 else w.clone()
+        elif '.linear2.' in key:   # (d, d_ff): writer only
+            new_state[key] = dup_rows(w) if w.dim() == 2 else dup_vec(w)
+        else:
+            raise ValueError(f"unmapped key: {key}")
+    return new_state
 
 
 def run_iterations(model, x, n_iters):
-    """Forward-only iterative refinement, eager mode (probe path)."""
+    """Eager probe path."""
     device = x.device
     rope_cos = TINY_ROPE_COS.to(device)
     rope_sin = TINY_ROPE_SIN.to(device)
@@ -128,7 +149,7 @@ def make_compiled_runner(model, device):
     compiled_block = torch.compile(iter_block, dynamic=False)
 
     def run(x, n_iters):
-        assert n_iters % COMPILE_CHUNK == 0, f"{n_iters} not a multiple of {COMPILE_CHUNK}"
+        assert n_iters % COMPILE_CHUNK == 0
         h_prev = model.initial_encoder(x)
         preds = torch.zeros(x.size(0), 81, 9, device=device)
         for _ in range(n_iters // COMPILE_CHUNK):
@@ -155,7 +176,6 @@ def count_solved(model, x, puzzles, solutions, n_iters):
 
 
 def perturb(params, seed, scale):
-    """Add scale * z to every parameter, z regenerated from the seed (never stored)."""
     gen = torch.Generator(device=params[0].device)
     gen.manual_seed(seed)
     with torch.no_grad():
@@ -167,7 +187,7 @@ def perturb(params, seed, scale):
 def train(output_dir="."):
     device = torch.device("cuda")
 
-    print("Loading fitness pool (train rows beyond the first-order training cut)...")
+    print("Loading fitness pool...")
     dataset = load_dataset("sapientinc/sudoku-extreme", split="train")
     pool_rows = dataset[fitness_pool_offset:fitness_pool_offset + fitness_pool_size]
     pool_puzzles = pool_rows["question"]
@@ -177,7 +197,7 @@ def train(output_dir="."):
     pool_empty = torch.tensor([[p[j] == '.' for j in range(81)] for p in pool_puzzles], device=device)
     print(f"Fitness pool: {len(pool_puzzles)} puzzles")
 
-    print("Loading validation probe (test split, 200 per rating bucket)...")
+    print("Loading validation probe...")
     test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
     probe_idx = []
     per_bucket = {name: 0 for _, _, name in RATING_BUCKETS}
@@ -195,29 +215,6 @@ def train(output_dir="."):
     probe_x = encode_puzzles(probe_puzzles).to(device)
     print(f"Validation probe: {len(probe_puzzles)} puzzles")
 
-    model = TinySudokuTransformer().to(device)
-    n_params = sum(p.numel() for p in model.parameters())
-    print(f"Tiny model: {n_params} parameters")
-
-    checkpoint_path, start_gen = find_latest_checkpoint(output_dir, CHECKPOINT_PREFIX)
-    if checkpoint_path:
-        ckpt = torch.load(checkpoint_path, map_location=device, weights_only=True)
-        model.load_state_dict(ckpt['model_state_dict'])
-        start_gen = ckpt['step'] + 1
-        print(f"Resumed ES state from generation {ckpt['step']}")
-    else:
-        seed_path = os.path.join(os.getcwd(), "seed_model.pt")
-        state = torch.load(seed_path, map_location=device, weights_only=True)
-        if 'model_state_dict' in state:
-            state = state['model_state_dict']
-        model.load_state_dict(state)
-        start_gen = 0
-        print(f"Loaded seed model from {seed_path}")
-
-    model.eval()
-    params = list(model.parameters())
-    run_compiled = make_compiled_runner(model, device)
-
     log_path = os.path.join(output_dir, log_name)
     log_file = open(log_path, "a")
 
@@ -226,10 +223,36 @@ def train(output_dir="."):
         log_file.write(msg + "\n")
         log_file.flush()
 
+    checkpoint_path, _ = find_latest_checkpoint(output_dir, CHECKPOINT_PREFIX)
+    if checkpoint_path:
+        ckpt = torch.load(checkpoint_path, map_location='cpu', weights_only=True)
+        current_d_model = int(ckpt.get('d_model', D_MODEL_SMALL))
+        model = make_model(current_d_model).to(device)
+        model.load_state_dict(ckpt['model_state_dict'])
+        start_gen = ckpt['step'] + 1
+        log(f"Resumed from generation {ckpt['step']} at d_model={current_d_model}")
+    else:
+        seed_path = os.path.join(os.getcwd(), "seed_model.pt")
+        state = torch.load(seed_path, map_location='cpu', weights_only=True)
+        if 'model_state_dict' in state:
+            state = state['model_state_dict']
+        current_d_model = D_MODEL_SMALL
+        model = make_model(current_d_model).to(device)
+        model.load_state_dict(state)
+        start_gen = 0
+        log(f"Loaded bootstrap seed from {seed_path}")
+
+    model.eval()
+    params = list(model.parameters())
+    run_compiled = make_compiled_runner(model, device)
+    n_params = sum(p.numel() for p in params)
+    log(f"Model: {n_params} parameters (d_model={current_d_model})")
+
     def save_checkpoint(gen):
         path = os.path.join(output_dir, f"{CHECKPOINT_PREFIX}{gen}.pt")
         torch.save({
             'step': gen,
+            'd_model': current_d_model,
             'model_state_dict': model.state_dict(),
             'config': CONFIG,
         }, path)
@@ -241,35 +264,34 @@ def train(output_dir="."):
         fm = pool_empty[lo:lo + fitness_puzzles]
         with torch.no_grad(), torch.autocast('cuda', dtype=torch.bfloat16):
             final = run_compiled(fx, fitness_iters).argmax(dim=-1)
-        hits = (final == ft) & fm
-        if fitness_dense:
-            return int(hits.sum().item())
-        return int((hits | ~fm).all(dim=1).sum().item())
+        return int(((final == ft) & fm).sum().item())
+
+    def calibrate():
+        unperturbed = score_slice(0)
+        snapshot = [p.detach().clone() for p in model.parameters()]
+        chosen = sigma_ladder[-1]
+        for candidate in sigma_ladder:
+            perturb(list(model.parameters()), 777, candidate)
+            score = score_slice(0)
+            with torch.no_grad():
+                for p, s in zip(model.parameters(), snapshot):
+                    p.copy_(s)
+            log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
+            if score >= unperturbed // 2:
+                chosen = candidate
+                break
+        log(f"CALIBRATE chose sigma={chosen:.0e}")
+        return chosen
 
     baseline_probe = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-    log(f"GEN {start_gen - 1:4d} | {n_params} params | validation {fitness_iters}-iter: "
-        f"{baseline_probe}/{len(probe_puzzles)} (starting point)")
-
-    unperturbed = score_slice(0)
-    snapshot = [p.detach().clone() for p in model.parameters()]
-    sigma = sigma_ladder[-1]
-    for candidate in sigma_ladder:
-        perturb(list(model.parameters()), 777, candidate)
-        score = score_slice(0)
-        with torch.no_grad():
-            for p, s in zip(model.parameters(), snapshot):
-                p.copy_(s)
-        log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
-        if score >= unperturbed // 2:
-            sigma = candidate
-            break
-    log(f"CALIBRATE chose sigma={sigma:.0e}")
+    log(f"GEN {start_gen - 1:4d} | validation {fitness_iters}-iter: {baseline_probe}/{len(probe_puzzles)} (starting point)")
+    sigma = calibrate()
 
     if start_gen >= total_steps:
         # Resuming from the final checkpoint: the run is already complete. Save the
         # final model and exit cleanly — without this, the loop below never runs and
         # the return would crash on loop-local variables, failing every retry.
-        final_path = os.path.join(output_dir, "model_es_tiny.pt")
+        final_path = os.path.join(output_dir, "model_es_streamgrow.pt")
         torch.save(model.state_dict(), final_path)
         log(f"Run already complete at generation {start_gen - 1}; final model saved: {final_path}")
         log_file.close()
@@ -277,6 +299,21 @@ def train(output_dir="."):
 
     rng = random.Random(1234 + start_gen)
     for gen in range(start_gen, total_steps):
+        if gen == GROW_AT_GEN and current_d_model == D_MODEL_SMALL:
+            pre = score_slice(0)
+            grown = grown_state_dict({k: v.cpu() for k, v in model.state_dict().items()})
+            current_d_model = D_MODEL_BIG
+            model = make_model(current_d_model).to(device)
+            model.load_state_dict(grown)
+            model.eval()
+            params = list(model.parameters())
+            run_compiled = make_compiled_runner(model, device)
+            post = score_slice(0)
+            n_params = sum(p.numel() for p in params)
+            log(f"GROW at gen {gen}: d_model {D_MODEL_SMALL} -> {D_MODEL_BIG} ({n_params} params) | "
+                f"fitness before {pre}, after {post} (function-preserving: should match)")
+            sigma = calibrate()
+
         t0 = time.time()
         lo = (gen * fitness_puzzles) % (fitness_pool_size - fitness_puzzles)
 
@@ -318,11 +355,11 @@ def train(output_dir="."):
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_tiny.pt")
+    final_path = os.path.join(output_dir, "model_es_streamgrow.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
-    return {'final_fitness': float(np.mean(all_scores))}
+    return {'final_probe': probe_solved}
 
 
 if __name__ == "__main__":

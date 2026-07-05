@@ -1,17 +1,13 @@
-# ES at an INTERMEDIATE horizon: fitness graded at 64 iterations, transfer watched
-# at 1024. Backprop's training horizon is pinned near 16 by compounding gradients and
-# memory (32-iteration training already collapses); ES has neither constraint, so the
-# training-time horizon is a free knob — and grading at 64 costs 16x less per
-# generation than grading at 1024. The seed is the same 6.7%-at-1024 checkpoint that
-# ES-at-1024 lifted to 94.6% (es_ft_hbsb), so this run answers directly whether the
-# long-horizon property can be trained at a shorter, cheaper horizon (burn-in's
-# dose-response — depth 128 protecting depth 1024 — says protection reaches several
-# times past the trained depth).
-# Plain antithetic ES: perturb weights with seeded Gaussian noise, score each
-# perturbation by solved puzzles, update along the rank-weighted average direction.
-# Starts from ./seed_model.pt (packaged into the job by submit.py --seed-model).
-# Generations chain across jobs: each ~2h job runs what fits, checkpoints every 20
-# generations, and a resubmit with --resume-checkpoint-key continues from there.
+# CE-fitness from scratch, phase two. Phase one climbed -12.6 to -2.38 nats over
+# 4,000 generations and asymptoted AT the uniform-prediction floor (-ln 9 = -2.20):
+# the trivial optimum. Two suspects for the stall, both addressed here: sigma was
+# calibrated on the random init (the terrain at the floor is different — the ladder
+# now extends both directions and recalibrates on the floor-sitting seed), and near
+# the floor the fitness differences between population members are tiny, so the
+# population grows 16 -> 128 pairs (256 evaluations per generation) to resolve them.
+# Seed: model_es_ce.pt, the phase-one endpoint. The question: is the uniform floor an
+# escapable plateau (backprop escapes it via per-cell gradients) or a trap for
+# scalar fitness at any practical population?
 
 import os
 import random
@@ -19,66 +15,88 @@ import time
 
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 from datasets import load_dataset
 
 from checkpoint_utils import find_latest_checkpoint
 from iters.exp_baseline_lr2e3 import (
+    COL_IDX,
     RATING_BUCKETS,
-    ROPE_COS,
-    ROPE_SIN,
-    SudokuTransformer,
+    ROW_IDX,
+    RoPETransformerLayer,
     encode_puzzles,
 )
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_h64_checkpoint_step"
+CHECKPOINT_PREFIX = "es_ce2_checkpoint_step"
 
 CONFIG = {
-    'experiment': 'exp_es_h64',
-    'es_generations': 480,
-    'population_pairs': 16,
+    'experiment': 'exp_es_ce2',
+    'd_model': 32,
+    'n_heads': 4,
+    'd_ff': 128,
+    'n_layers': 4,
+    'es_generations': 1000,
+    'population_pairs': 128,
     'sigma': 'calibrated',
     'lr': 3e-4,
-    'anchor_lambda': 1e-3,
-    'fitness': 'solved',
+    'anchor_lambda': 0.0,
+    'fitness': 'neg_ce_empty_cells',
     'fitness_puzzles': 384,
-    'fitness_iters': 64,
+    'fitness_iters': 16,
 }
 
-total_steps = 480         # generations; cheap at 64 iterations
-eval_every = 60           # checkpoint every N generations
-population_pairs = 16     # antithetic pairs per generation (32 evaluations)
-sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
-                                          # only mildly degrades fitness. At 1024
-                                          # iterations the model is extremely sensitive
-                                          # to weight noise (1e-3 zeroes a 96% model).
+total_steps = 1000        # 256 evaluations per generation makes these 8x heavier
+eval_every = 100          # checkpoint every N generations
+population_pairs = 128    # antithetic pairs per generation (256 evaluations)
+sigma_ladder = [1e-2, 3e-3, 1e-3, 3e-4, 1e-4, 3e-5]
 lr = 3e-4                 # update step size
-anchor_lambda = 1e-3      # pull toward the seed weights each generation
-fitness_dense = False      # dense cell-level fitness gives near-collapsed seeds a usable
-                          # slope; solved-puzzle fitness matches the deployment metric
-                          # exactly and is fine for any seed that already solves some
-fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generation)
-fitness_iters = 64        # the trained horizon; deployment stays 1024 (watched below)
-fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
+fitness_dense = True
+fitness_puzzles = 384
+fitness_iters = 16        # short horizon: un-scramble the fitness signal for a random net
+fitness_pool_offset = 2_700_000
 fitness_pool_size = 20_000
-log_name = "exp_es_h64.log"
+log_name = "exp_es_ce2.log"
+
+d_model = 32
+n_heads = 4
+d_ff = 128
+n_layers = 4
+
+COMPILE_CHUNK = 16   # one compiled block covers the whole 16-iteration horizon
+
+# 2D RoPE tables for the tiny head size (head_dim 8: 2 frequency pairs per axis)
+head_dim = d_model // n_heads
+rope_half = head_dim // 2
+rope_pairs = rope_half // 2
+rope_base = 10.0
+_freqs = 1.0 / (rope_base ** (torch.arange(rope_pairs).float() * 2 / rope_half))
+_row_angles = ROW_IDX.float().unsqueeze(1) * _freqs.unsqueeze(0)
+_col_angles = COL_IDX.float().unsqueeze(1) * _freqs.unsqueeze(0)
+_angles = torch.cat([_row_angles, _col_angles], dim=-1)
+TINY_ROPE_COS = _angles.cos()
+TINY_ROPE_SIN = _angles.sin()
 
 
-COMPILE_CHUNK = 32   # iterations per compiled block; fitness_iters must divide evenly
+class TinySudokuTransformer(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.initial_encoder = nn.Linear(10, d_model)
+        self.pred_proj = nn.Linear(9, d_model)
+        self.layers = nn.ModuleList([
+            RoPETransformerLayer(d_model, n_heads, d_ff)
+            for _ in range(n_layers)
+        ])
+        self.output_head = nn.Linear(d_model, 9)
 
 
 def run_iterations(model, x, n_iters):
-    """Forward-only iterative refinement, eager mode. Returns final logits.
-
-    The validation probe stays on this exact path so probe values remain comparable
-    across every run in the project's history; only fitness evaluation uses the
-    compiled path below (3.4x faster, numerically a different-but-equally-valid
-    realization — reduction-order changes compound over 1024 iterations)."""
+    """Forward-only iterative refinement, eager mode (probe path)."""
     device = x.device
-    rope_cos = ROPE_COS.to(device)
-    rope_sin = ROPE_SIN.to(device)
+    rope_cos = TINY_ROPE_COS.to(device)
+    rope_sin = TINY_ROPE_SIN.to(device)
     h_prev = model.initial_encoder(x)
     preds = torch.zeros(x.size(0), 81, 9, device=device)
     for _ in range(n_iters):
@@ -91,11 +109,8 @@ def run_iterations(model, x, n_iters):
 
 
 def make_compiled_runner(model, device):
-    """Compiled fitness path: one 32-iteration block, compiled once, called in a loop.
-    Compiling the block (not the whole horizon) keeps compile time to a few minutes
-    while removing eager per-op launch overhead, the dominant cost for this tiny model."""
-    rope_cos = ROPE_COS.to(device)
-    rope_sin = ROPE_SIN.to(device)
+    rope_cos = TINY_ROPE_COS.to(device)
+    rope_sin = TINY_ROPE_SIN.to(device)
 
     def iter_block(h_prev, preds):
         for _ in range(COMPILE_CHUNK):
@@ -154,9 +169,6 @@ def train(output_dir="."):
     pool_puzzles = pool_rows["question"]
     pool_solutions = pool_rows["answer"]
     pool_x = encode_puzzles(pool_puzzles).to(device)
-    # Dense fitness needs per-cell targets and the empty-cell mask: counting only
-    # fully-solved puzzles gives near-collapsed seeds a flat fitness landscape (every
-    # perturbation scores ~0), while correct-cell counts differ everywhere.
     pool_targets = torch.tensor([[int(s[j]) - 1 for j in range(81)] for s in pool_solutions], device=device)
     pool_empty = torch.tensor([[p[j] == '.' for j in range(81)] for p in pool_puzzles], device=device)
     print(f"Fitness pool: {len(pool_puzzles)} puzzles")
@@ -179,13 +191,14 @@ def train(output_dir="."):
     probe_x = encode_puzzles(probe_puzzles).to(device)
     print(f"Validation probe: {len(probe_puzzles)} puzzles")
 
-    model = SudokuTransformer().to(device)
+    model = TinySudokuTransformer().to(device)
+    n_params = sum(p.numel() for p in model.parameters())
+    print(f"Tiny model: {n_params} parameters")
 
     checkpoint_path, start_gen = find_latest_checkpoint(output_dir, CHECKPOINT_PREFIX)
     if checkpoint_path:
         ckpt = torch.load(checkpoint_path, map_location=device, weights_only=True)
         model.load_state_dict(ckpt['model_state_dict'])
-        anchor = [t.to(device) for t in ckpt['anchor']]
         start_gen = ckpt['step'] + 1
         print(f"Resumed ES state from generation {ckpt['step']}")
     else:
@@ -194,13 +207,12 @@ def train(output_dir="."):
         if 'model_state_dict' in state:
             state = state['model_state_dict']
         model.load_state_dict(state)
-        anchor = [p.detach().clone() for p in model.parameters()]
         start_gen = 0
         print(f"Loaded seed model from {seed_path}")
 
-    model.eval()  # no dropout anywhere in ES — fitness must reflect deployment
+    model.eval()
     params = list(model.parameters())
-    run_compiled = make_compiled_runner(model, device)  # fitness path; first call compiles (~5 min)
+    run_compiled = make_compiled_runner(model, device)
 
     log_path = os.path.join(output_dir, log_name)
     log_file = open(log_path, "a")
@@ -215,33 +227,23 @@ def train(output_dir="."):
         torch.save({
             'step': gen,
             'model_state_dict': model.state_dict(),
-            'anchor': [t.cpu() for t in anchor],
             'config': CONFIG,
         }, path)
         log(f"Checkpoint saved: {path}")
 
     def score_slice(lo):
-        # One full-batch evaluation on the compiled path (chunking removed: it was
-        # 1.8x slower and per-puzzle results don't depend on batch composition).
         fx = pool_x[lo:lo + fitness_puzzles]
         ft = pool_targets[lo:lo + fitness_puzzles]
         fm = pool_empty[lo:lo + fitness_puzzles]
         with torch.no_grad(), torch.autocast('cuda', dtype=torch.bfloat16):
-            final = run_compiled(fx, fitness_iters).argmax(dim=-1)
-        hits = (final == ft) & fm
-        if fitness_dense:
-            return int(hits.sum().item())
-        # A puzzle is solved when every empty cell is correct (givens always match).
-        return int((hits | ~fm).all(dim=1).sum().item())
+            logits = run_compiled(fx, fitness_iters)
+        ce = F.cross_entropy(logits.float()[fm], ft[fm])
+        return -float(ce.item())
 
-    baseline_64 = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-    baseline_1024 = count_solved(model, probe_x, probe_puzzles, probe_solutions, 1024)
-    log(f"GEN {start_gen - 1:4d} | validation 64-iter: {baseline_64}/{len(probe_puzzles)} | "
-        f"1024-iter: {baseline_1024}/{len(probe_puzzles)} (starting point)")
+    baseline_probe = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
+    log(f"GEN {start_gen - 1:4d} | {n_params} params | validation {fitness_iters}-iter: "
+        f"{baseline_probe}/{len(probe_puzzles)} (starting point)")
 
-    # Calibrate the perturbation scale: pick the largest sigma whose perturbed model
-    # keeps at least half the unperturbed fitness. Too large and every member scores
-    # zero (no signal); too small and the finite-difference signal drowns in noise.
     unperturbed = score_slice(0)
     snapshot = [p.detach().clone() for p in model.parameters()]
     sigma = sigma_ladder[-1]
@@ -252,7 +254,7 @@ def train(output_dir="."):
             for p, s in zip(model.parameters(), snapshot):
                 p.copy_(s)
         log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
-        if score >= unperturbed // 2:
+        if score >= unperturbed - 0.3:   # allow ~0.3 nats degradation (chance is -ln 9 = -2.20)
             sigma = candidate
             break
     log(f"CALIBRATE chose sigma={sigma:.0e}")
@@ -261,7 +263,7 @@ def train(output_dir="."):
         # Resuming from the final checkpoint: the run is already complete. Save the
         # final model and exit cleanly — without this, the loop below never runs and
         # the return would crash on loop-local variables, failing every retry.
-        final_path = os.path.join(output_dir, "model_es_h64.pt")
+        final_path = os.path.join(output_dir, "model_es_ce2.pt")
         torch.save(model.state_dict(), final_path)
         log(f"Run already complete at generation {start_gen - 1}; final model saved: {final_path}")
         log_file.close()
@@ -270,8 +272,6 @@ def train(output_dir="."):
     rng = random.Random(1234 + start_gen)
     for gen in range(start_gen, total_steps):
         t0 = time.time()
-        # Same probe slice for every population member (common random numbers),
-        # rotated each generation so we don't overfit one subset.
         lo = (gen * fitness_puzzles) % (fitness_pool_size - fitness_puzzles)
 
         snapshot = [p.detach().clone() for p in params]
@@ -289,10 +289,6 @@ def train(output_dir="."):
                 for p, s in zip(params, snapshot):
                     p.copy_(s)
 
-        # Score-normalized weights, tie-safe: a generation where every member scores
-        # the same (no signal) takes no step at all. The update direction is the
-        # fitness-weighted average of the unit-variance perturbation directions; sigma
-        # deliberately does not appear (it is absorbed into the effective step size).
         all_scores = np.array(scores_plus + scores_minus, dtype=np.float64)
         spread = all_scores.std()
         if spread > 1e-9:
@@ -306,26 +302,21 @@ def train(output_dir="."):
                     for p in params:
                         z = torch.randn(p.shape, generator=gen_t, device=device, dtype=torch.float32)
                         p.add_(z, alpha=lr * w)
-                for p, a in zip(params, anchor):
-                    p.add_(p - a, alpha=-anchor_lambda)
 
-        probe_64 = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
-        transfer = ""
-        if gen % 20 == 0 or gen == total_steps - 1:
-            probe_1024 = count_solved(model, probe_x, probe_puzzles, probe_solutions, 1024)
-            transfer = f" | 1024-iter: {probe_1024}/{len(probe_puzzles)}"
-        log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.0f} "
-            f"best {max(all_scores):.0f} | validation 64-iter: {probe_64}/{len(probe_puzzles)}"
-            f"{transfer} | {time.time() - t0:.0f}s")
+        if gen % 10 == 0 or gen == total_steps - 1:
+            probe_solved = count_solved(model, probe_x, probe_puzzles, probe_solutions, fitness_iters)
+            log(f"GEN {gen:4d} | fitness mean {np.mean(all_scores):.4f} "
+                f"best {max(all_scores):.4f} | validation {fitness_iters}-iter: "
+                f"{probe_solved}/{len(probe_puzzles)} | {time.time() - t0:.1f}s")
 
         if gen % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_h64.pt")
+    final_path = os.path.join(output_dir, "model_es_ce2.pt")
     torch.save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
-    return {'final_validation': probe_64}
+    return {'final_fitness': float(np.mean(all_scores))}
 
 
 if __name__ == "__main__":
