@@ -122,3 +122,20 @@ Three rungs following the pixel bootstrap's twitch, all through the unchanged ar
 **The maze pair (exp_pixel_maze.py, exp_pixel_maze2.py): the port passes everywhere; the scaling needs task depth.** 9x9 unique-shortest-path mazes rendered as wall/floor/start/goal glyphs, the model drawing the path into floor cells. The first version (path >= 6, density 0.28) saturated instantly: 996/1000 at the first probe, perfect from step 5,000, both horizons. The hard version (path >= 14, density 0.30, 0.3% generator acceptance) also ended perfect at both horizons with training loss at zero. So the architecture masters its second task with zero changes — but at 9x9, path-finding is too shallow for more iterations to buy anything: 16 already suffices, and the iteration-scaling question cannot be asked. The reading: iteration scaling is a property of task depth — sudoku's long constraint-propagation chains demand it; short-corridor path-finding does not — and the right second task for the scaling claim needs deep inferential chains, not just a 2D grid. One incidental observation from the hard variant: early in training the 128-iteration probe lagged the 16-iteration probe (744 vs 994) before converging — the long-horizon instability appears even on a task where depth buys nothing, one more sign it is a property of the loop itself.
 
 The program's standing after one day: the phenomenon (iteration scaling), the pathology (mid-training long-horizon collapse), and the cure (settledness fitness) all live below the symbol level; the architecture ports across tasks unchanged; and what iteration scaling feeds on is the task's inferential depth.
+
+## The Rescue-Law Cohort (July 5-6): Eight Unseeded Runs, the Law Gets Its Texture
+
+Before this cohort, the checkpoint-plus-ES recipe stood at four-for-four and read like a law: any plain-trained late checkpoint with healthy 128-iteration accuracy converts to 94+ at 1024 in 60 generations. Eight fresh unseeded runs of the canonical config, each put through the full pipeline (train 50K, evaluate 40K/45K/final checkpoints, ES the best 128-healthy late checkpoint), say the truth is rougher:
+
+| run | best material found | pipeline outcome |
+|---|---|---|
+| e | final 97.1% at 1024 | success (direct) |
+| h | final **98.1%** at 1024 | success (direct) — second-best result in project history, unseeded |
+| b | 45K checkpoint 95.5%; ES polish reached probe 965 | success (harvest, plus polish) |
+| g | 40K at 89.7%/128, 48.8%/1024 | partial: ES climbed 485 to 692 over 120 generations, decelerating |
+| d | 45K at **93.9%/128**, 1.6%/1024 | refused: flat under sparse (24/1000) AND dense (29/1000) fitness |
+| a | 40K at 84.4%/128, 0.2%/1024 | refused: flat at 5/1000 |
+| c | nothing above 74.7% at 128 | no material |
+| f | nothing above 0.9% at 128 | no material |
+
+Verdict: **3 of 8 runs yielded 94+ material** (two finals, one checkpoint), one more is a slow partial conversion, and four had nothing the recipe could finish. Two findings revise the law. First, the original boundary — short-horizon health decides rescuability — is broken by cohort_d: the healthiest 128-iteration seed ever fed to ES (93.9%) refused under both fitness types, while hbsb's 89.0%/6.7% seed had rescued fully; the seed's 1024-level foothold matters too (every past success started at 5.4%+ there; d and a sit at 1.6% and 0.2%). Second, even the foothold does not predict speed — g's 48.8% foothold converted far slower than hbsb's 6.7% — so per-seed basin idiosyncrasy (the same phenomenon as the 2048 depth inversion) dominates any simple criterion. The honest operating law: the pipeline converts roughly half of what training produces cheaply, individual seeds are unpredictable, and the right yardstick for training-recipe comparisons is pipeline yield — the canonical config's is 3/8 at 94+ — rather than any single-run guarantee. Silver lining for the February mystery: two unseeded July runs landed at 97.1% and 98.1%, so nothing about the current fleet prevents near-record runs; February's four-for-four remains an outlier streak.
