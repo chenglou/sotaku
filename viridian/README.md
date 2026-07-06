@@ -50,7 +50,7 @@ VD_BIN="$(pwd)/viridian/bin" sh viridian/raw/install.sh
 ## Files
 
 - `docs.md` and `raw/` are the current downloaded Viridian docs.
-- `docs_issues_assessment.md` records which old docs issues were fixed by the current docs.
+- `docs_issues_assessment.md` records which old docs issues were fixed by the current docs. The live issues-and-features doc moved to the tips-for-running-viridian repo (issues_and_features.md).
 - `min_repro/` keeps the smallest current-doc runner job.
 - `gpu_repro/` keeps small GPU smoke job specs. The live H100 smoke job is listed in `pretraining_probe/RUNS.md`; L4 is covered by the R2 checkpoint/resume jobs.
 - `logs_probe/` keeps the jobs used to verify that `/v1/jobs/{id}/logs` still returned empty entries.

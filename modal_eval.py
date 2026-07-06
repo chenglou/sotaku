@@ -39,11 +39,15 @@ def run_eval(exp_name: str, model_name: str, iter_counts_str: str = "16,32,64,12
 
     from iters.eval_more_iters import evaluate
 
+    outputs_volume.reload()
     model_path = os.path.join("/outputs", model_name)
     iter_counts = [int(x) for x in iter_counts_str.split(",")]
 
-    evaluate(model_path, exp_module=exp_name, iter_counts=iter_counts, device='cuda',
-             output_dir="/outputs")
+    try:
+        evaluate(model_path, exp_module=exp_name, iter_counts=iter_counts, device='cuda',
+                 output_dir="/outputs")
+    finally:
+        outputs_volume.commit()
 
 
 @app.local_entrypoint()
@@ -53,4 +57,6 @@ def main(
     iters: str = "16,32,64,128,256,512,1024",
 ):
     print(f"Evaluating {model} with exp={exp}, iters={iters}")
-    run_eval.remote(exp_name=exp, model_name=model, iter_counts_str=iters)
+    call = run_eval.spawn(exp_name=exp, model_name=model, iter_counts_str=iters)
+    print(f"Spawned eval call: {call.object_id}")
+    print("Eval continues server-side; poll the *_eval.log file on the sudoku-outputs volume for progress.")
