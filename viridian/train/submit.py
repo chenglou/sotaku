@@ -256,22 +256,21 @@ def main():
     spec = build_spec(args, digest, args.exp, eval_cmd)
     spec_path = out_dir / "job.json"
     spec_path.write_text(json.dumps(spec, indent=2))
-    (out_dir / "manifest.safe.json").write_text(
-        json.dumps(
-            {
-                "bucket": args.bucket,
-                "exp": args.exp,
-                "gpu_tier": args.gpu_tier,
-                "prefix": prefix,
-                "private_manifest_key": manifest_key,
-                "resume_checkpoint_key": args.resume_checkpoint_key,
-                "spec": str(spec_path),
-                "timeout": args.timeout,
-                "uploads": uploads,
-            },
-            indent=2,
-        )
-    )
+    safe_manifest = {
+        "bucket": args.bucket,
+        "exp": args.exp,
+        "extra_modules": args.extra_module,
+        "gpu_tier": args.gpu_tier,
+        "prefix": prefix,
+        "private_manifest_key": manifest_key,
+        "resume_checkpoint_key": args.resume_checkpoint_key,
+        "seeded": bool(args.seed_model),
+        "spec": str(spec_path),
+        "timeout": args.timeout,
+        "uploads": uploads,
+    }
+    safe_path = out_dir / "manifest.safe.json"
+    safe_path.write_text(json.dumps(safe_manifest, indent=2))
     print(f"job spec: {spec_path}")
     print(f"r2 prefix: {prefix}")
 
@@ -285,6 +284,8 @@ def main():
             f"vd submit failed (exit {completed.returncode}): stdout={completed.stdout!r} stderr={completed.stderr!r}"
         )
     job_id = completed.stdout.strip()
+    safe_manifest["job_id"] = job_id
+    safe_path.write_text(json.dumps(safe_manifest, indent=2))
     print(f"job: {job_id}")
     print(f"watch: rclone cat 'r2:{args.bucket}/{prefix}/outputs/{exp_module.log_name}'")
 
