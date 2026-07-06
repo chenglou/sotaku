@@ -131,7 +131,7 @@ Before this cohort, the checkpoint-plus-ES recipe stood at four-for-four and rea
 |---|---|---|
 | e | final 97.1% at 1024 | success (direct) |
 | h | final **98.1%** at 1024 | success (direct) — second-best result in project history, unseeded |
-| b | 45K checkpoint 95.5%; ES polish reached probe 965 | success (harvest, plus polish) |
+| b | 45K checkpoint 95.5%; ES polish certified **96.1%** full set | success (harvest, plus polish) |
 | g | 40K at 89.7%/128, 48.8%/1024 | partial: ES climbed 485 to 692 over 120 generations, decelerating |
 | d | 45K at **93.9%/128**, 1.6%/1024 | refused: flat under sparse (24/1000) AND dense (29/1000) fitness |
 | a | 40K at 84.4%/128, 0.2%/1024 | refused: flat at 5/1000 |
