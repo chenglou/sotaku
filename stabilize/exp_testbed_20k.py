@@ -8,11 +8,14 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from datasets import load_dataset
+import json
 import random
 import os
 import math
 import numpy as np
-from checkpoint_utils import find_latest_checkpoint, load_checkpoint
+import re
+from checkpoint_utils import atomic_torch_save, find_latest_checkpoint, load_checkpoint
+from iters.state_norm import DEFAULT_EPSILON, cap_token_rms, rms_normalize
 
 torch.set_float32_matmul_precision('high')
 
@@ -142,8 +145,20 @@ class RoPETransformerLayer(nn.Module):
 
 
 class SudokuTransformer(nn.Module):
-    def __init__(self):
+    def __init__(
+        self,
+        outer_state_norm=False,
+        outer_state_norm_epsilon=DEFAULT_EPSILON,
+        outer_state_rms_cap=None,
+    ):
         super().__init__()
+        if outer_state_norm and outer_state_rms_cap is not None:
+            raise ValueError("outer state normalization and capping are mutually exclusive")
+        if outer_state_rms_cap is not None and outer_state_rms_cap <= 0:
+            raise ValueError("outer_state_rms_cap must be positive")
+        self.outer_state_norm = outer_state_norm
+        self.outer_state_norm_epsilon = outer_state_norm_epsilon
+        self.outer_state_rms_cap = outer_state_rms_cap
         self.initial_encoder = nn.Linear(10, d_model)
         self.pred_proj = nn.Linear(9, d_model)
         self.layers = nn.ModuleList([
@@ -151,6 +166,17 @@ class SudokuTransformer(nn.Module):
             for _ in range(n_layers)
         ])
         self.output_head = nn.Linear(d_model, 9)
+
+    def normalize_outer_state(self, hidden_state):
+        if self.outer_state_norm:
+            return rms_normalize(hidden_state, self.outer_state_norm_epsilon)
+        if self.outer_state_rms_cap is not None:
+            return cap_token_rms(
+                hidden_state,
+                self.outer_state_rms_cap,
+                self.outer_state_norm_epsilon,
+            )
+        return hidden_state
 
     def forward(self, x, return_all=False):
         batch_size = x.size(0)
@@ -166,6 +192,7 @@ class SudokuTransformer(nn.Module):
             h = h_prev + self.pred_proj(preds)
             for layer in self.layers:
                 h = layer(h, rope_cos, rope_sin)
+            h = self.normalize_outer_state(h)
             h_prev = h
             logits = self.output_head(h)
             preds = F.softmax(logits, dim=-1)
@@ -200,15 +227,112 @@ def encode_solutions(solutions):
     return torch.cat(chunks, dim=0)
 
 
-def get_lr(step):
-    if step < warmup_steps:
-        return lr * (step + 1) / warmup_steps
-    progress = (step - warmup_steps) / (total_steps - warmup_steps)
+def get_lr(step, schedule_warmup_steps=warmup_steps, schedule_total_steps=total_steps):
+    if step < schedule_warmup_steps:
+        return lr * (step + 1) / schedule_warmup_steps
+    progress = (
+        (step - schedule_warmup_steps)
+        / (schedule_total_steps - schedule_warmup_steps)
+    )
     cosine_decay = 0.5 * (1 + math.cos(math.pi * progress))
     return lr * (lr_min_ratio + (1 - lr_min_ratio) * cosine_decay)
 
 
-def train(output_dir="."):
+def resolve_schedule(overrides=None):
+    schedule = {
+        'warmup_steps': warmup_steps,
+        'total_steps': total_steps,
+        'eval_every': eval_every,
+        'probe_every': 1000,
+        'phases': tuple(PHASES),
+    }
+    if overrides:
+        unknown_keys = set(overrides) - set(schedule)
+        if unknown_keys:
+            raise ValueError(f"unknown schedule settings: {sorted(unknown_keys)}")
+        schedule.update(overrides)
+
+    for key in ('warmup_steps', 'total_steps', 'eval_every', 'probe_every'):
+        if not isinstance(schedule[key], int) or schedule[key] <= 0:
+            raise ValueError(f"{key} must be a positive integer")
+    if schedule['warmup_steps'] >= schedule['total_steps']:
+        raise ValueError("warmup_steps must be smaller than total_steps")
+
+    phases = tuple(tuple(phase) for phase in schedule['phases'])
+    expected_start = 0
+    for phase in phases:
+        if len(phase) != 4:
+            raise ValueError("each training phase must have four fields")
+        start, end, _, _ = phase
+        if start != expected_start or end <= start:
+            raise ValueError("training phases must be contiguous and increasing")
+        expected_start = end
+    if expected_start != schedule['total_steps']:
+        raise ValueError("training phases must cover exactly total_steps")
+    schedule['phases'] = phases
+    return schedule
+
+
+def train(
+    output_dir=".",
+    *,
+    experiment_name=CONFIG['experiment'],
+    run_name=None,
+    outer_state_norm=False,
+    outer_state_norm_epsilon=DEFAULT_EPSILON,
+    outer_state_rms_cap=None,
+    random_seed=None,
+    checkpoint_on_probe=False,
+    schedule=None,
+):
+    if run_name is not None and not re.fullmatch(r"[A-Za-z0-9_.-]+", run_name):
+        raise ValueError(f"unsafe run name: {run_name!r}")
+    if outer_state_norm_epsilon <= 0:
+        raise ValueError("outer_state_norm_epsilon must be positive")
+    if outer_state_norm and outer_state_rms_cap is not None:
+        raise ValueError("outer state normalization and capping are mutually exclusive")
+    if outer_state_rms_cap is not None and outer_state_rms_cap <= 0:
+        raise ValueError("outer_state_rms_cap must be positive")
+
+    run_schedule = resolve_schedule(schedule)
+    run_warmup_steps = run_schedule['warmup_steps']
+    run_total_steps = run_schedule['total_steps']
+    run_eval_every = run_schedule['eval_every']
+    run_probe_every = run_schedule['probe_every']
+    run_phases = run_schedule['phases']
+
+    run_config = dict(CONFIG)
+    run_config['experiment'] = experiment_name
+    if schedule is not None:
+        run_config.update(run_schedule)
+    if run_name is not None:
+        run_config.update({
+            'run_name': run_name,
+            'outer_state_norm': 'rmsnorm_no_affine' if outer_state_norm else 'none',
+            'outer_state_norm_epsilon': outer_state_norm_epsilon,
+            'random_seed': random_seed,
+            'checkpoint_on_probe': checkpoint_on_probe,
+        })
+        if outer_state_rms_cap is not None:
+            run_config['outer_state_rms_cap'] = outer_state_rms_cap
+        run_checkpoint_prefix = f"{run_name}_checkpoint_step"
+        run_log_name = f"{run_name}.log"
+        final_model_name = f"model_{run_name}.pt"
+        best_model_name = f"model_{run_name}_best_probe.pt"
+        result_name = f"result_{run_name}.json"
+    else:
+        run_checkpoint_prefix = checkpoint_prefix
+        run_log_name = log_name
+        final_model_name = "model_testbed_20k.pt"
+        best_model_name = "model_testbed_20k_best_probe.pt"
+        result_name = "result_testbed_20k.json"
+
+    if random_seed is not None:
+        random.seed(random_seed)
+        np.random.seed(random_seed)
+        torch.manual_seed(random_seed)
+        torch.cuda.manual_seed_all(random_seed)
+
     device = torch.device("cuda")
     print(
         "SDPA backends enabled: "
@@ -247,7 +371,7 @@ def train(output_dir="."):
         print("done")
 
     phase_buckets = {}
-    for start, end, min_rating, name in PHASES:
+    for start, end, min_rating, name in run_phases:
         buckets_for_phase = [k for k in train_data.keys() if k[0] >= min_rating]
         total = sum(train_data[k]['size'] for k in buckets_for_phase)
         phase_buckets[min_rating] = buckets_for_phase
@@ -280,18 +404,22 @@ def train(output_dir="."):
     probe_x = torch.cat(probe_x_parts, dim=0)
     print(f"Long-horizon probe set: {len(probe_puzzles)} puzzles")
 
-    model = SudokuTransformer().to(device)
+    model = SudokuTransformer(
+        outer_state_norm=outer_state_norm,
+        outer_state_norm_epsilon=outer_state_norm_epsilon,
+        outer_state_rms_cap=outer_state_rms_cap,
+    ).to(device)
     param_count = sum(p.numel() for p in model.parameters())
     print(f"\nModel parameters: {param_count:,}")
 
     checkpoint_path, start_step = None, 0
     checkpoint_data = None
-    checkpoint_path, start_step = find_latest_checkpoint(output_dir, checkpoint_prefix)
+    checkpoint_path, start_step = find_latest_checkpoint(output_dir, run_checkpoint_prefix)
     if checkpoint_path:
         print(f"Found checkpoint: {checkpoint_path}")
-        checkpoint_data = load_checkpoint(checkpoint_path, model, CONFIG)
-        start_step = checkpoint_data['step']
-        print(f"Loaded model weights from step {start_step}")
+        checkpoint_data = load_checkpoint(checkpoint_path, model, run_config)
+        start_step = int(checkpoint_data['step']) + 1
+        print(f"Loaded model weights through step {start_step - 1}")
 
     model = torch.compile(model)
 
@@ -303,17 +431,34 @@ def train(output_dir="."):
             for k, v in state.items():
                 if isinstance(v, torch.Tensor):
                     state[k] = v.to(device)
-        print(f"Resumed from step {start_step}")
+        rng_state = checkpoint_data.get('rng_state')
+        if rng_state:
+            random.setstate(rng_state['python'])
+            np.random.set_state(rng_state['numpy'])
+            torch.set_rng_state(rng_state['torch'])
+            torch.cuda.set_rng_state_all(rng_state['cuda'])
+        print(f"Resuming at step {start_step}")
 
-    print(f"\nExperiment: Baseline with LR=2e-3 (vs 1.5e-3)")
+    print(f"\nExperiment: {experiment_name}")
     print(f"Architecture: d_model={d_model}, d_ff={d_ff}, n_layers={n_layers}")
     print(f"Iterations: {n_iterations}")
-    print(f"Batch size: {batch_size}, lr: {lr}, warmup_steps: {warmup_steps}")
-    print(f"Total steps: {total_steps}")
+    print(f"Batch size: {batch_size}, lr: {lr}, warmup_steps: {run_warmup_steps}")
+    print(f"Total steps: {run_total_steps}")
+    if outer_state_norm:
+        outer_state_constraint = "RMSNorm without affine"
+    elif outer_state_rms_cap is not None:
+        outer_state_constraint = f"per-token RMS cap at {outer_state_rms_cap:g}"
+    else:
+        outer_state_constraint = "none"
+    print(f"Outer state constraint: {outer_state_constraint}")
+    print(f"Random seed: {random_seed}")
     print(f"Output directory: {output_dir}")
 
-    log_path = os.path.join(output_dir, log_name)
+    log_path = os.path.join(output_dir, run_log_name)
     log_file = open(log_path, "a")
+
+    probe_history = list(checkpoint_data.get('probe_history', [])) if checkpoint_data else []
+    best_probe = dict(checkpoint_data.get('best_probe', {'step': -1, 'solved_1024': -1})) if checkpoint_data else {'step': -1, 'solved_1024': -1}
 
     def log(msg):
         print(msg)
@@ -321,7 +466,7 @@ def train(output_dir="."):
         log_file.flush()
 
     def get_phase(step):
-        for start, end, min_rating, name in PHASES:
+        for start, end, min_rating, name in run_phases:
             if start <= step < end:
                 return phase_buckets[min_rating], name
         return None, None
@@ -407,6 +552,7 @@ def train(output_dir="."):
                     h = h_prev + m.pred_proj(preds)
                     for layer in m.layers:
                         h = layer(h, rope_cos, rope_sin)
+                    h = m.normalize_outer_state(h)
                     h_prev = h
                     preds = F.softmax(m.output_head(h), dim=-1)
                 final_preds = m.output_head(h_prev).argmax(dim=-1).cpu()
@@ -420,20 +566,35 @@ def train(output_dir="."):
         return solved
 
     def do_save_checkpoint(step):
-        path = os.path.join(output_dir, f"{checkpoint_prefix}{step}.pt")
-        torch.save({
+        path = os.path.join(output_dir, f"{run_checkpoint_prefix}{step}.pt")
+        atomic_torch_save({
             'step': step,
             'model_state_dict': {k.replace('_orig_mod.', ''): v for k, v in model.state_dict().items()},
             'optimizer_state_dict': optimizer.state_dict(),
-            'config': CONFIG,
+            'config': run_config,
+            'probe_history': probe_history,
+            'best_probe': best_probe,
+            'rng_state': {
+                'python': random.getstate(),
+                'numpy': np.random.get_state(),
+                'torch': torch.get_rng_state(),
+                'cuda': torch.cuda.get_rng_state_all(),
+            },
         }, path)
         print(f"Checkpoint saved: {path}")
+
+    def save_model(path):
+        state_dict = {
+            key.replace('_orig_mod.', ''): value
+            for key, value in model.state_dict().items()
+        }
+        atomic_torch_save(state_dict, path)
 
     current_phase_name = None
     current_buckets = None
 
-    for step in range(start_step, total_steps):
-        current_lr = get_lr(step)
+    for step in range(start_step, run_total_steps):
+        current_lr = get_lr(step, run_warmup_steps, run_total_steps)
         for param_group in optimizer.param_groups:
             param_group['lr'] = current_lr
 
@@ -458,44 +619,95 @@ def train(output_dir="."):
         loss.backward()
         optimizer.step()
 
-        if step % 100 == 0 or step == total_steps - 1:
+        if step % 100 == 0 or step == run_total_steps - 1:
             with torch.no_grad():
                 final_logits = all_logits[-1]
                 preds = final_logits.argmax(dim=-1)
                 correct = (preds == t_batch) & (mask > 0)
                 train_acc = correct.sum().item() / mask.sum().item()
 
-            do_eval = step % eval_every == 0 or step == total_steps - 1
+            do_eval = step % run_eval_every == 0 or step == run_total_steps - 1
             if do_eval:
                 results = evaluate_all()
                 total_r = results.pop('_total')
                 log(f"Step {step:5d} | LR: {current_lr:.2e} | Loss: {loss.item():.4f} Acc: {train_acc:.2%} | " +
                     " | ".join([f"{name}: {r['solved']}/{r['total']}" for name, r in results.items()]) +
                     f" | Total: {total_r['solved']}/{total_r['total']} ({100*total_r['solved']/total_r['total']:.1f}%)")
-                do_save_checkpoint(step)
             else:
                 log(f"Step {step:5d} | LR: {current_lr:.2e} | Loss: {loss.item():.4f} Acc: {train_acc:.2%}")
 
-            if step % 1000 == 0 and step > 0:
+            do_probe = step % run_probe_every == 0 and step > 0
+            if do_probe:
                 solved_128 = probe_long_horizon(128)
                 solved_1024 = probe_long_horizon(1024)
+                probe_result = {
+                    'step': step,
+                    'solved_128': solved_128,
+                    'solved_1024': solved_1024,
+                    'total': len(probe_puzzles),
+                }
+                probe_history.append(probe_result)
                 log(f"PROBE {step:5d} | 128-iter: {solved_128}/{len(probe_puzzles)} | 1024-iter: {solved_1024}/{len(probe_puzzles)}")
+                if solved_1024 > best_probe['solved_1024']:
+                    best_probe.clear()
+                    best_probe.update(probe_result)
+                    save_model(os.path.join(output_dir, best_model_name))
+                    log(f"Best 1024-iteration probe so far; saved {best_model_name}")
+
+            if do_eval or (checkpoint_on_probe and do_probe):
+                do_save_checkpoint(step)
 
     log("\n" + "="*60)
-    log("FINAL RESULTS - exp_testbed_20k")
+    log(f"FINAL RESULTS - {experiment_name}")
     log("="*60)
     results = evaluate_all()
     total_r = results.pop('_total')
     for name, r in results.items():
         log(f"Rating {name:6s}: {r['solved']:5d}/{r['total']:5d} solved ({100*r['solved']/r['total']:5.1f}%)")
     log(f"\nTotal: {total_r['solved']}/{total_r['total']} ({100*total_r['solved']/total_r['total']:.1f}%)")
-    log(f"Baseline LR=1.5e-3: 81.4% at 16, 98.1% at 1024")
+    final_probe_128 = probe_long_horizon(128)
+    final_probe_1024 = probe_long_horizon(1024)
+    log(f"Final probe | 128-iter: {final_probe_128}/{len(probe_puzzles)} | 1024-iter: {final_probe_1024}/{len(probe_puzzles)}")
+    final_probe_result = {
+        'step': run_total_steps - 1,
+        'solved_128': final_probe_128,
+        'solved_1024': final_probe_1024,
+        'total': len(probe_puzzles),
+        'final': True,
+    }
+    probe_history.append(final_probe_result)
+    if final_probe_1024 > best_probe['solved_1024']:
+        best_probe.clear()
+        best_probe.update(final_probe_result)
+        save_model(os.path.join(output_dir, best_model_name))
+        log(f"Final probe is the best 1024-iteration probe; saved {best_model_name}")
 
-    final_path = os.path.join(output_dir, "model_testbed_20k.pt")
-    state_dict = {k.replace('_orig_mod.', ''): v for k, v in model.state_dict().items()}
-    torch.save(state_dict, final_path)
+    final_path = os.path.join(output_dir, final_model_name)
+    save_model(final_path)
     log(f"Final model saved: {final_path}")
+    result = {
+        'experiment': experiment_name,
+        'run_name': run_name,
+        'config': run_config,
+        'final_16_iteration_solved': total_r['solved'],
+        'final_16_iteration_total': total_r['total'],
+        'final_probe_128': final_probe_128,
+        'final_probe_1024': final_probe_1024,
+        'probe_total': len(probe_puzzles),
+        'probe_history': probe_history,
+        'best_probe': best_probe,
+        'final_16_iteration_per_bucket': results,
+        'final_model_path': final_path,
+    }
+    result_path = os.path.join(output_dir, result_name)
+    temporary_result_path = result_path + ".tmp"
+    with open(temporary_result_path, "w") as result_file:
+        json.dump(result, result_file, indent=2, sort_keys=True)
+        result_file.write("\n")
+    os.replace(temporary_result_path, result_path)
+    log(f"Structured results saved: {result_path}")
     log_file.close()
+    return result
 
 
 if __name__ == "__main__":

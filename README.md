@@ -4,13 +4,15 @@ From-scratch experiments on iterative neural Sudoku solvers. See [post](https://
 
 ## Current Status
 
-- **SOTA model:** `iters/exp_baseline_lr2e3.py`
+- **Highest-scoring model:** `iters/exp_baseline_lr2e3.py`
+- **Recommended training recipe:** `stabilize/exp_lr2e3_outer_rmsnorm.py`
 - **Benchmark:** `sapientinc/sudoku-extreme` via `load_dataset(..., split="test")`
-- **Best result:** **98.9%** puzzle accuracy at 1024 test-time iterations
+- **Best demonstrated result:** **98.9%** puzzle accuracy at 1024 test-time iterations
+- **Recommended-recipe result:** **91.3-92.4%** at 1024 across three independently trained models; all three were healthy
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** BS=2048, LR=2e-3, 16 training iterations, cosine decay, reverse curriculum
 
-The headline number is a best-of-several-runs result. Training this config is noisy: with identical code and data, only about 1 run in 4 ends up stable at 1024 test-time iterations, and the rest degrade at long iteration counts despite normal 16-iteration accuracy. If you're retraining, `iters/EXPERIMENTS_ITERS.md` (Reproducibility section), `stabilize/EXPERIMENTS_STABILIZE.md`, and `es/EXPERIMENTS_ES.md` have the details and the current recipe: keep the run's best mid-training checkpoint (evaluated at long iteration counts during the learning-rate decay tail), then fine-tune that checkpoint with a short evolution-strategies run on the 1024-iteration solve rate itself — this landed at 94-95% even on runs whose final weights had fully collapsed. A further fine-tune that also rewards the answer for holding still (es/exp_es_settle.py) produced the current best reproducible model: 96.8% at 1024 iterations and essentially flat through 4096. Evaluating a fixed checkpoint, on the other hand, is deterministic and reproduces exactly (test subsampling in `iters/eval_more_iters.py`).
+Sotaku reaches 98.9% puzzle accuracy at 1024 test-time iterations with an ~800K-parameter looped transformer trained for only 16 iterations, showing that its learned computation can keep improving far beyond the training horizon. The recommended `stabilize/exp_lr2e3_outer_rmsnorm.py` recipe makes strong long-horizon behavior substantially more reproducible: all three full-schedule runs finished healthy, and their harvested checkpoints scored 91.3-92.4% at 1024 and 91.6-92.8% at 2048 over 25,000 test puzzles. The unconstrained recipe remains the path to the highest demonstrated scores, while RMSNorm is the reliable default; direct ES reached 94-95%, and the settling fine-tune in `es/exp_es_settle.py` reached 96.8% at 1024 and stayed essentially flat through 4096. See `iters/EXPERIMENTS_ITERS.md`, `stabilize/EXPERIMENTS_STABILIZE.md`, and `es/EXPERIMENTS_ES.md` for the full evidence.
 
 ## Setup
 
@@ -88,7 +90,11 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 
 ## Blessed Entry Points
 
-- `iters/exp_baseline_lr2e3.py` - current SOTA training script
+- `iters/exp_baseline_lr2e3.py` - highest-scoring but unreliable training recipe
+- `stabilize/exp_lr2e3_outer_rmsnorm.py` - recommended reliable training recipe; keep its best long-horizon checkpoint
+- `stabilize/eval_lr2e3_outer_rmsnorm.py` - full 16/128/1024/2048 evaluation of harvested RMSNorm checkpoints
+- `stabilize/exp_lr2e3_outer_cap1.py` - less invasive cap-1 alternative
+- `stabilize/eval_lr2e3_outer_cap1.py` - full evaluation of harvested cap-1 checkpoints
 - `iters/eval_more_iters.py` - canonical evaluation across test-time iteration counts
 - `analyze_failures_new.py` - per-iteration failure analysis for current models
 - `checkpoint_utils.py` - checkpoint discovery and config-checked resume
@@ -99,8 +105,8 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 - `viz/plot_collapse_diagnostics.py` - hidden-state and prediction-stability diagnostics
 - `viz/plot_iteration_scaling.py` - static summary plots from the documented scaling tables
 - `iters/EXPERIMENTS_ITERS.md` - current source of truth for iteration-scaling results
-- `es/exp_es_finetune.py` + `es/EXPERIMENTS_ES.md` - evolution-strategies fine-tuning on the 1024-iteration solve rate (the current retraining recipe's second stage)
-- `stabilize/EXPERIMENTS_STABILIZE.md` - training-time stabilization study (burn-in, weight averaging, feedback noise)
+- `es/exp_es_finetune.py` + `es/EXPERIMENTS_ES.md` - optional evolution-strategies rescue or polish for unconstrained checkpoints
+- `stabilize/EXPERIMENTS_STABILIZE.md` - training-time stabilization study (recurrent RMSNorm and caps, burn-in, weight averaging, feedback noise)
 
 ## Results
 
@@ -108,6 +114,8 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 |-------|--------|---------------|----------|
 | **exp_baseline_lr2e3 (1024 test iters)** | 800K | ~2h40m (H200) | **98.9%** |
 | exp_baseline_lr2e3 (16 test iters) | 800K | ~2h40m (H200) | 81.8% |
+| exp_lr2e3_outer_rmsnorm (harvested, 1024 test iters) | 800K | ~2h45m (H200) | 91.3-92.4% |
+| exp_lr2e3_outer_cap1 (harvested, 1024 test iters) | 800K | ~3h (H200) | 91.3-91.9% |
 | [TRM](https://github.com/SamsungSAILMontreal/TinyRecursiveModels) (reference) | 7M | ~18h (L40S) | ~87% |
 
 The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row/col/box constraint embedding, just 2D RoPE in attention. Running more test-time iterations than used during training is the key result: 16 training iterations scales cleanly to 1024 evaluation iterations. Full scaling tables, stability analysis, interventions, and ablations live in [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).

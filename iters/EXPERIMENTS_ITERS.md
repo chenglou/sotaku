@@ -33,6 +33,8 @@ Older pre-sudoku-extreme experiments live in `../STALE_EXPERIMENTS_DOC.md`.
 - `exp_qhead.py` - Q-head learned halt signal (16 iters, negative result)
 - `exp_qhead_32.py` - Q-head learned halt signal (32 iters, negative result)
 - `eval_interventions.py` - Test-time interventions (damping, pred scaling, pre-norm)
+- `eval_state_rms_cap.py` - Direction-preserving recurrent-state RMS cap diagnostic
+- `modal_state_rms_cap.py` - Modal wrapper for recurrent-state RMS cap sweeps
 - `eval_spectral_radius.py` - Jacobian spectral radius via power iteration
 - `modal_eval_interventions.py` - Modal wrapper for intervention sweeps
 - `modal_spectral_stable.py` - Modal wrapper for spectral radius + stable model interventions
@@ -99,6 +101,41 @@ f destroys the correct solution when starting from a cold hidden state. But this
 Both 32-iter models (mixed and curriculum) collapse past 128-256 test iters, while 16-iter BS=2048 models scale to 2048+. The implicit teacher forcing signal is too weak — f still learns to re-solve rather than preserve.
 
 **Conclusion:** The cold-start test disproved teacher forcing (f can't preserve solutions it didn't derive itself), but the warm-state test shows f naturally converges to an argmax-fixed-point. Fixed-point behavior is emergent — no explicit loss needed.
+
+### Latent-State Equilibrium Probe — Negative
+
+The argmax result above does not mean the continuous hidden state reaches a DEQ-style equilibrium. `eval_deq_root.py` measured the full residual `F(h) - h` in FP32 on 1,000 held-out puzzles, stratified evenly across rating buckets, using the 98.9% `model_baseline_lr2e3.pt` checkpoint.
+
+| Iteration | Puzzles solved | Hidden-state RMS | RMS of `F(h) - h` | Predictions unchanged one step later |
+|---:|---:|---:|---:|---:|
+| 16 | 82.1% | 24.2 | 1.46 | 82.1% |
+| 64 | 93.1% | 74.4 | 0.856 | 93.4% |
+| 128 | 95.4% | 123 | 0.733 | 95.9% |
+| 1024 | 98.4% | 706 | 0.631 | 99.3% |
+
+The hidden-state magnitude grows approximately linearly while its absolute step size plateaus near 0.63. The small relative residual at iteration 1024 (`0.000894` median) is therefore caused by the growing denominator, not convergence of the hidden state.
+
+Two independent root solvers were given 64 function evaluations from warm states at iterations 16, 64, 128, and 1024. Anderson acceleration reported strict convergence for only 1.1–2.2% of puzzles and drove the median hidden-state RMS to `1e5`; Broyden reported 2.4–8.3% and drove it to `1e8`. At those magnitudes, FP32 rounds away the model's update and can produce a numerical `F(h) == h`; these are not useful equilibria. Neither solver accelerated the warm prediction toward the iteration-1024 answer.
+
+**Conclusion:** The SOTA checkpoint has a settled answer but no useful latent-state equilibrium. Its pre-norm residual stream acts as a growing accumulator after the answer stabilizes. A genuine DEQ experiment must change and retrain the update so the hidden state is bounded; implicit differentiation cannot simply be attached to this checkpoint.
+
+### Stable-Ray Probe — Confirmed
+
+`eval_ray_dynamics.py` compared three same-architecture checkpoints on the same 1,000-puzzle FP32 sample through 2,048 iterations: the naturally stable 98.9% backprop model, the 5.4%-at-1024 collapsed clean-A model, and that exact collapsed model after ES rescued it to 96.2%. For each state `h`, the probe also evaluated the bias-free output head on `h / ||h||`. This "ray" prediction discards the growing magnitude and retains only direction.
+
+Ray accuracy matched ordinary accuracy to within 0.3 percentage points at every measured horizon for all three models, and normally matched exactly. The readout therefore depends on the residual stream's direction, not its unbounded magnitude. Successive updates were also almost perfectly aligned locally after iteration 16 (`cos(delta_t, delta_{t+1}) > 0.999`), including in the collapsed model; simple adjacent-step smoothness does not distinguish stability.
+
+| Model | @128 | @512 | @1024 | @2048 | 10th-percentile ray margin @1024 | Update cosine, iter 128 vs 2048 |
+|---|---:|---:|---:|---:|---:|---:|
+| Naturally stable BP | 95.4% | 98.0% | 98.4% | 98.7% | +0.0698 | 0.9948 |
+| Collapsed before ES | 93.9% | 83.7% | 7.3% | 2.6% | -0.0327 | 0.4479 |
+| Same weights after ES | 94.2% | 97.4% | 97.8% | 84.3% | +0.0536 | 0.9172 |
+
+The useful discriminator is long-range direction. The stable model's iteration-128 update already points almost exactly along its iteration-2048 update. The collapsed model moves smoothly but follows a broad curve: its lower-tail directional target margin crosses zero by iteration 512, then most puzzle trajectories enter wrong decision regions. ES changes the seed weights by only 0.30% in relative L2 (parameter cosine 0.999995), yet compounds that small change over recurrence: collapsed-versus-rescued update cosine falls from 0.944 at iteration 128 to 0.678 at 1024 and 0.484 at 2048.
+
+The repaired model's remaining 2048 weakness has the same explanation. Its median directional margin remains positive, but the 10th percentile moves from +0.0536 at iteration 1024 to -0.0024 at 2048, exactly where accuracy falls. The naturally stable model's 10th percentile remains near +0.070 throughout.
+
+**Conclusion:** These models approach a direction, or ray, rather than a finite hidden state. ES repairs long-horizon behavior by rotating the accumulated trajectory into a longer-lived correct decision region; it does not stop norm growth or create a fixed point. The rare naturally stable backprop model has a straighter trajectory and a substantially wider directional margin than the ES rescue.
 
 ### Explicit Fixed-Point Losses — All Hurt
 
@@ -214,6 +251,21 @@ Scripts: `eval_interventions.py`, `modal_eval_interventions.py`.
 | Pred_scale β=0.1 | 1.2% | 0.8% | 0.8% | 0.8% | 0.8% | 0.8% | 0.6% |
 | Pre_norm | 81.3% | 88.5% | 92.8% | 95.3% | 96.7% | 51.5% | 16.7% |
 
+### Recurrent-State RMS Cap (July 2026)
+
+`eval_state_rms_cap.py` tested a different intervention. After every complete four-layer iteration, it measures each token's RMS over the 128 hidden features and rescales the token only when its RMS exceeds a fixed cap. It does not subtract the mean, change the token's direction, or add learned parameters. A balanced 1,000-puzzle sweep tested caps 8, 12, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 64, and 128; cap 12 was then confirmed on the standard 25,000-puzzle evaluation.
+
+| Checkpoint | State cap | 16 | 128 | 1024 | 2048 |
+|---|---:|---:|---:|---:|---:|
+| Stable BP | none | 82.19% | 95.40% | 98.94% | 98.95% |
+| Stable BP | 12 | 82.14% | 95.92% | 98.66% | 98.82% |
+| Collapsed before ES | none | 80.31% | 93.30% | 5.61% | 3.26% |
+| Collapsed before ES | 12 | 80.02% | 91.73% | **91.45%** | **91.31%** |
+| Rescued after ES | none | 80.09% | 93.32% | 95.99% | 81.68% |
+| Rescued after ES | 12 | 79.86% | 91.85% | 93.50% | 93.59% |
+
+The collapsed checkpoint's rescue is large and horizon-flat: cap 12 changes 5.61% at 1024 iterations and 3.26% at 2048 into 91.45% and 91.31%. The same cap leaves the stable checkpoint essentially intact. Threshold choice matters: on the 1,000-puzzle sweep, cap 12 was best for the collapsed checkpoint, while cap 24 was best after ES at 97.5% and 97.4% for 1024 and 2048 iterations. This is not the earlier `Pre_norm` experiment. `Pre_norm` normalized a temporary copy only before the output head and left the recurrent state untouched; the RMS cap constrains the state carried into the next iteration while preserving its direction. The result shows that runaway recurrent-state magnitude is a causal part of this collapse mode, although a cap selected on one checkpoint is not yet a universal inference rule.
+
 ### Intervention Analysis
 
 1. **Damping delays collapse proportionally but doesn't prevent it.** For LR=3e-3: α=0.5 recovers baseline-equivalent 88.3% at 64 iters (vs 39.9%), effectively shifting the collapse point by ~1 octave. For d=192: α=0.5 peaks at 91.3% at 128 (vs 85.9% baseline) and holds 70.1% at 256 (vs 23.3%). But all damped models still collapse at higher iter counts. The oscillation is merely slowed, not eliminated.
@@ -224,7 +276,7 @@ Scripts: `eval_interventions.py`, `modal_eval_interventions.py`.
 
 4. **Damping on the stable model just slows convergence.** α=0.9: 98.7% at 1024 (vs 98.9% baseline). α=0.5: peaks at 95.6% at 512 then drops to 94.1% at 1024 — heavy damping makes even the stable model degrade. Confirms damping is pure friction, not a mechanism fix.
 
-5. **Test-time interventions can't fix a non-contractive iteration map.** The collapse is baked into the trained weights. Damping just adds friction; pred_scale breaks the mechanism; pre_norm removes information. None address the root cause.
+5. **Constraining the carried recurrent state can fix collapse.** Damping, prediction scaling, and pre-output LayerNorm failed, but a direction-preserving per-token RMS cap is a direct counterexample to the earlier blanket conclusion about test-time interventions. On 25,000 puzzles, cap 12 rescues the collapsed checkpoint from 5.61% to 91.45% at 1024 iterations while changing its 16-iteration score by only -0.30 points. The cap does not make the original iteration map contractive; it changes the map by projecting excessively large recurrent states back to a bounded radius.
 
 ## Jacobian Spectral Radius Analysis
 
@@ -258,6 +310,6 @@ Key findings:
 9. **3-phase curriculum works if you keep phase durations** — dropping Medium+ with original durations (40K total) is stable at 95.9%, but redistributing to maintain 50K steps collapses because the LR schedule decays slower.
 10. **Smaller model (d=96) peaks early then degrades** — 87.8% at 128 iters, slowly degrades to 73.2% at 2048. Not enough capacity for clean convergence.
 11. **Q-head (learned halt) failed** — loss competition degrades main task.
-12. **Test-time interventions can't fix collapse** — damping delays collapse by ~1 octave but all damped models still collapse. Pre-output LayerNorm actively introduces collapse even on the stable model (96.7%→51.5% at 256→512). Pred scaling is destructive. On the stable model, damping just slows convergence (α=0.5 peaks at 95.6%@512, drops to 94.1%@1024).
+12. **A recurrent-state RMS cap can fix collapse at test time.** On 25,000 puzzles, cap 12 rescues one collapsed checkpoint from 5.61% to 91.45% at 1024 iterations and from 3.26% to 91.31% at 2048, while the stable checkpoint remains at 98.66-98.82%. Earlier damping, prediction scaling, and pre-output LayerNorm interventions still failed; the successful cap differs because it bounds the state carried into the next iteration without changing its direction.
 13. **Jacobian spectral radius >> 1 for ALL models, including stable** — SR ranges from 14-88 across all models at all operating points. Linear stability theory (SR<1) does not apply. What differentiates stable from collapsing models is the SR *trend*: stable model's SR decreases monotonically (56→14); collapsing models stay flat or rebound. Convergence is entirely nonlinear — the model enters a basin of attraction despite local instability.
 14. **SOTA: 98.9%** at 1024 test iters with LR=2e-3 (exp_baseline_lr2e3). Stable at 98.8% at 2048.
