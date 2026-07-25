@@ -14,7 +14,12 @@ import os
 import math
 import numpy as np
 import re
-from checkpoint_utils import atomic_torch_save, find_latest_checkpoint, load_checkpoint
+from checkpoint_utils import (
+    atomic_torch_save,
+    find_latest_checkpoint,
+    load_branch_checkpoint,
+    load_checkpoint,
+)
 from iters.state_norm import DEFAULT_EPSILON, cap_token_rms, rms_normalize
 
 torch.set_float32_matmul_precision('high')
@@ -105,10 +110,13 @@ def apply_rope(x, cos, sin):
 
 
 class RoPETransformerLayer(nn.Module):
-    def __init__(self, d_model, n_heads, d_ff, dropout=0.1):
+    def __init__(self, d_model, n_heads, d_ff, dropout=0.1, residual_scale=1.0):
         super().__init__()
+        if residual_scale <= 0:
+            raise ValueError("residual_scale must be positive")
         self.n_heads = n_heads
         self.head_dim = d_model // n_heads
+        self.residual_scale = float(residual_scale)
         self.norm1 = nn.LayerNorm(d_model)
         self.norm2 = nn.LayerNorm(d_model)
         self.q_proj = nn.Linear(d_model, d_model)
@@ -136,11 +144,11 @@ class RoPETransformerLayer(nn.Module):
         attn_out = F.scaled_dot_product_attention(
             q, k, v, dropout_p=self.attn_dropout_p if self.training else 0.0)
         attn_out = attn_out.transpose(1, 2).contiguous().view(B, L, D)
-        x = x + self.dropout1(self.out_proj(attn_out))
+        x = x + self.residual_scale * self.dropout1(self.out_proj(attn_out))
 
         h2 = self.norm2(x)
         h2 = self.linear2(self.dropout(F.relu(self.linear1(h2))))
-        x = x + self.dropout2(h2)
+        x = x + self.residual_scale * self.dropout2(h2)
         return x
 
 
@@ -150,20 +158,58 @@ class SudokuTransformer(nn.Module):
         outer_state_norm=False,
         outer_state_norm_epsilon=DEFAULT_EPSILON,
         outer_state_rms_cap=None,
+        unique_layers=n_layers,
+        layer_schedule=None,
+        residual_scale=1.0,
+        feedback_scale=1.0,
+        training_iterations=n_iterations,
     ):
         super().__init__()
         if outer_state_norm and outer_state_rms_cap is not None:
             raise ValueError("outer state normalization and capping are mutually exclusive")
         if outer_state_rms_cap is not None and outer_state_rms_cap <= 0:
             raise ValueError("outer_state_rms_cap must be positive")
+        if not isinstance(unique_layers, int) or unique_layers <= 0:
+            raise ValueError("unique_layers must be a positive integer")
+        if residual_scale <= 0:
+            raise ValueError("residual_scale must be positive")
+        if feedback_scale < 0:
+            raise ValueError("feedback_scale must be non-negative")
+        if not isinstance(training_iterations, int) or training_iterations <= 0:
+            raise ValueError("training_iterations must be a positive integer")
+        if layer_schedule is None:
+            layer_schedule = tuple(range(unique_layers))
+        else:
+            layer_schedule = tuple(layer_schedule)
+        if not layer_schedule:
+            raise ValueError("layer_schedule must not be empty")
+        if any(
+            not isinstance(layer_index, int)
+            or layer_index < 0
+            or layer_index >= unique_layers
+            for layer_index in layer_schedule
+        ):
+            raise ValueError(
+                "layer_schedule indices must refer to stored transformer layers"
+            )
         self.outer_state_norm = outer_state_norm
         self.outer_state_norm_epsilon = outer_state_norm_epsilon
         self.outer_state_rms_cap = outer_state_rms_cap
+        self.unique_layers = unique_layers
+        self.layer_schedule = layer_schedule
+        self.residual_scale = float(residual_scale)
+        self.feedback_scale = float(feedback_scale)
+        self.training_iterations = training_iterations
         self.initial_encoder = nn.Linear(10, d_model)
         self.pred_proj = nn.Linear(9, d_model)
         self.layers = nn.ModuleList([
-            RoPETransformerLayer(d_model, n_heads, d_ff)
-            for _ in range(n_layers)
+            RoPETransformerLayer(
+                d_model,
+                n_heads,
+                d_ff,
+                residual_scale=self.residual_scale,
+            )
+            for _ in range(unique_layers)
         ])
         self.output_head = nn.Linear(d_model, 9)
 
@@ -178,27 +224,63 @@ class SudokuTransformer(nn.Module):
             )
         return hidden_state
 
-    def forward(self, x, return_all=False):
+    def apply_recurrent_updates(
+        self,
+        hidden_state,
+        predictions,
+        rope_cos,
+        rope_sin,
+    ):
+        hidden_state = (
+            hidden_state + self.feedback_scale * self.pred_proj(predictions)
+        )
+        for layer_index in self.layer_schedule:
+            hidden_state = self.layers[layer_index](
+                hidden_state,
+                rope_cos,
+                rope_sin,
+            )
+        return hidden_state
+
+    def recurrent_step(self, hidden_state, predictions, rope_cos, rope_sin):
+        hidden_state = self.apply_recurrent_updates(
+            hidden_state,
+            predictions,
+            rope_cos,
+            rope_sin,
+        )
+        return self.normalize_outer_state(hidden_state)
+
+    def forward(
+        self,
+        x,
+        return_all=False,
+        initial_state=None,
+        return_state=False,
+    ):
         batch_size = x.size(0)
         device = x.device
         rope_cos = ROPE_COS.to(device)
         rope_sin = ROPE_SIN.to(device)
 
-        h_prev = self.initial_encoder(x)
-        preds = torch.zeros(batch_size, 81, 9, device=device)
+        if initial_state is None:
+            h_prev = self.initial_encoder(x)
+            preds = torch.zeros(batch_size, 81, 9, device=device)
+        else:
+            h_prev, preds = initial_state
 
         all_logits = []
-        for _ in range(n_iterations):
-            h = h_prev + self.pred_proj(preds)
-            for layer in self.layers:
-                h = layer(h, rope_cos, rope_sin)
-            h = self.normalize_outer_state(h)
+        for _ in range(self.training_iterations):
+            h = self.recurrent_step(h_prev, preds, rope_cos, rope_sin)
             h_prev = h
             logits = self.output_head(h)
             preds = F.softmax(logits, dim=-1)
             if return_all:
                 all_logits.append(logits)
-        return all_logits if return_all else logits
+        outputs = all_logits if return_all else logits
+        if return_state:
+            return outputs, (h_prev, preds)
+        return outputs
 
 
 def encode_puzzles(puzzles):
@@ -273,6 +355,151 @@ def resolve_schedule(overrides=None):
     return schedule
 
 
+def resolve_late_supervision(horizons, probability, mix):
+    horizons = tuple(horizons)
+    if any(
+        not isinstance(horizon, int) or horizon <= 0 or horizon % n_iterations != 0
+        for horizon in horizons
+    ):
+        raise ValueError(
+            f"late-supervision horizons must be positive multiples of {n_iterations}"
+        )
+    if len(set(horizons)) != len(horizons):
+        raise ValueError("late-supervision horizons must be unique")
+    if not 0 <= probability <= 1:
+        raise ValueError("late-supervision probability must be between 0 and 1")
+    if not 0 <= mix <= 1:
+        raise ValueError("late-supervision mix must be between 0 and 1")
+    enabled_settings = (bool(horizons), probability > 0, mix > 0)
+    if any(enabled_settings) and not all(enabled_settings):
+        raise ValueError(
+            "late-supervision horizons, probability, and mix must be enabled together"
+        )
+    return horizons
+
+
+def resolve_late_supervision_timing(
+    horizons,
+    start_step,
+    probability_ramp_steps,
+    horizon_start_steps,
+):
+    if not isinstance(start_step, int) or start_step < 0:
+        raise ValueError("late-supervision start step must be a non-negative integer")
+    if (
+        not isinstance(probability_ramp_steps, int)
+        or probability_ramp_steps < 0
+    ):
+        raise ValueError(
+            "late-supervision probability ramp must be a non-negative integer"
+        )
+
+    horizon_start_steps = tuple(horizon_start_steps)
+    if not horizons:
+        if start_step != 0:
+            raise ValueError("late-supervision start step requires late supervision")
+        if probability_ramp_steps != 0:
+            raise ValueError(
+                "late-supervision probability ramp requires late supervision"
+            )
+        if horizon_start_steps:
+            raise ValueError(
+                "late-supervision horizon start steps require late supervision"
+            )
+        return ()
+
+    if not horizon_start_steps:
+        horizon_start_steps = (start_step,) * len(horizons)
+    if len(horizon_start_steps) != len(horizons):
+        raise ValueError(
+            "late-supervision horizons and horizon start steps must have equal length"
+        )
+    if any(
+        not isinstance(horizon_step, int) or horizon_step < start_step
+        for horizon_step in horizon_start_steps
+    ):
+        raise ValueError(
+            "late-supervision horizon start steps must be integers at or after "
+            "the late-supervision start step"
+        )
+    if tuple(sorted(horizon_start_steps)) != horizon_start_steps:
+        raise ValueError(
+            "late-supervision horizon start steps must be non-decreasing"
+        )
+    return horizon_start_steps
+
+
+def late_supervision_plan_for_step(
+    step,
+    horizons,
+    horizon_start_steps,
+    target_probability,
+    start_step,
+    probability_ramp_steps,
+):
+    available_horizons = tuple(
+        horizon
+        for horizon, horizon_step in zip(horizons, horizon_start_steps)
+        if step >= horizon_step
+    )
+    if not available_horizons:
+        return (), 0.0
+    if probability_ramp_steps == 0:
+        return available_horizons, target_probability
+    ramp_progress = min(
+        1.0,
+        max(0.0, (step - start_step) / probability_ramp_steps),
+    )
+    return available_horizons, target_probability * ramp_progress
+
+
+def correct_prediction_consistency_loss(
+    anchor_logits,
+    future_logits,
+    targets,
+    mask,
+):
+    anchor_probabilities = F.softmax(anchor_logits.detach(), dim=-1)
+    anchor_correct = anchor_logits.detach().argmax(dim=-1).eq(targets)
+    eligible = anchor_correct & mask.bool()
+    per_cell_kl = F.kl_div(
+        F.log_softmax(future_logits, dim=-1),
+        anchor_probabilities,
+        reduction="none",
+    ).sum(dim=-1)
+    return (per_cell_kl * eligible).sum() / eligible.sum().clamp_min(1)
+
+
+def resolve_late_recheck(
+    gaps,
+    loss_weight,
+    consistency_weight,
+    late_supervision_enabled,
+):
+    gaps = tuple(gaps)
+    if any(
+        not isinstance(gap, int) or gap <= 0 or gap % n_iterations != 0
+        for gap in gaps
+    ):
+        raise ValueError(
+            f"late recheck gaps must be positive multiples of {n_iterations}"
+        )
+    if not 0 <= loss_weight <= 1:
+        raise ValueError("late recheck loss weight must be between 0 and 1")
+    if consistency_weight < 0:
+        raise ValueError("late consistency weight must be non-negative")
+    if bool(gaps) != (loss_weight > 0):
+        raise ValueError(
+            "late recheck gaps and a positive recheck loss weight must be "
+            "enabled together"
+        )
+    if gaps and not late_supervision_enabled:
+        raise ValueError("late rechecks require late supervision")
+    if consistency_weight > 0 and not gaps:
+        raise ValueError("late consistency requires late rechecks")
+    return gaps
+
+
 def train(
     output_dir=".",
     *,
@@ -281,18 +508,87 @@ def train(
     outer_state_norm=False,
     outer_state_norm_epsilon=DEFAULT_EPSILON,
     outer_state_rms_cap=None,
+    unique_layers=n_layers,
+    layer_schedule=None,
+    residual_scale=1.0,
+    feedback_scale=1.0,
+    training_iterations=n_iterations,
+    run_batch_size=batch_size,
+    microbatch_size=None,
     random_seed=None,
     checkpoint_on_probe=False,
     schedule=None,
+    late_supervision_horizons=(),
+    late_supervision_probability=0.0,
+    late_supervision_mix=0.0,
+    late_supervision_start_step=0,
+    late_supervision_probability_ramp_steps=0,
+    late_supervision_horizon_start_steps=(),
+    late_recheck_gaps=(),
+    late_recheck_loss_weight=0.0,
+    late_consistency_weight=0.0,
+    branch_checkpoint_path=None,
 ):
     if run_name is not None and not re.fullmatch(r"[A-Za-z0-9_.-]+", run_name):
         raise ValueError(f"unsafe run name: {run_name!r}")
+    if branch_checkpoint_path is not None and run_name is None:
+        raise ValueError("branch_checkpoint_path requires a run_name")
     if outer_state_norm_epsilon <= 0:
         raise ValueError("outer_state_norm_epsilon must be positive")
     if outer_state_norm and outer_state_rms_cap is not None:
         raise ValueError("outer state normalization and capping are mutually exclusive")
     if outer_state_rms_cap is not None and outer_state_rms_cap <= 0:
         raise ValueError("outer_state_rms_cap must be positive")
+    if not isinstance(run_batch_size, int) or run_batch_size <= 0:
+        raise ValueError("run_batch_size must be a positive integer")
+    if microbatch_size is None:
+        microbatch_size = run_batch_size
+    if not isinstance(microbatch_size, int) or not 0 < microbatch_size <= run_batch_size:
+        raise ValueError(
+            "microbatch_size must be a positive integer no larger than run_batch_size"
+        )
+
+    late_supervision_horizons = resolve_late_supervision(
+        late_supervision_horizons,
+        late_supervision_probability,
+        late_supervision_mix,
+    )
+    if microbatch_size < run_batch_size and late_supervision_horizons:
+        raise ValueError(
+            "gradient accumulation is not implemented for late supervision"
+        )
+    late_supervision_horizon_start_steps = resolve_late_supervision_timing(
+        late_supervision_horizons,
+        late_supervision_start_step,
+        late_supervision_probability_ramp_steps,
+        late_supervision_horizon_start_steps,
+    )
+    late_recheck_gaps = resolve_late_recheck(
+        late_recheck_gaps,
+        late_recheck_loss_weight,
+        late_consistency_weight,
+        bool(late_supervision_horizons),
+    )
+
+    resolved_layer_schedule = (
+        tuple(range(unique_layers))
+        if layer_schedule is None
+        else tuple(layer_schedule)
+    )
+    model_settings = {
+        'unique_layers': unique_layers,
+        'layer_schedule': resolved_layer_schedule,
+        'residual_scale': residual_scale,
+        'feedback_scale': feedback_scale,
+        'training_iterations': training_iterations,
+    }
+    nondefault_model_settings = (
+        unique_layers != n_layers
+        or resolved_layer_schedule != tuple(range(n_layers))
+        or residual_scale != 1.0
+        or feedback_scale != 1.0
+        or training_iterations != n_iterations
+    )
 
     run_schedule = resolve_schedule(schedule)
     run_warmup_steps = run_schedule['warmup_steps']
@@ -300,11 +596,52 @@ def train(
     run_eval_every = run_schedule['eval_every']
     run_probe_every = run_schedule['probe_every']
     run_phases = run_schedule['phases']
+    if (
+        late_supervision_horizons
+        and late_supervision_start_step >= run_total_steps
+    ):
+        raise ValueError("late-supervision start step must precede total_steps")
+    if (
+        late_supervision_horizon_start_steps
+        and late_supervision_horizon_start_steps[-1] >= run_total_steps
+    ):
+        raise ValueError(
+            "every late-supervision horizon must become active before total_steps"
+        )
 
     run_config = dict(CONFIG)
     run_config['experiment'] = experiment_name
+    run_config['batch_size'] = run_batch_size
+    if microbatch_size < run_batch_size:
+        run_config['microbatch_size'] = microbatch_size
+    if nondefault_model_settings:
+        run_config.update(model_settings)
     if schedule is not None:
         run_config.update(run_schedule)
+    if late_supervision_horizons:
+        run_config.update({
+            'late_supervision_horizons': late_supervision_horizons,
+            'late_supervision_probability': late_supervision_probability,
+            'late_supervision_mix': late_supervision_mix,
+            'late_supervision_start_step': late_supervision_start_step,
+        })
+        if late_supervision_probability_ramp_steps:
+            run_config['late_supervision_probability_ramp_steps'] = (
+                late_supervision_probability_ramp_steps
+            )
+        if any(
+            horizon_step != late_supervision_start_step
+            for horizon_step in late_supervision_horizon_start_steps
+        ):
+            run_config['late_supervision_horizon_start_steps'] = (
+                late_supervision_horizon_start_steps
+            )
+        if late_recheck_gaps:
+            run_config.update({
+                'late_recheck_gaps': late_recheck_gaps,
+                'late_recheck_loss_weight': late_recheck_loss_weight,
+                'late_consistency_weight': late_consistency_weight,
+            })
     if run_name is not None:
         run_config.update({
             'run_name': run_name,
@@ -326,6 +663,10 @@ def train(
         final_model_name = "model_testbed_20k.pt"
         best_model_name = "model_testbed_20k_best_probe.pt"
         result_name = "result_testbed_20k.json"
+    if branch_checkpoint_path is not None:
+        run_config['branch_source_checkpoint'] = os.path.basename(
+            os.path.abspath(branch_checkpoint_path)
+        )
 
     if random_seed is not None:
         random.seed(random_seed)
@@ -408,6 +749,7 @@ def train(
         outer_state_norm=outer_state_norm,
         outer_state_norm_epsilon=outer_state_norm_epsilon,
         outer_state_rms_cap=outer_state_rms_cap,
+        **model_settings,
     ).to(device)
     param_count = sum(p.numel() for p in model.parameters())
     print(f"\nModel parameters: {param_count:,}")
@@ -420,8 +762,82 @@ def train(
         checkpoint_data = load_checkpoint(checkpoint_path, model, run_config)
         start_step = int(checkpoint_data['step']) + 1
         print(f"Loaded model weights through step {start_step - 1}")
+    elif branch_checkpoint_path is not None:
+        branch_source = os.path.abspath(branch_checkpoint_path)
+        if not os.path.isfile(branch_source):
+            raise FileNotFoundError(
+                f"branch checkpoint does not exist: {branch_source}"
+            )
+        allowed_config_changes = {
+            'branch_source_checkpoint',
+            'experiment',
+            'late_consistency_weight',
+            'late_recheck_gaps',
+            'late_recheck_loss_weight',
+            'run_name',
+        }
+        print(f"Branching from checkpoint: {branch_source}")
+        checkpoint_data = load_branch_checkpoint(
+            branch_source,
+            model,
+            run_config,
+            allowed_config_changes,
+        )
+        start_step = int(checkpoint_data['step']) + 1
+        checkpoint_data = dict(checkpoint_data)
+        checkpoint_data.update({
+            'probe_history': [],
+            'best_probe': {'step': -1, 'solved_1024': -1},
+            'late_horizon_counts': {},
+            'recheck_gap_counts': {},
+        })
+        print(f"Loaded branch source through step {start_step - 1}")
 
     model = torch.compile(model)
+
+    original_model = getattr(model, '_orig_mod', model)
+    if late_supervision_horizons:
+        def _burnin_chunk(hidden_state, predictions):
+            rope_cos = ROPE_COS.to(hidden_state.device)
+            rope_sin = ROPE_SIN.to(hidden_state.device)
+            for _ in range(n_iterations):
+                hidden_state = original_model.recurrent_step(
+                    hidden_state,
+                    predictions,
+                    rope_cos,
+                    rope_sin,
+                )
+                predictions = F.softmax(
+                    original_model.output_head(hidden_state),
+                    dim=-1,
+                )
+            return hidden_state, predictions
+
+        burnin_chunk = torch.compile(_burnin_chunk)
+
+        def detached_advance(initial_state, horizon):
+            hidden_state, predictions = initial_state
+            for _ in range(horizon // n_iterations):
+                hidden_state, predictions = burnin_chunk(
+                    hidden_state,
+                    predictions,
+                )
+            return hidden_state.detach(), predictions.detach()
+
+        def detached_burnin(x_batch, horizon):
+            initial_state = (
+                original_model.initial_encoder(x_batch),
+                torch.zeros(
+                    x_batch.size(0),
+                    81,
+                    9,
+                    device=x_batch.device,
+                ),
+            )
+            return detached_advance(initial_state, horizon)
+    else:
+        detached_burnin = None
+        detached_advance = None
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=lr, betas=(0.9, 0.95))
 
@@ -440,9 +856,22 @@ def train(
         print(f"Resuming at step {start_step}")
 
     print(f"\nExperiment: {experiment_name}")
-    print(f"Architecture: d_model={d_model}, d_ff={d_ff}, n_layers={n_layers}")
-    print(f"Iterations: {n_iterations}")
-    print(f"Batch size: {batch_size}, lr: {lr}, warmup_steps: {run_warmup_steps}")
+    schedule_text = "".join(chr(ord('A') + index) for index in resolved_layer_schedule)
+    print(
+        f"Architecture: d_model={d_model}, d_ff={d_ff}, "
+        f"unique_layers={unique_layers}, layer_schedule={schedule_text}"
+    )
+    print(f"Training iterations: {training_iterations}")
+    print(
+        f"Residual scale: {residual_scale:g}, "
+        f"prediction-feedback scale: {feedback_scale:g}"
+    )
+    print(
+        f"Batch size: {run_batch_size}, lr: {lr}, "
+        f"warmup_steps: {run_warmup_steps}"
+    )
+    if microbatch_size < run_batch_size:
+        print(f"Gradient accumulation microbatch size: {microbatch_size}")
     print(f"Total steps: {run_total_steps}")
     if outer_state_norm:
         outer_state_constraint = "RMSNorm without affine"
@@ -452,6 +881,36 @@ def train(
         outer_state_constraint = "none"
     print(f"Outer state constraint: {outer_state_constraint}")
     print(f"Random seed: {random_seed}")
+    if late_supervision_horizons:
+        print(
+            "Detached late-state supervision: "
+            f"horizons={late_supervision_horizons}, "
+            f"probability={late_supervision_probability:g}, "
+            f"late-loss mix={late_supervision_mix:g}, "
+            f"start step={late_supervision_start_step}"
+        )
+        if late_supervision_probability_ramp_steps:
+            print(
+                "Late-state probability ramp: "
+                f"{late_supervision_probability_ramp_steps} steps"
+            )
+        if any(
+            horizon_step != late_supervision_start_step
+            for horizon_step in late_supervision_horizon_start_steps
+        ):
+            print(
+                "Late-state horizon start steps: "
+                f"{late_supervision_horizon_start_steps}"
+            )
+        if late_recheck_gaps:
+            print(
+                "Late-state recheck: "
+                f"gaps={late_recheck_gaps}, "
+                f"loss weight={late_recheck_loss_weight:g}, "
+                f"consistency weight={late_consistency_weight:g}"
+            )
+    else:
+        print("Detached late-state supervision: none")
     print(f"Output directory: {output_dir}")
 
     log_path = os.path.join(output_dir, run_log_name)
@@ -459,6 +918,16 @@ def train(
 
     probe_history = list(checkpoint_data.get('probe_history', [])) if checkpoint_data else []
     best_probe = dict(checkpoint_data.get('best_probe', {'step': -1, 'solved_1024': -1})) if checkpoint_data else {'step': -1, 'solved_1024': -1}
+    late_horizon_counts = dict(
+        checkpoint_data.get('late_horizon_counts', {})
+        if checkpoint_data
+        else {}
+    )
+    recheck_gap_counts = dict(
+        checkpoint_data.get('recheck_gap_counts', {})
+        if checkpoint_data
+        else {}
+    )
 
     def log(msg):
         print(msg)
@@ -492,8 +961,22 @@ def train(
         t_batch = t_batch[perm]
         return x_batch, t_batch
 
-    def compute_loss(x_batch, t_batch):
-        all_logits = model(x_batch, return_all=True)
+    def compute_loss(
+        x_batch,
+        t_batch,
+        initial_state=None,
+        return_state=False,
+    ):
+        model_outputs = model(
+            x_batch,
+            return_all=True,
+            initial_state=initial_state,
+            return_state=return_state,
+        )
+        if return_state:
+            all_logits, final_state = model_outputs
+        else:
+            all_logits = model_outputs
         mask = x_batch[:, :, 0]
         mask = mask.to(dtype=torch.float32)
         t_batch = t_batch.to(dtype=torch.long)
@@ -503,7 +986,10 @@ def train(
             per_cell = per_cell.view(t_batch.size(0), 81)
             loss = loss + (per_cell * mask).sum() / mask.sum()
         loss = loss / len(all_logits)
-        return loss, all_logits, mask, t_batch
+        outputs = (loss, all_logits, mask, t_batch)
+        if return_state:
+            return outputs + (final_state,)
+        return outputs
 
     def evaluate_all():
         model.eval()
@@ -549,10 +1035,7 @@ def train(
                 h_prev = m.initial_encoder(batch_x)
                 preds = torch.zeros(bs, 81, 9, device=device)
                 for _ in range(n_iters):
-                    h = h_prev + m.pred_proj(preds)
-                    for layer in m.layers:
-                        h = layer(h, rope_cos, rope_sin)
-                    h = m.normalize_outer_state(h)
+                    h = m.recurrent_step(h_prev, preds, rope_cos, rope_sin)
                     h_prev = h
                     preds = F.softmax(m.output_head(h), dim=-1)
                 final_preds = m.output_head(h_prev).argmax(dim=-1).cpu()
@@ -574,6 +1057,8 @@ def train(
             'config': run_config,
             'probe_history': probe_history,
             'best_probe': best_probe,
+            'late_horizon_counts': late_horizon_counts,
+            'recheck_gap_counts': recheck_gap_counts,
             'rng_state': {
                 'python': random.getstate(),
                 'numpy': np.random.get_state(),
@@ -609,32 +1094,216 @@ def train(
             log(f"{'='*60}\n")
 
         model.train()
-        x_batch, t_batch = sample_batch(current_buckets, batch_size)
+        x_batch, t_batch = sample_batch(current_buckets, run_batch_size)
         x_batch = x_batch.to(device)
         t_batch = t_batch.to(device)
 
-        optimizer.zero_grad()
-        with torch.autocast('cuda', dtype=torch.bfloat16):
-            loss, all_logits, mask, t_batch = compute_loss(x_batch, t_batch)
-        loss.backward()
-        optimizer.step()
+        (
+            available_late_horizons,
+            current_late_probability,
+        ) = late_supervision_plan_for_step(
+            step,
+            late_supervision_horizons,
+            late_supervision_horizon_start_steps,
+            late_supervision_probability,
+            late_supervision_start_step,
+            late_supervision_probability_ramp_steps,
+        )
+        use_late_supervision = (
+            bool(available_late_horizons)
+            and random.random() < current_late_probability
+        )
+        late_horizon = (
+            random.choice(available_late_horizons)
+            if use_late_supervision
+            else None
+        )
+        if late_horizon is not None:
+            horizon_key = str(late_horizon)
+            late_horizon_counts[horizon_key] = (
+                late_horizon_counts.get(horizon_key, 0) + 1
+            )
+        late_loss = None
+        recheck_gap = None
+        recheck_loss = None
+        consistency_loss = None
 
-        if step % 100 == 0 or step == run_total_steps - 1:
+        optimizer.zero_grad()
+        if microbatch_size < run_batch_size:
+            total_mask = x_batch[:, :, 0].float().sum()
+            base_loss = torch.zeros((), device=device)
+            train_correct = 0
+            train_mask_count = 0
+            for microbatch_start in range(0, run_batch_size, microbatch_size):
+                microbatch_end = min(
+                    microbatch_start + microbatch_size,
+                    run_batch_size,
+                )
+                microbatch_x = x_batch[microbatch_start:microbatch_end]
+                microbatch_targets = t_batch[microbatch_start:microbatch_end]
+                with torch.autocast('cuda', dtype=torch.bfloat16):
+                    (
+                        microbatch_loss,
+                        microbatch_logits,
+                        microbatch_mask,
+                        microbatch_targets,
+                    ) = compute_loss(microbatch_x, microbatch_targets)
+                microbatch_weight = microbatch_mask.sum() / total_mask
+                (microbatch_weight * microbatch_loss).backward()
+                base_loss = (
+                    base_loss
+                    + microbatch_weight.detach() * microbatch_loss.detach()
+                )
+                with torch.no_grad():
+                    microbatch_predictions = microbatch_logits[-1].argmax(dim=-1)
+                    train_correct += (
+                        (microbatch_predictions == microbatch_targets)
+                        & (microbatch_mask > 0)
+                    ).sum().item()
+                    train_mask_count += microbatch_mask.sum().item()
+            loss = base_loss
+            train_acc = train_correct / train_mask_count
+        else:
+            base_weight = 1 - late_supervision_mix if use_late_supervision else 1
+            if base_weight > 0:
+                with torch.autocast('cuda', dtype=torch.bfloat16):
+                    base_loss, all_logits, mask, t_batch = compute_loss(
+                        x_batch,
+                        t_batch,
+                    )
+                (base_weight * base_loss).backward()
+            else:
+                base_loss = None
+                all_logits = None
+                mask = None
+
+            if use_late_supervision:
+                with torch.no_grad(), torch.autocast('cuda', dtype=torch.bfloat16):
+                    initial_state = detached_burnin(x_batch, late_horizon)
+                with torch.autocast('cuda', dtype=torch.bfloat16):
+                    if late_recheck_gaps:
+                        (
+                            late_loss,
+                            late_logits,
+                            late_mask,
+                            t_batch,
+                            late_final_state,
+                        ) = compute_loss(
+                            x_batch,
+                            t_batch,
+                            initial_state=initial_state,
+                            return_state=True,
+                        )
+                    else:
+                        (
+                            late_loss,
+                            late_logits,
+                            late_mask,
+                            t_batch,
+                        ) = compute_loss(
+                            x_batch,
+                            t_batch,
+                            initial_state=initial_state,
+                        )
+
+                late_primary_weight = (
+                    1 - late_recheck_loss_weight
+                    if late_recheck_gaps
+                    else 1
+                )
+                if late_primary_weight > 0:
+                    (
+                        late_supervision_mix
+                        * late_primary_weight
+                        * late_loss
+                    ).backward()
+                late_objective = late_primary_weight * late_loss.detach()
+
+                if late_recheck_gaps:
+                    recheck_gap = random.choice(late_recheck_gaps)
+                    gap_key = str(recheck_gap)
+                    recheck_gap_counts[gap_key] = (
+                        recheck_gap_counts.get(gap_key, 0) + 1
+                    )
+                    with torch.no_grad():
+                        with torch.autocast('cuda', dtype=torch.bfloat16):
+                            recheck_initial_state = detached_advance(
+                                late_final_state,
+                                recheck_gap,
+                            )
+                    with torch.autocast('cuda', dtype=torch.bfloat16):
+                        (
+                            recheck_loss,
+                            recheck_logits,
+                            recheck_mask,
+                            t_batch,
+                        ) = compute_loss(
+                            x_batch,
+                            t_batch,
+                            initial_state=recheck_initial_state,
+                        )
+                        if late_consistency_weight > 0:
+                            consistency_loss = sum(
+                                correct_prediction_consistency_loss(
+                                    late_logits[-1],
+                                    future_logits,
+                                    t_batch,
+                                    recheck_mask,
+                                )
+                                for future_logits in recheck_logits
+                            ) / len(recheck_logits)
+                        else:
+                            consistency_loss = recheck_loss.new_zeros(())
+                        recheck_objective = (
+                            late_recheck_loss_weight * recheck_loss
+                            + late_consistency_weight * consistency_loss
+                        )
+                    (
+                        late_supervision_mix * recheck_objective
+                    ).backward()
+                    late_objective = (
+                        late_objective + recheck_objective.detach()
+                    )
+
+                loss = late_supervision_mix * late_objective
+                if base_loss is not None:
+                    loss = loss + base_weight * base_loss.detach()
+                else:
+                    if recheck_loss is not None:
+                        all_logits = recheck_logits
+                        mask = recheck_mask
+                    else:
+                        all_logits = late_logits
+                        mask = late_mask
+            else:
+                loss = base_loss.detach()
             with torch.no_grad():
                 final_logits = all_logits[-1]
                 preds = final_logits.argmax(dim=-1)
                 correct = (preds == t_batch) & (mask > 0)
                 train_acc = correct.sum().item() / mask.sum().item()
+        optimizer.step()
 
+        if step % 100 == 0 or step == run_total_steps - 1:
+            late_text = (
+                f" Late@{late_horizon}: {late_loss.item():.4f}"
+                if late_loss is not None
+                else ""
+            )
+            if recheck_loss is not None:
+                late_text += (
+                    f" Recheck+{recheck_gap}: {recheck_loss.item():.4f}"
+                    f" Stable: {consistency_loss.item():.4f}"
+                )
             do_eval = step % run_eval_every == 0 or step == run_total_steps - 1
             if do_eval:
                 results = evaluate_all()
                 total_r = results.pop('_total')
-                log(f"Step {step:5d} | LR: {current_lr:.2e} | Loss: {loss.item():.4f} Acc: {train_acc:.2%} | " +
+                log(f"Step {step:5d} | LR: {current_lr:.2e} | Loss: {loss.item():.4f}{late_text} Acc: {train_acc:.2%} | " +
                     " | ".join([f"{name}: {r['solved']}/{r['total']}" for name, r in results.items()]) +
                     f" | Total: {total_r['solved']}/{total_r['total']} ({100*total_r['solved']/total_r['total']:.1f}%)")
             else:
-                log(f"Step {step:5d} | LR: {current_lr:.2e} | Loss: {loss.item():.4f} Acc: {train_acc:.2%}")
+                log(f"Step {step:5d} | LR: {current_lr:.2e} | Loss: {loss.item():.4f}{late_text} Acc: {train_acc:.2%}")
 
             do_probe = step % run_probe_every == 0 and step > 0
             if do_probe:
@@ -668,6 +1337,10 @@ def train(
     final_probe_128 = probe_long_horizon(128)
     final_probe_1024 = probe_long_horizon(1024)
     log(f"Final probe | 128-iter: {final_probe_128}/{len(probe_puzzles)} | 1024-iter: {final_probe_1024}/{len(probe_puzzles)}")
+    if late_horizon_counts:
+        log(f"Late-state batch counts by horizon: {late_horizon_counts}")
+    if recheck_gap_counts:
+        log(f"Recheck batch counts by gap: {recheck_gap_counts}")
     final_probe_result = {
         'step': run_total_steps - 1,
         'solved_128': final_probe_128,
@@ -689,16 +1362,25 @@ def train(
         'experiment': experiment_name,
         'run_name': run_name,
         'config': run_config,
-        'final_16_iteration_solved': total_r['solved'],
-        'final_16_iteration_total': total_r['total'],
+        'final_training_iteration_count': training_iterations,
+        'final_training_iteration_solved': total_r['solved'],
+        'final_training_iteration_total': total_r['total'],
         'final_probe_128': final_probe_128,
         'final_probe_1024': final_probe_1024,
         'probe_total': len(probe_puzzles),
         'probe_history': probe_history,
         'best_probe': best_probe,
-        'final_16_iteration_per_bucket': results,
+        'late_horizon_counts': late_horizon_counts,
+        'recheck_gap_counts': recheck_gap_counts,
+        'final_training_iteration_per_bucket': results,
         'final_model_path': final_path,
     }
+    if training_iterations == n_iterations:
+        result.update({
+            'final_16_iteration_solved': total_r['solved'],
+            'final_16_iteration_total': total_r['total'],
+            'final_16_iteration_per_bucket': results,
+        })
     result_path = os.path.join(output_dir, result_name)
     temporary_result_path = result_path + ".tmp"
     with open(temporary_result_path, "w") as result_file:

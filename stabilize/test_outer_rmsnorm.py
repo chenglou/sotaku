@@ -74,7 +74,10 @@ class OuterRMSNormTest(unittest.TestCase):
             model,
             "normalize_outer_state",
             wraps=model.normalize_outer_state,
-        ) as normalize_outer_state:
+        ) as normalize_outer_state, patch(
+            "iters.eval_state_rms_cap.per_token_rms",
+            wraps=per_token_rms,
+        ) as measured_token_rms:
             results = evaluate_trajectory(
                 model=model,
                 module=testbed_module,
@@ -89,6 +92,7 @@ class OuterRMSNormTest(unittest.TestCase):
             )
 
         self.assertEqual(normalize_outer_state.call_count, 2)
+        self.assertEqual(measured_token_rms.call_count, 2)
         self.assertAlmostEqual(
             results["2"]["post_cap_token_rms"]["mean"],
             1.0,

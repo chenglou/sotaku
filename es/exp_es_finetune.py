@@ -1,14 +1,13 @@
 # Evolution-strategies fine-tuning of a trained checkpoint, directly on the
 # 1024-iteration solve rate — the metric first-order training cannot see (backprop
 # through 1024 iterations is memory-impossible; ES needs only forward passes).
-# Plain antithetic ES: perturb weights with seeded Gaussian noise, score each
-# perturbation by solved puzzles, update along the rank-weighted average direction.
+# By default, evaluate 32 independent Gaussian perturbations and update along their
+# score-weighted average direction. Antithetic sampling remains available as a control.
 # Starts from ./seed_model.pt (packaged into the job by submit.py --seed-model).
 # Generations chain across jobs: each ~2h job runs what fits, checkpoints every 20
 # generations, and a resubmit with --resume-checkpoint-key continues from there.
 
 import os
-import random
 import time
 
 import numpy as np
@@ -16,7 +15,15 @@ import torch
 import torch.nn.functional as F
 from datasets import load_dataset
 
-from checkpoint_utils import find_latest_checkpoint
+from checkpoint_utils import atomic_torch_save, find_latest_checkpoint
+from es.es_sampling import (
+    DEFAULT_SAMPLING_MODE,
+    POPULATION_PAIRS,
+    POPULATION_SIZE,
+    SAMPLING_MODES,
+    direction_weights,
+    generation_direction_seeds,
+)
 from iters.exp_baseline_lr2e3 import (
     RATING_BUCKETS,
     ROPE_COS,
@@ -27,12 +34,14 @@ from iters.exp_baseline_lr2e3 import (
 
 torch.set_float32_matmul_precision('high')
 
-CHECKPOINT_PREFIX = "es_finetune_checkpoint_step"
+sampling_mode = DEFAULT_SAMPLING_MODE
+CHECKPOINT_PREFIX = f"es_finetune_{sampling_mode}_checkpoint_step"
 
 CONFIG = {
     'experiment': 'exp_es_finetune',
     'es_generations': 120,
-    'population_pairs': 16,
+    'sampling_mode': sampling_mode,
+    'population_evaluations': POPULATION_SIZE,
     'sigma': 'calibrated',
     'lr': 3e-4,
     'anchor_lambda': 1e-3,
@@ -43,7 +52,6 @@ CONFIG = {
 
 total_steps = 120         # generations; submit.py reads this for checkpoint names
 eval_every = 20           # checkpoint every N generations
-population_pairs = 16     # antithetic pairs per generation (32 evaluations)
 sigma_ladder = [3e-4, 1e-4, 3e-5, 1e-5]   # calibrated at startup: largest scale that
                                           # only mildly degrades fitness. At 1024
                                           # iterations the model is extremely sensitive
@@ -57,7 +65,7 @@ fitness_puzzles = 384     # puzzles per fitness evaluation (rotated per generati
 fitness_iters = 1024      # the deployment horizon — the point of all this
 fitness_pool_offset = 2_700_000   # train rows beyond the first-order training cut
 fitness_pool_size = 20_000
-log_name = "exp_es_finetune.log"
+log_name = f"exp_es_finetune_{sampling_mode}.log"
 
 
 COMPILE_CHUNK = 32   # iterations per compiled block; fitness_iters must divide evenly
@@ -140,6 +148,9 @@ def perturb(params, seed, scale):
 
 
 def train(output_dir="."):
+    if sampling_mode not in SAMPLING_MODES:
+        raise ValueError("sampling_mode must be 'paired' or 'independent'")
+
     device = torch.device("cuda")
 
     print("Loading fitness pool (train rows beyond the first-order training cut)...")
@@ -178,8 +189,13 @@ def train(output_dir="."):
     checkpoint_path, start_gen = find_latest_checkpoint(output_dir, CHECKPOINT_PREFIX)
     if checkpoint_path:
         ckpt = torch.load(checkpoint_path, map_location=device, weights_only=True)
+        for key, expected in CONFIG.items():
+            actual = ckpt.get('config', {}).get(key)
+            if actual != expected:
+                raise ValueError(f"resume config mismatch for {key}: {actual!r} != {expected!r}")
         model.load_state_dict(ckpt['model_state_dict'])
         anchor = [t.to(device) for t in ckpt['anchor']]
+        sigma = float(ckpt['sigma'])
         start_gen = ckpt['step'] + 1
         print(f"Resumed ES state from generation {ckpt['step']}")
     else:
@@ -189,6 +205,7 @@ def train(output_dir="."):
             state = state['model_state_dict']
         model.load_state_dict(state)
         anchor = [p.detach().clone() for p in model.parameters()]
+        sigma = None
         start_gen = 0
         print(f"Loaded seed model from {seed_path}")
 
@@ -206,10 +223,11 @@ def train(output_dir="."):
 
     def save_checkpoint(gen):
         path = os.path.join(output_dir, f"{CHECKPOINT_PREFIX}{gen}.pt")
-        torch.save({
+        atomic_torch_save({
             'step': gen,
             'model_state_dict': model.state_dict(),
             'anchor': [t.cpu() for t in anchor],
+            'sigma': sigma,
             'config': CONFIG,
         }, path)
         log(f"Checkpoint saved: {path}")
@@ -234,32 +252,32 @@ def train(output_dir="."):
     # Calibrate the perturbation scale: pick the largest sigma whose perturbed model
     # keeps at least half the unperturbed fitness. Too large and every member scores
     # zero (no signal); too small and the finite-difference signal drowns in noise.
-    unperturbed = score_slice(0)
-    snapshot = [p.detach().clone() for p in model.parameters()]
-    sigma = sigma_ladder[-1]
-    for candidate in sigma_ladder:
-        perturb(list(model.parameters()), 777, candidate)
-        score = score_slice(0)
-        with torch.no_grad():
-            for p, s in zip(model.parameters(), snapshot):
-                p.copy_(s)
-        log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
-        if score >= unperturbed // 2:
-            sigma = candidate
-            break
-    log(f"CALIBRATE chose sigma={sigma:.0e}")
+    if sigma is None:
+        unperturbed = score_slice(0)
+        snapshot = [p.detach().clone() for p in model.parameters()]
+        sigma = sigma_ladder[-1]
+        for candidate in sigma_ladder:
+            perturb(list(model.parameters()), 777, candidate)
+            score = score_slice(0)
+            with torch.no_grad():
+                for p, s in zip(model.parameters(), snapshot):
+                    p.copy_(s)
+            log(f"CALIBRATE sigma={candidate:.0e}: {score} (unperturbed {unperturbed})")
+            if score >= unperturbed // 2:
+                sigma = candidate
+                break
+        log(f"CALIBRATE chose sigma={sigma:.0e}")
 
     if start_gen >= total_steps:
         # Resuming from the final checkpoint: the run is already complete. Save the
         # final model and exit cleanly — without this, the loop below never runs and
         # the return would crash on loop-local variables, failing every retry.
-        final_path = os.path.join(output_dir, "model_es_finetune.pt")
-        torch.save(model.state_dict(), final_path)
+        final_path = os.path.join(output_dir, f"model_es_finetune_{sampling_mode}.pt")
+        atomic_torch_save(model.state_dict(), final_path)
         log(f"Run already complete at generation {start_gen - 1}; final model saved: {final_path}")
         log_file.close()
-        return {'already_complete': True}
+        return {'already_complete': True, 'sampling_mode': sampling_mode}
 
-    rng = random.Random(1234 + start_gen)
     for gen in range(start_gen, total_steps):
         t0 = time.time()
         # Same probe slice for every population member (common random numbers),
@@ -267,37 +285,44 @@ def train(output_dir="."):
         lo = (gen * fitness_puzzles) % (fitness_pool_size - fitness_puzzles)
 
         snapshot = [p.detach().clone() for p in params]
-        seeds = [rng.randrange(2**62) for _ in range(population_pairs)]
-        scores_plus, scores_minus = [], []
-        for seed in seeds:
-            perturb(params, seed, sigma)
-            scores_plus.append(score_slice(lo))
-            with torch.no_grad():
-                for p, s in zip(params, snapshot):
-                    p.copy_(s)
-            perturb(params, seed, -sigma)
-            scores_minus.append(score_slice(lo))
-            with torch.no_grad():
-                for p, s in zip(params, snapshot):
-                    p.copy_(s)
+        all_direction_seeds = generation_direction_seeds(1234, gen)
+        if sampling_mode == 'paired':
+            direction_seeds = all_direction_seeds[:POPULATION_PAIRS]
+            scores_plus, scores_minus = [], []
+            for direction_seed in direction_seeds:
+                perturb(params, direction_seed, sigma)
+                scores_plus.append(score_slice(lo))
+                with torch.no_grad():
+                    for p, saved in zip(params, snapshot):
+                        p.copy_(saved)
+                perturb(params, direction_seed, -sigma)
+                scores_minus.append(score_slice(lo))
+                with torch.no_grad():
+                    for p, saved in zip(params, snapshot):
+                        p.copy_(saved)
+            all_scores = np.asarray(scores_plus + scores_minus, dtype=np.float64)
+        else:
+            direction_seeds = all_direction_seeds
+            scores = []
+            for direction_seed in direction_seeds:
+                perturb(params, direction_seed, sigma)
+                scores.append(score_slice(lo))
+                with torch.no_grad():
+                    for p, saved in zip(params, snapshot):
+                        p.copy_(saved)
+            all_scores = np.asarray(scores, dtype=np.float64)
 
-        # Score-normalized weights, tie-safe: a generation where every member scores
-        # the same (no signal) takes no step at all. The update direction is the
-        # fitness-weighted average of the unit-variance perturbation directions; sigma
-        # deliberately does not appear (it is absorbed into the effective step size).
-        all_scores = np.array(scores_plus + scores_minus, dtype=np.float64)
-        spread = all_scores.std()
+        # Centered, score-normalized weights are tie-safe: a generation where every
+        # member scores the same takes no step. Sigma is absorbed into the learning rate.
+        weights, spread = direction_weights(all_scores, sampling_mode)
         if spread > 1e-9:
-            utilities = (all_scores - all_scores.mean()) / spread
-            u_plus, u_minus = utilities[:population_pairs], utilities[population_pairs:]
             with torch.no_grad():
-                for i, seed in enumerate(seeds):
-                    w = float(u_plus[i] - u_minus[i]) / (2 * population_pairs)
+                for direction_seed, weight in zip(direction_seeds, weights):
                     gen_t = torch.Generator(device=device)
-                    gen_t.manual_seed(seed)
+                    gen_t.manual_seed(direction_seed)
                     for p in params:
                         z = torch.randn(p.shape, generator=gen_t, device=device, dtype=torch.float32)
-                        p.add_(z, alpha=lr * w)
+                        p.add_(z, alpha=lr * float(weight))
                 for p, a in zip(params, anchor):
                     p.add_(p - a, alpha=-anchor_lambda)
 
@@ -306,14 +331,14 @@ def train(output_dir="."):
             f"best {max(all_scores):.0f} | validation 1024-iter: {probe_solved}/{len(probe_puzzles)} "
             f"| {time.time() - t0:.0f}s")
 
-        if gen % eval_every == 0 or gen == total_steps - 1:
+        if (gen + 1) % eval_every == 0 or gen == total_steps - 1:
             save_checkpoint(gen)
 
-    final_path = os.path.join(output_dir, "model_es_finetune.pt")
-    torch.save(model.state_dict(), final_path)
+    final_path = os.path.join(output_dir, f"model_es_finetune_{sampling_mode}.pt")
+    atomic_torch_save(model.state_dict(), final_path)
     log(f"Final model saved: {final_path}")
     log_file.close()
-    return {'final_validation': probe_solved}
+    return {'final_validation': probe_solved, 'sampling_mode': sampling_mode}
 
 
 if __name__ == "__main__":

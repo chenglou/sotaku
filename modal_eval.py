@@ -23,7 +23,8 @@ image = (
 @app.function(
     image=image,
     gpu="H200",
-    timeout=2 * 60 * 60,  # 2 hours
+    timeout=6 * 60 * 60,
+    retries=modal.Retries(max_retries=3, initial_delay=10.0),
     volumes={
         "/hf_cache": hf_cache_volume,
         "/outputs": outputs_volume,

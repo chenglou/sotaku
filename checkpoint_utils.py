@@ -68,3 +68,24 @@ def load_checkpoint(path, model, config):
 
     model.load_state_dict(checkpoint['model_state_dict'])
     return checkpoint
+
+
+def load_branch_checkpoint(path, model, config, allowed_config_changes):
+    """Load a checkpoint for a new run while validating every unchanged setting."""
+    checkpoint = torch.load(path, map_location='cpu', weights_only=False)
+    saved_config = checkpoint.get('config', {})
+    allowed_config_changes = set(allowed_config_changes)
+
+    for key in set(saved_config) | set(config):
+        if key in allowed_config_changes:
+            continue
+        saved_value = saved_config.get(key)
+        current_value = config.get(key)
+        if saved_value != current_value:
+            raise ValueError(
+                f"Branch config mismatch! {key}: saved={saved_value}, "
+                f"current={current_value}."
+            )
+
+    model.load_state_dict(checkpoint['model_state_dict'])
+    return checkpoint

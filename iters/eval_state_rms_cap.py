@@ -167,22 +167,38 @@ def evaluate_trajectory(
                 batch_inputs.size(0), 81, 9, device=device
             )
             for iteration in range(1, max_iterations + 1):
-                next_hidden = hidden_state + model.pred_proj(predictions)
-                for layer in model.layers:
-                    next_hidden = layer(next_hidden, rope_cos, rope_sin)
+                save_iteration = iteration in saved
+                apply_recurrent_updates = getattr(
+                    model,
+                    "apply_recurrent_updates",
+                    None,
+                )
+                if apply_recurrent_updates is not None:
+                    next_hidden = apply_recurrent_updates(
+                        hidden_state,
+                        predictions,
+                        rope_cos,
+                        rope_sin,
+                    )
+                else:
+                    next_hidden = hidden_state + model.pred_proj(predictions)
+                    for layer in model.layers:
+                        next_hidden = layer(next_hidden, rope_cos, rope_sin)
 
-                pre_cap = per_token_rms(next_hidden)
+                if save_iteration:
+                    pre_cap = per_token_rms(next_hidden)
                 normalize_outer_state = getattr(model, "normalize_outer_state", None)
                 if normalize_outer_state is not None:
                     next_hidden = normalize_outer_state(next_hidden)
                 if maximum_rms is not None:
                     next_hidden = cap_token_rms(next_hidden, maximum_rms)
-                post_cap = per_token_rms(next_hidden)
+                if save_iteration:
+                    post_cap = per_token_rms(next_hidden)
                 hidden_state = next_hidden
                 logits = model.output_head(hidden_state)
                 predictions = F.softmax(logits, dim=-1)
 
-                if iteration in saved:
+                if save_iteration:
                     saved[iteration]["predictions"].append(
                         logits.argmax(dim=-1).cpu()
                     )
