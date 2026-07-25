@@ -14,9 +14,12 @@ The general, project-independent version of these rules lives in the public temp
 - `--detach` is also the safer default for longer eval and analysis runs.
 - Modal can preempt GPU workers at any time, and GPU jobs cannot opt out. A preempted job restarts with the same input only when the function sets `retries=` (modal_run.py does), so design training to resume from checkpoints.
 - Launch training with the spawn-based entrypoint in modal_run.py plus `--detach`. A `.remote()`-style client holds a connection for the whole run and cancels the input if that connection breaks (laptop sleep, network blip) — this killed three runs on 2026-07-02 and looks deceptively like preemption in the logs.
+- Keep one `.spawn()` call per detached local-entrypoint invocation. Modal only guarantees that the last spawned call survives after the entrypoint exits; launch independent jobs with separate `modal run --detach` commands.
+- `modal run --detach` may print `App completed` after the local entrypoint exits while its spawned worker is still running. Verify the worker with `modal container list`; do not treat the local message as training completion.
 - Modal's default function timeout is 5 minutes, so set a longer timeout for training. In practice this repo uses the 24h maximum.
 - Volumes persist indefinitely without automatic eviction; treat the output volume as the source of truth for checkpoints and logs.
 - A local output stream can die while the Modal worker keeps running. Check `modal container list` and `modal volume ls` for true status.
+- Read an active worker's not-yet-committed log with `modal container exec <container-id> cat <path>`. After the worker exits, verify the result file on the Volume; no active container alone does not distinguish success from failure.
 - `modal app logs` only works while the app is still active. For detached or finished runs, poll the log file from the volume with `modal volume get`.
 - Keep experiment code Modal-agnostic: accept an `output_dir` argument and let the Modal wrapper point it at the mounted volume path.
 - Do not pipe `modal run --detach` into `tail`, `head`, or similar tools; those commands hang waiting for EOF.
@@ -24,6 +27,7 @@ The general, project-independent version of these rules lives in the public temp
 ## Checkpoints
 
 - Save model state, optimizer state, training step, and config in resumable checkpoints.
+- When selecting by a validation metric, save the corresponding weights immediately. Recording only the best score is insufficient if periodic checkpoints do not include that step.
 - Load checkpoints before `torch.compile()` so parameter names still match the saved state.
 - Save config in checkpoints and verify it on load to avoid resuming the wrong experiment.
 

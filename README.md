@@ -5,14 +5,18 @@ From-scratch experiments on iterative neural Sudoku solvers. See [post](https://
 ## Current Status
 
 - **Highest-scoring model:** `iters/exp_baseline_lr2e3.py`
-- **Recommended training recipe:** `stabilize/exp_lr2e3_outer_rmsnorm.py`
+- **Recommended reproducible recipe:** randomized late-state training in `looping/exp_late_supervision.py`, then delayed damping from iteration 512
 - **Benchmark:** `sapientinc/sudoku-extreme` via `load_dataset(..., split="test")`
 - **Best demonstrated result:** **98.9%** puzzle accuracy at 1024 test-time iterations
-- **Recommended-recipe result:** **91.3-92.4%** at 1024 across three independently trained models; all three were healthy
+- **Recommended-recipe result:** **94.7-96.9%** through 4096 across three independently trained final checkpoints
+- **Best recent undamped result:** late stay-consistency reached **97.5%** at 1024; its best deep checkpoint scored **90.5%** at 2048
+- **Simplest reliable alternative:** recurrent RMSNorm reached **91.3-92.4%** at 1024 across three seeds
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** BS=2048, LR=2e-3, 16 training iterations, cosine decay, reverse curriculum
 
-Sotaku reaches 98.9% puzzle accuracy at 1024 test-time iterations with an ~800K-parameter looped transformer trained for only 16 iterations, showing that its learned computation can keep improving far beyond the training horizon. The recommended `stabilize/exp_lr2e3_outer_rmsnorm.py` recipe makes strong long-horizon behavior substantially more reproducible: all three full-schedule runs finished healthy, and their harvested checkpoints scored 91.3-92.4% at 1024 and 91.6-92.8% at 2048 over 25,000 test puzzles. The unconstrained recipe remains the path to the highest demonstrated scores, while RMSNorm is the reliable default; direct ES reached 94-95%, and the settling fine-tune in `es/exp_es_settle.py` reached 96.8% at 1024 and stayed essentially flat through 4096. See `iters/EXPERIMENTS_ITERS.md`, `stabilize/EXPERIMENTS_STABILIZE.md`, and `es/EXPERIMENTS_ES.md` for the full evidence.
+Sotaku's ~800K-parameter looped transformer is trained for 16 iterations but can improve for more than 1,000 at inference. The 98.9% record checkpoint remains difficult to reproduce. The reliable recipe instead trains 20% of batches from detached states sampled at iterations 32-512, then uses `alpha = 0.25` after iteration 512 at inference. Three independent final checkpoints scored 94.7-96.9% through iteration 4096 with the same policy.
+
+Late stay-consistency is the strongest undamped follow-up, while recurrent RMSNorm is the simplest bounded-state alternative. ES remains useful for rescuing selected collapsed checkpoints and for settledness training, but the latest polish of an already-good model did not improve it. Detailed evidence lives in `iters/EXPERIMENTS_ITERS.md`, `stabilize/EXPERIMENTS_STABILIZE.md`, `looping/EXPERIMENTS_LOOPING.md`, and `es/EXPERIMENTS_ES.md`.
 
 ## Setup
 
@@ -26,6 +30,10 @@ python iters/exp_baseline_lr2e3.py
 
 # Evaluate the trained checkpoint at 1024 test-time iterations
 python -c "from iters.eval_more_iters import evaluate; evaluate('model_baseline_lr2e3.pt', exp_module='iters.exp_baseline_lr2e3', iter_counts=[1024])"
+
+# Train the recommended reproducible recipe and evaluate its final checkpoint
+python -m looping.exp_late_supervision
+python -m looping.eval_late_recipe model_loop_late_random_replace_trial0.pt
 ```
 
 ## Reproduce The Released Checkpoint
@@ -50,6 +58,10 @@ modal token new
 
 # Train on Modal and keep the job alive if your client disconnects
 modal run --detach modal_run.py --exp iters.exp_baseline_lr2e3
+
+# Recommended reproducible training and delayed-damping evaluation
+modal run --detach looping/modal_late_supervision.py
+modal run --detach looping/modal_late_recipe_eval.py --run-name loop_late_random_replace_trial0
 
 # Inspect outputs on the volume
 modal volume ls sudoku-outputs
@@ -91,7 +103,10 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 ## Blessed Entry Points
 
 - `iters/exp_baseline_lr2e3.py` - highest-scoring but unreliable training recipe
-- `stabilize/exp_lr2e3_outer_rmsnorm.py` - recommended reliable training recipe; keep its best long-horizon checkpoint
+- `looping/exp_late_supervision.py` - recommended reliable training recipe; randomized detached late states are the default arm
+- `looping/exp_stay_solved.py` - second-window and late stay-consistency experiments
+- `looping/eval_late_recipe.py` - recommended delayed-damping evaluation from iteration 512 onward
+- `stabilize/exp_lr2e3_outer_rmsnorm.py` - simpler reliable alternative with no extra burn-in forwards
 - `stabilize/eval_lr2e3_outer_rmsnorm.py` - full 16/128/1024/2048 evaluation of harvested RMSNorm checkpoints
 - `stabilize/exp_lr2e3_outer_cap1.py` - less invasive cap-1 alternative
 - `stabilize/eval_lr2e3_outer_cap1.py` - full evaluation of harvested cap-1 checkpoints
@@ -105,6 +120,7 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 - `viz/plot_collapse_diagnostics.py` - hidden-state and prediction-stability diagnostics
 - `viz/plot_iteration_scaling.py` - static summary plots from the documented scaling tables
 - `iters/EXPERIMENTS_ITERS.md` - current source of truth for iteration-scaling results
+- `looping/eval_delayed_damping.py` + `looping/EXPERIMENTS_LOOPING.md` - inference-time damping rescue, loop schedules, residual scaling, and late-state training
 - `es/exp_es_finetune.py` + `es/EXPERIMENTS_ES.md` - optional evolution-strategies rescue or polish for unconstrained checkpoints
 - `stabilize/EXPERIMENTS_STABILIZE.md` - training-time stabilization study (recurrent RMSNorm and caps, burn-in, weight averaging, feedback noise)
 
@@ -114,8 +130,12 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 |-------|--------|---------------|----------|
 | **exp_baseline_lr2e3 (1024 test iters)** | 800K | ~2h40m (H200) | **98.9%** |
 | exp_baseline_lr2e3 (16 test iters) | 800K | ~2h40m (H200) | 81.8% |
+| randomized late states + delayed damping (4096 test iters) | 800K | ~2h20m (H200) | 94.7-96.9% |
+| late states through 1024 + delayed damping (4096 test iters) | 800K | ~3h (H200) | 93.9-96.8% shared policy; 97.9% best run |
+| late stay-consistency, final (1024 test iters) | 800K | ~2h40m (H200) | 97.5% |
 | exp_lr2e3_outer_rmsnorm (harvested, 1024 test iters) | 800K | ~2h45m (H200) | 91.3-92.4% |
 | exp_lr2e3_outer_cap1 (harvested, 1024 test iters) | 800K | ~3h (H200) | 91.3-91.9% |
+| collapsed exp_baseline_lr2e3 + delayed damping (1024) | 800K | inference only | 95.7% |
 | [TRM](https://github.com/SamsungSAILMontreal/TinyRecursiveModels) (reference) | 7M | ~18h (L40S) | ~87% |
 
 The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row/col/box constraint embedding, just 2D RoPE in attention. Running more test-time iterations than used during training is the key result: 16 training iterations scales cleanly to 1024 evaluation iterations. Full scaling tables, stability analysis, interventions, and ablations live in [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).

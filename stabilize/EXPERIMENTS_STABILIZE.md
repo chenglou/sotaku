@@ -2,6 +2,8 @@
 
 Training-time interventions against the long-iteration instability documented in iters/EXPERIMENTS_ITERS.md (Reproducibility section). Scripts live in this folder; they were originally under iters/.
 
+Headline: EMA and feedback noise failed; 128-iteration burn-in stabilized 6 of 7 runs near a 90% ceiling; recurrent RMSNorm produced three healthy 50K runs whose harvested checkpoints scored 91.3-92.4% at 1024. RMSNorm remains the simplest bounded-state option, while randomized late-state training in `looping/` has the higher demonstrated ceiling.
+
 Run convention: parallel runs of one config used per-run copies of the base file (exp_testbed_ema_a.py, _b.py, ...) because log and checkpoint filenames derive from module constants. The copies were byte-identical to the base apart from those names and have been deleted; recreate one by copying the base file and renaming its experiment constants. Artifacts on the sudoku-outputs Modal volume keep the per-run names.
 
 
@@ -114,4 +116,4 @@ Full evaluation of the harvested checkpoints on 25,000 balanced test puzzles:
 | 1 | 46K | 80.93% | 90.56% | **92.44%** | **92.78%** |
 | 2 | 46K | 81.28% | 89.92% | **91.30%** | **91.60%** |
 
-RMSNorm beat the matched cap-1 checkpoint on two seeds and was effectively tied on the third. Its mean 1024 score was 92.06% versus 91.52% for cap 1, and all three models improved at 2048. Current recommendation when reliability matters: use the 50K RMSNorm recipe with the periodic 1024-iteration probe and keep its best checkpoint. The unconstrained model plus retries and ES still has the higher demonstrated ceiling at 96.8-98.9%.
+RMSNorm beat cap 1 on two seeds and tied it on the third. Mean 1024 accuracy was 92.06% versus 91.52%, and all three models improved at 2048. Use the 50K RMSNorm recipe with a periodic 1024-iteration probe when a simple bounded recurrence matters more than the highest score.

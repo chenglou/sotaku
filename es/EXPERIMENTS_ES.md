@@ -1,141 +1,141 @@
-# Evolution-Strategies Fine-Tuning (July 2026)
+# Evolution-Strategies Experiments (July 2026)
 
-Forward-only fine-tuning of trained checkpoints on the 1024-iteration solve rate. The single script is es/exp_es_finetune.py (originally under iters/); `fitness_dense` selects cell-level or solved-puzzle fitness, `total_steps` the generation count.
+ES evaluates perturbed copies of a model with forward passes and combines the perturbations according to their scores. It can optimize behavior at 1024 or 2048 iterations without storing those trajectories for backpropagation.
 
-Run convention: each launched run used a per-run copy of the base file (exp_es_ft_hbs.py, ...) because output filenames derive from module constants; the copies have been deleted (byte-identical apart from names, fitness mode, and generation count). The full run ledger:
+Current conclusions:
 
-| run | seed | fitness | gens | outcome @1024 |
-|---|---|---|---|---|
-| es_ft_collapsed | lr2e3 clean A final (5.4%) | solved | 120 | **96.2%** full set (81.5% @2048) |
-| es_ft_stable | canonical B200 final (96.0%) | solved | 120 | **96.5%** full set (96.5% @2048) |
-| es_ft_r101 / r1012 | seed-101 run final (3.0%) | solved / cells | 60+60 | flat — unrescuable |
-| es_ft_rbs / rbs2 | bs2048 clean B final (1.2%) | solved / cells | 60+60 | flat — unrescuable |
-| es_ft_r3ph / r3ph2 | 3phase clean A final (0.3%) | solved / cells | 60+60 | flat — unrescuable |
-| es_ft_rburn / rburn2 | burn-in 50K final (88.5%) | solved / cells | 60+60 | ~89% — no gain |
-| es_ft_hbs | bs2048 clean A step-40K checkpoint (92.8%) | solved | 60 | **95.2%** full set (59.0% @2048) |
-| es_ft_hbsb | bs2048 clean B step-35K checkpoint (6.7%, 89.0% @128) | solved | 60 | **94.6%** full set (89.5% @2048) |
-| es_ft_hburn | burnin128 C step-25K checkpoint (744/1000 probe) | solved | 120 | 82.3% full set (52.8% @2048) |
+- ES can rescue some trained checkpoints with broken long-horizon behavior, but it cannot rescue every checkpoint that is healthy at 128 iterations.
+- ES is useful for solved-and-settled training. The best settledness run scored 96.8% at 1024 and 2048 and 96.6% at 4096.
+- Thirty-two independent perturbations and 16 positive/negative pairs perform similarly. Independent sampling is the default because it tests more distinct directions with simpler code.
+- Pure ES has not learned 9x9 Sudoku from random initialization. Smooth losses reach uniform predictions; discrete fitness remains at chance.
+- ES is not automatic polish. The latest run on an already-good late-consistency checkpoint ended below its starting score.
 
+## Trained-Model Rescue
 
-Backprop cannot reach the deployment horizon: differentiating through 1024 iterations is memory-impossible, and with the Jacobian spectral radius measured at 14-88 the gradients would explode into noise anyway. Evolution strategies need neither — perturb the weights, count solved puzzles, move toward the perturbations that scored best. Following the argument in apaz.dev's "Scaling To Unfathomable Depth" (the projection noise floor scales with parameter count, and at 800K parameters we are far below the regime where ES fine-tuning is known to work), exp_es_finetune.py fine-tunes a trained checkpoint directly on the 1024-iteration solve rate: 16 antithetic perturbation pairs per generation, perturbation scale calibrated at startup, rank-weighted updates, weight decay anchored to the seed, fitness on fresh train-split puzzles beyond the 2.7M training cut (rotated per generation, same slice for all members).
+`exp_es_finetune.py` calibrates perturbation scale at startup, evaluates fresh train-split puzzles beyond the 2.7M training cut, standardizes population scores, and pulls weights gently toward the seed. The historical runs used 16 positive/negative direction pairs; the current default uses 32 independent directions.
 
-Two pilots, 120 generations each (~2 B200-hours per 60-generation job, chained across the platform's 2-hour limit):
+| run | seed | fitness | generations | full-set result |
+|---|---|---|---:|---|
+| `es_ft_collapsed` | clean-A final, 5.4% at 1024 | solved | 120 | 96.2% at 1024, 81.5% at 2048 |
+| `es_ft_stable` | stable final, 96.0% at 1024 | solved | 120 | 96.5% at 1024 and 2048 |
+| `es_ft_hbs` | clean-A step 40K, 92.8% at 1024 | solved | 60 | 95.2% at 1024, 59.0% at 2048 |
+| `es_ft_hbsb` | clean-B step 35K, 89.0% at 128 and 6.7% at 1024 | solved | 60 | 94.6% at 1024, 89.5% at 2048 |
+| `es_ft_hburn` | burn-in step 25K, 744/1000 probe | solved | 120 | 82.3% at 1024, 52.8% at 2048 |
+| `es_ft_r101`, `rbs`, `r3ph` | 0.3-3.0% at 1024 and poor at 128 | solved or cells | 60+60 | no solve-rate improvement |
+| `es_ft_rburn` | burn-in final, 88.5% at 1024 | solved or cells | 60+60 | remained near 89% |
 
-| seed | @1024 before | @1024 after | @2048 after |
-|---|---|---|---|
-| collapsed clean run (5.4%) | 63/1000 probe | **96.2%** full set | 81.5% |
-| stable B200 canonical (96.0%) | 961/1000 probe | **96.5%** full set | **96.5%** |
+The first successful repairs suggested that healthy 128-iteration behavior was sufficient. A later eight-run cohort disproved that rule:
 
-The collapsed model recovered completely — 5.4% to 96.2% at 1024 iterations in roughly seven forward-only GPU-hours, past every training-time intervention tested above. The stable model gained half a point and now holds flat through 2048 iterations, beyond its tuned horizon; the repaired model softens there (81.5%), so a freshly-carved basin appears shallower past the tuned horizon than a naturally-deep one. Two measurements along the way: the fitness landscape at 1024 iterations tolerates per-weight perturbations of 3e-4 almost without loss (357/384 vs 358 unperturbed) but is destroyed at 1e-3 — a remarkably sharp cliff — and a buggy first pilot that took thousand-fold-too-large steps zeroed both seeds within one generation, which is the same cliff seen from the other side.
-
-A follow-up batch corrected the first impression that any collapsed checkpoint is salvageable. Six more 60-generation runs — three deeper collapses (3.0%, 1.2%, 0.3% at 1024 iterations) and a burn-in model (88.5%), each run twice: once with solved-puzzle fitness and once with dense correct-cell fitness — all failed to move at the solve level. The dense runs prove the failure is not a signal problem: cell counts climbed by thousands while solved puzzles stayed flat, i.e. the optimizer was climbing a slope that does not lead to the solving region. The one successful repair (5.4% to 96.2%) worked because that seed sat near the edge of the good region; seeds deep inside a bad one have no local path out. The burn-in seed neither degraded nor meaningfully improved (~88.5% to ~89%), so starting ES from a burn-in model buys nothing over starting it from any stable model — evidence against burn-in as a preparation step for ES, though not against burn-in itself.
-
-A third batch (July 4) tested that recovery path. First, checkpoint sweeps over the two deep-collapse lineages (full test set at 1024 iterations, every saved 5K-step checkpoint): bs2048_baseline_clean_b never exceeded 6.7% (step 35,000) and 3phase_40k_clean_a never exceeded 2.3% (step 15,000). Runs that finish near 1% do not lose a good model at the end — they never visit the good region at all, at least at 5K-step sampling (long-iteration accuracy can swing within 2K steps, so a brief good window could hide between checkpoints). The harvest statistic above therefore does not cover every failure: checkpoint selection only helps runs that actually pass through stability.
-
-The 1024-iteration score turned out to be the wrong criterion for what ES can rescue, though. That 6.7% checkpoint scores 89.0% at 128 iterations — short horizons intact, only the long-horizon drift broken, the same shape as the previously rescued 5.4% model — while the same lineage's final weights are broken at every horizon (1.2% at 1024, ~14% at 128) and had resisted ES entirely. Seeded from the checkpoint (exp_es_ft_hbsb.py), 60 generations took it from 6.7% to 94.6% on the full set, restored the monotonic iteration profile (79.2 / 92.4 / 94.6 at 16 / 128 / 1024), and held 89.5% at 2048 — the deepest basin of any repaired model (the original 5.4% rescue holds 81.5% there). So the rescue boundary is short-horizon health, not the 1024-iteration score: ES repairs weights whose 128-iteration behavior is intact and cannot repair weights that are broken at short horizons too.
-
-The other two arms of the batch. exp_es_ft_hbs.py, seeded from bs2048_baseline_clean_a's step-40,000 checkpoint (92.8% at 1024 inside a run that finished at 31.2%), reached 95.2% at 1024 (95.5% at 128) — the third-best model this project has produced — though it softens to 59.0% at 2048. Basin depth at 2048 runs opposite to seed quality (rescued-from-6.7%: 89.5%; polished-from-92.8%: 59.0%; the 96.5% record model: flat), which is unexplained and strengthens the case for tuning at 2048 directly. exp_es_ft_hburn.py, seeded from the soft burn-in failure's step-25,000 checkpoint (744/1000 on the ES probe), rose to ~800/1000 by generation 35 and stayed there through all 120 generations; on the full set it measured 81.8% at 1024 and 43.0% at 2048 at generation 60, and 82.3% / 52.8% at generation 120 — the extra 60 generations bought half a point. Burn-in weights are now 0-for-2 as ES seeds (the 88.5% burn-in final also refused to move), while plain-training weights with intact short horizons are 4-for-4 (5.4 to 96.2, 96.0 to 96.5, 92.8 to 95.2, 6.7 to 94.6). Whatever burn-in does to guarantee a safe landing also appears to place the weights somewhere ES cannot push far from.
-
-Practical upshot, current form: train plain runs (no burn-in), evaluate checkpoints at long iteration counts during the anneal tail, pick any checkpoint with healthy 128-iteration accuracy, and fine-tune it with ES for 60 generations (~1.5 forward-only GPU-hours). Both failed runs given this treatment came out at 94.6% and 95.2% — how the run itself ended barely matters. Still open: tune at 2048+ (now more motivated by the basin-depth inversion), and whether ES can lift a stable model past February's 98.9%.
-
-## How Early Can ES Take Over? (July 2026)
-
-A ladder of runs seeded from progressively earlier checkpoints of one trajectory (bs2048_baseline_clean_a), asking at what point in first-order training the network becomes something ES can carry the rest of the way (exp_es_from0/5k/10k/20k.py, dense cell-level fitness). Full-set results, with the later rungs from the sections above for comparison:
-
-| backprop steps before ES | ES gens | probe trajectory | @16 | @128 | @1024 | @2048 |
-|---|---|---|---|---|---|---|
-| 0 (near-random weights) | 60 | 0 → 0, cell fitness pinned at chance | — | — | 0% | — |
-| 5,000 (a tenth) | 120 | 286 → 647, still rising | 63.1% | 75.3% | **69.0%** | 36.9% |
-| 10,000 | 120 | 2 → 371, still rising | 69.1% | 78.0% | 39.7% | 0.1% |
-| 20,000 | 60 | 785 → 824 | 73.6% | 90.3% | **84.7%** | 50.0% |
-| 40,000 (es_ft_hbs) | 60 | 922 → 958 | 80.6% | 95.5% | **95.2%** | 59.0% |
-| 50,000 + ES polish (es_ft_stable) | 120 | 961 → 965 | — | — | **96.5%** | 96.5% |
-
-The reading: backprop's role is carrying the network into territory where ES has a slope to climb. From random weights, sixty generations never solved a single puzzle and the cell-level fitness never left chance — there is no local slope toward solving at this population size. But one tenth of the training schedule already hands ES a workable seed (286/1000, lifted to 69% and still climbing when the budget ran out), and each additional block of backprop buys a higher landing point along a smooth gradient — no cliff anywhere between 5K and 50K. The step-10K seed is the same non-monotonic mid-training turbulence seen everywhere else in this project (it probes far below the *earlier* step-5K seed) and ES recovers it too, just more slowly.
-
-Three caveats. The rung seeds are mid-flight checkpoints of one 50K-step cosine run, not budget-matched trainings — a step-5K checkpoint still carries near-peak learning rate, so it is a worse seed than a model whose schedule completed at 5K would be (the same schedule-versus-budget confound that broke the original OpenAI scaling laws, pointed the other way). The rung values are therefore lower bounds on "N steps of backprop done properly." The early rungs' iteration profiles also still peak at 128 and decay after (they gained enormously at 1024 but are not monotonic like the step-35K rescue above), and their 2048 behavior is weak — these are partial models, not finished ones. And the ladder holds population and generations fixed; whether more ES budget, larger populations, or a fitness schedule that starts at short horizons closes the remaining gap from below is untested. As it stands, the cheapest route to a strong model is still moderate backprop plus ES (20-40K steps, then fine-tune), but the zero-rung's hard failure and the 5K rung's partial success bracket where "how much backprop do we actually need" lives: more than zero, possibly much less than the full schedule.
-
-A follow-up pilot (exp_es_tiny.py) tested whether the zero-rung's deadness is about scale: a 52K-parameter model (d_model=32, 15x smaller) with fitness at 16 iterations (64x cheaper, so 2,000 generations fit one job — thirty times the ladder's generation budget) and the sigma ladder extended upward for the random-init regime. Result: flat at chance for all 2,000 generations — 64,000 fitness evaluations with no drift whatsoever. So the deadness is not parameter count, not horizon length, and not generation budget. The reading: backprop's contribution at the start of training is per-cell credit assignment — the chain rule tells every weight how it affected every cell, which is astronomically more information per example than a scalar fitness carries. Until some feature structure exists, cell-accuracy fitness has no local slope for ES to find at practical population sizes. This closes the door on growing a network under pure ES from scratch (there is nothing to grow *from*), though growth on top of a brief backprop bootstrap remains open, and one fitness variant remains untried: a smooth score (cross-entropy on empty cells) can move where argmax cell counts cannot, since near-random weight changes shift probabilities continuously but rarely flip an argmax.
-
-## Performance (July 2026)
-
-The generation loop was profiled on a real seed model (es/bench_es.py, H200, 32 members × 384 puzzles × 1024 iterations):
-
-| variant | 32 members | fidelity vs production |
+| run | best training material | pipeline outcome |
 |---|---|---|
-| sequential eager, 256-puzzle chunks (production) | 117.3s | — |
-| sequential eager, one 384 batch | 64.8s | bit-exact (0 cells differ) |
-| sequential + compiled 32-iteration block | **34.7s** | ~1-3% of cells land differently |
-| batched population (vmap), eager | 96.6s | ~1-3% |
-| batched population + compiled | 36.7s | ~1-3% |
+| e | final 97.1% at 1024 | direct success |
+| h | final 98.1% at 1024 | direct success |
+| b | step 45K at 95.5% | ES-polished to 96.1% full set |
+| g | step 40K at 89.7%/128 and 48.8%/1024 | partial ES climb |
+| d | step 45K at 93.9%/128 and 1.6%/1024 | flat under solved and dense fitness |
+| a | step 40K at 84.4%/128 and 0.2%/1024 | flat |
+| c | no checkpoint above 74.7% at 128 | no useful seed |
+| f | no checkpoint above 0.9% at 128 | no useful seed |
 
-Two findings shaped the fold. Removing the chunking is free — per-puzzle results don't depend on batch composition, so the counts match bit for bit. And batching the whole population, the presumed big win, adds nothing over compilation alone: the compiled kernels already saturate the GPU at batch 384, so the simpler sequential-member loop stays. The compiled path's ~1-3% cell differences are not errors — reduction-order changes compound over 1024 iterations, the same magnitude of divergence seen when moving a checkpoint between GPU models.
+Three of eight runs produced material above 94%, and one produced a partial rescue. Healthy short-horizon behavior and some correct 1024-iteration behavior both help, but neither predicts success or speed. Training comparisons should therefore report the yield of the complete train, select, and ES pipeline rather than assume that every failed run is repairable.
 
-What shipped in exp_es_finetune.py: fitness evaluation runs the compiled full-batch path (~3x cheaper generations, 43s/generation on H200 including the probe — a 120-generation fine-tune now fits one 2-hour job); the validation probe keeps the untouched eager path so probe values stay comparable across the project's history. An 8-generation live run from the 96.0% seed validated the fold: starting probe 958/1000 (historical: 961), fitness in the historical 330-370/384 band, probe stable across generations.
+Burn-in-trained checkpoints were poor ES seeds in both attempts. Burn-in improves reliability by changing the states used for supervised training, but appears to place the weights in a region that this ES recipe cannot move far from.
 
-Also measured but deferred: per-puzzle early exit. On the healthy seed, half of all puzzles reach their final answer by iteration 7 (mean 63 of 1024) — but 4.2% never settle at all, and that fraction matches the model's failure rate: non-convergence at the fixed point identifies exactly the puzzles the model gets wrong. Early exit would cut fitness cost several times more, but it changes what fitness measures (settled answer vs answer-at-1024), so it stays out until the compiled path's headroom is exhausted. Deployment is untouched by all of this: the model ships as plain weights evaluated at a fixed iteration count, per the no-inference-time-tricks rule.
+## Sampling And Runtime
 
-## From-Scratch and Growth Probes (July 5)
+`exp_es_sampling_ablation.py` compared equal-cost estimators on a known-rescuable seed. Both arms used 32 evaluations per generation: either 16 directions at both signs or 32 independent positive directions.
 
-Five cheap probes following the ladder's "backprop carries, ES climbs" conclusion, each attacking the carrying requirement from a different side.
+| trial | paired full @1024 | independent full @1024 |
+|---|---:|---:|
+| 0 | 94.7% | 95.3% |
+| 1 | 94.5% | 95.2% |
+| 2 | 96.3% | 95.3% |
+| mean | 95.14% | 95.23% |
 
-**Smooth fitness from scratch (exp_es_ce.py).** Same setup as the flat-at-chance tiny pilot, with one change: fitness is negative cross-entropy on empty cells instead of argmax cell counts. It moved immediately — from -12.6 nats (a random net being confidently wrong) to -2.38 over 4,000 generations — confirming the staircase diagnosis: argmax counting hid a slope that a smooth score sees. But the slope led to the trivial optimum: the run asymptoted at the uniform-prediction floor (-ln 9 = -2.20; best population member -2.23) with the solve probe at 0 throughout. Backprop also passes through predict-the-prior early in training and breaks out because per-cell gradients point beyond it; scalar CE fitness at population 32 did not. Untried knobs before calling this closed: recalibrate sigma at the floor (3e-3 was chosen at random init), larger populations (fitness differences near the floor are tiny), fitness at horizon 1 first, easy-puzzle curriculum.
+All six runs were still partial at generation 60 and reached 94% or better by generation 120. On the difficult cohort-d seed, paired and independent sampling both remained near 3% after 60 generations. The experiment supports parity, not a quality advantage for either estimator.
 
-**Fitness at a mastered horizon (exp_es_h64.py).** The 6.7%-at-1024 rescue seed already solves 891/1000 at 64 iterations, and grading fitness there produced no pressure: 480 generations ended at 898/1000 at 64 and 108/1000 at 1024, versus the same seed reaching ~940/1000 in 60 generations when fitness was graded at 1024 directly (es_ft_hbsb). The intermediate-horizon idea itself is untested — the horizon choice was wrong, not the idea. Fitness pressure must sit where the model is weak; for this seed that is 128-512. Fitness-at-256 is the open follow-up.
+The runtime study found two useful simplifications:
 
-**Backprop bootstrap at tiny scale (exp_tiny_bootstrap.py).** 5,000 supervised steps on the 52K-parameter d_model=32 model: 51/1000 solved at 16 iterations, 228/1000 at 128 — the tiny model already shows iteration scaling, and this is ample fitness slope for ES. Credit assignment at tiny scale is cheap (minutes).
+- Evaluating all 384 fitness puzzles in one batch was bit-exact and reduced an H200 generation from 117 to 65 seconds.
+- Compiling a 32-iteration block reduced the same work to about 35 seconds, with 1-3% of cells changing because of numerical reduction order.
 
-**Function-preserving growth under ES (exp_es_grow.py).** ES from the bootstrap seed with dense cell fitness at 128 iterations, widening d_ff 128 to 512 (52K to 152K parameters) at generation 500. The widening preserved fitness exactly on GPU (12,403 before and after). But the slope did not change: probe 228 to 251 over the 500 pre-growth generations, 251 to 260 over the 1,000 post-growth generations (finishing at 260/1000). Widening the feed-forward layer was not the binding constraint at this stage; the residual stream (still 32-dimensional) is the suspect bottleneck, and stream widening — via duplicate-and-halve, which survives LayerNorm — is the untested growth axis.
+`exp_es_finetune.py` uses the compiled full-batch path for fitness and the unchanged eager path for the validation probe. A 120-generation rescue now fits in one two-hour H200 job.
 
-**Mipmap-down (exp_mipdown.py).** Compressing the canonical 96.0% model's residual stream from d=128 to 64 by literal 2x2 box-filtering of adjacent channel pairs (with the pseudo-inverse factor, the best a pair-averaging basis can do) destroys the model completely: 0/1000 solved and 11.2% of cells — the 1/9 chance floor — at 16, 128, and 1024 iterations alike. Image mipmaps work because adjacent pixels correlate; a trained network's channels have no adjacency structure, and the measurement says the redundancy under that basis is exactly zero. Principled variants (similarity-matched channel pairing before averaging, a shared low-rank basis from activations) remain open, with expectations set accordingly.
+## Horizon And Settledness Fitness
 
-## Horizon Transfer, Settledness, and the Growth Nulls (July 5, second batch)
+Training at an intermediate horizon transfers beyond that horizon, but direct long-horizon fitness remains stronger. Fitness at 256 iterations, given the 6.7% rescue seed, produced 94.1% at 256, 92.6% at 1024, and 68.1% at 2048. Direct 1024 fitness on the same seed reached 94.6% at 1024 and 89.5% at 2048.
 
-Four runs launched together after an adversarially-verified code review of the whole package (which found and fixed a resume-past-completion crash in every experiment file, a too-narrow exception in the Viridian auto-resume fallback, and a concurrent-writer loss in the Modal environment log).
+`exp_es_settle.py` scores a puzzle only when it is solved and unchanged over the last 128 of 2048 iterations. Starting from the stable 96.5% model, 60 generations produced:
 
-**Fitness at 256 — the intermediate-horizon idea, corrected (exp_es_h256.py).** From the same 6.7% seed as es_ft_hbsb, fitness graded at 256 iterations (where that seed actually breaks), 240 generations — exactly the iteration budget of hbsb's 60 generations at 1024. Full set: 79.4 / 92.6 / 94.1 / 92.6 / 68.1 at 16 / 128 / 256 / 1024 / 2048. The transfer is real: 92.6% at 1024 from a model never graded past 256, four times its trained horizon. But at equal compute, direct grading at 1024 remains better at 1024 (94.6%) and much better at 2048 (89.5% vs 68.1%) — the 256-trained basin fades past its horizon on the usual dose-response pattern. Intermediate-horizon ES is a cost-reach dial (useful when deployment-horizon generations are prohibitively slow), not a free lunch.
+| 1024 | 2048 | 4096 |
+|---:|---:|---:|
+| 96.8% | 96.8% | 96.6% |
 
-**Settledness at 2048 (exp_es_settle.py) — new best model.** Fitness counts puzzles solved AND unchanged over the last 128 of 2048 iterations, seeded from the 96.5% record model. Sixty generations. Full set: **96.8% at 1024, 96.8% at 2048, 96.6% at 4096** — flat through a horizon twice the graded one and never measured before in this project. Every previous model fades past its graded horizon; this one does not. Rewarding the settling behavior itself, rather than a snapshot of accuracy, appears to buy horizon-independent stability — and per the train/deploy-consistency rule, a model trained on settledness also legitimizes run-until-settled deployment. The probe-level detail held throughout the run: settled count stayed above solved count, and the unsolved puzzles were, as always, the never-settling ones. This is the best reproducible model of the project (February's unreproduced 98.9% one-off remains the 1024 record).
+This is the strongest demonstrated use of ES for stability. Rewarding settledness produced a model that remained flat beyond the graded horizon.
 
-**CE phase two (exp_es_ce2.py) — the uniform floor is a trap, now at scale.** Population 128 pairs (256 evaluations per generation), sigma recalibrated on the floor-sitting seed (the ladder correctly rejected 1e-2), 1,000 generations — a quarter-million evaluations. Fitness mean -2.36, best member -2.22, zero solves: pinned at the floor. The population lever is spent; the remaining untried knobs for ES-from-scratch are a horizon-1 fitness stage and an easy-puzzle curriculum, and expectations should now be low. Backprop's per-cell credit assignment remains the thing scalar fitness has not replaced.
+The latest polish used the same solved-and-settled objective with 32 independent directions on the best late stay-consistency checkpoint:
 
-**Stream growth (exp_es_streamgrow.py) — the second growth axis, same null.** d_model 32 to 64 by duplicate-and-halve (heads double at constant head_dim, so per-head attention and RoPE are untouched; LayerNorm survives duplication exactly). Preservation on GPU: 12,538 before, 12,557 after (bf16 realization noise). The widened thousand generations drifted from probe ~265 down to ~253, slightly below the pre-growth level. With exp_es_grow's d_ff null, both capacity axes now show the same picture: the growth mechanics are exact, and the acceleration is absent. At population 32 on this bootstrap seed, ES looks signal-limited, not capacity-limited — the plateau near 250-265/1000 does not move when parameters are added.
+| generation | solved | settled | both |
+|---:|---:|---:|---:|
+| start | 95.4% | 96.9% | 95.0% |
+| 15, best | 95.9% | 97.5% | 95.8% |
+| 59, final | 94.9% | 96.4% | 94.5% |
 
-## The Exploration Wave (July 5, third batch)
+This run did not improve the seed. The first harness recorded the best score but saved only generations 19, 39, 59, and the final model. A deterministic 16-generation replay reproduced every probe and recovered generation 15. `exp_es_settle_independent.py` now saves every new best probe atomically and records both best and final model paths.
 
-Six deliberately-minimal probes from two threads: the credit-assignment granularity question (can any forward-only signal richer than a scalar replace the backprop bootstrap?) and the drop-one-level program (does the core phenomenon survive below the symbol?).
+## Backprop-to-ES Handoff
 
-**The credit-assignment probes: four more granularities, same wall.** exp_es_ce_h1.py is the clean closure: at horizon 1 — a plain feedforward pass, no iteration scrambling at all, the identical objective backprop optimizes in minutes — scalar CE fitness pinned to the uniform floor at four decimal places (-2.1975 vs the theoretical -ln 9 = -2.1972). The scrambling explanation is dead; what stops from-scratch ES is credit assignment, full stop. exp_es_ce_easy.py (fitness on the 2,048 easiest puzzles) reproduced the original floor approach. exp_es_vec.py (per-puzzle majority vote per antithetic pair) came with its own diagnostic: vote mass ~0.05 of a possible 1.0 — at random initialization, even per-puzzle plus-versus-minus comparisons are coin flips, so the richer channel exists mechanically but carries nothing. exp_hebb.py (reward-modulated Hebbian: per-Linear input-output eligibility traces gated by fitness advantage) sat at chance for 3,000 updates with no runaway. From-scratch forward-only learning now stands at 0-for-7 configurations across four signal granularities (scalar solved, scalar cells, smooth CE at three horizons and two data mixes, per-puzzle vectors, local correlational traces).
+One training lineage was handed to ES at progressively later checkpoints:
 
-One observation parked rather than concluded: exp_hebbft.py (the same Hebbian rule fine-tuning the healthy bootstrap seed at 128 iterations) did not sit still — it consistently eroded the seed (fitness 12.5K to 11.8K, probe 228 to 208 over 1,000 updates). A rule that reliably moves downhill carries signal with the wrong sign or the wrong local factor; raw input-output correlation is the crudest possible trace choice, and a v2 with a better-chosen post-factor is a cheap future iteration.
+| backprop steps | ES generations | full @1024 | full @2048 |
+|---:|---:|---:|---:|
+| 0 | 60 | 0% | - |
+| 5K | 120 | 69.0% | 36.9% |
+| 10K | 120 | 39.7% | 0.1% |
+| 20K | 60 | 84.7% | 50.0% |
+| 40K | 60 | 95.2% | 59.0% |
+| 50K | 120 | 96.5% | 96.5% |
 
-**The pixel probe: the drop-one-level flagship, and it twitched hard (exp_pixel_bootstrap.py).** Cells become 8x8 glyph bitmaps in and out; digits exist only as shapes in the training targets; decoding is nearest-glyph on the drawn pixels. A 212K-parameter model (d_model 64, same 4 weight-shared layers, same 2D RoPE), 8,000 supervised steps, first attempt, no tuning. Probe trajectory (solved per 1,000, 16-iter vs 128-iter): 0/0 at step 0, 19/26 at 1K, 114/180 at 2K, 232/335 at 3K, 287/347 at 4K, 324/371 at 5K, 328/304 at 6K, 327/288 at 7K, 340/345 at 8K. Two findings. Iteration scaling survives below the symbol level — the 128-iteration probe led at every checkpoint through mid-training, peaking at 371/1000 solved from raw pixels. And the anneal-tail turbulence followed us down a level: the long-horizon probe dipped below the short one during the cosine tail (steps 6-7K) and recovered at the end — the digit models' signature pathology, reproduced in a different input/output space. The instability is a property of iterative-refinement training itself, not of any encoding; equivalently, the whole repair stack (checkpoint harvest, ES, settledness fitness) has a known target in the pixel domain. Next rungs, when taken deliberately: longer pixel training toward digit-model parity, the ES/settledness stack on pixels, and the maze renderer — the generality test with no encoding layer at all.
+The 5K and 10K checkpoints came from an unfinished 50K learning-rate schedule, so they are lower bounds on properly budgeted short backprop runs. The useful conclusion is narrower: a small backprop bootstrap creates an ES signal, while random initialization does not.
 
-## The Pixel Program (July 5, fourth batch)
+## From-Scratch ES
 
-Three rungs following the pixel bootstrap's twitch, all through the unchanged architecture: 81 cell-aligned tokens, 2D RoPE, weight-shared iterative refinement, bitmaps in and bitmaps out.
+The from-scratch program tested several ways to provide a denser or more local signal:
 
-**Parity run (exp_pixel_full.py): the signature catastrophe, complete and representation-independent.** d_model 128 (~900K parameters, the digit SOTA's width), 30K steps, probed at 16/128/1024 every 2K. At step 2,000 the model had the healthy scaling shape — 334 / 381 / 104 solved per 1,000, long horizons leading. By step 4,000 the long horizons were dead (5/1000 at 128, 0 at 1024) and they stayed dead through the entire remaining schedule, including the deep-anneal window, ending at 717 / 19 / 0 — short-horizon accuracy climbing throughout, no warning, no recovery. This is the digit domain's mid-training collapse reproduced end to end in pixel space: the pathology belongs to iterative-refinement training, not to any encoding. The step-2,000 checkpoint is the run's harvest candidate, and by the digit domain's playbook (checkpoint plus ES) it is recoverable material.
-
-**Settledness port (exp_es_pixel.py): the cure transfers, now a two-domain pattern.** The pixel bootstrap seed itself crashes past its comfort zone — 345/1000 solved at 128 iterations falling to 128/1000 at 256, worse degradation than the digit models show. Three hundred generations of solved-and-settled fitness at 256 (window 64) took the both-count from 126 to 380, and the 1024-iteration transfer reading from 22 to 357 — a sixteenfold improvement at four times the graded horizon, on a representation the recipe was never developed on. Settledness grading now repairs and extends long-horizon stability in both domains it has been tried in.
-
-**The maze pair (exp_pixel_maze.py, exp_pixel_maze2.py): the port passes everywhere; the scaling needs task depth.** 9x9 unique-shortest-path mazes rendered as wall/floor/start/goal glyphs, the model drawing the path into floor cells. The first version (path >= 6, density 0.28) saturated instantly: 996/1000 at the first probe, perfect from step 5,000, both horizons. The hard version (path >= 14, density 0.30, 0.3% generator acceptance) also ended perfect at both horizons with training loss at zero. So the architecture masters its second task with zero changes — but at 9x9, path-finding is too shallow for more iterations to buy anything: 16 already suffices, and the iteration-scaling question cannot be asked. The reading: iteration scaling is a property of task depth — sudoku's long constraint-propagation chains demand it; short-corridor path-finding does not — and the right second task for the scaling claim needs deep inferential chains, not just a 2D grid. One incidental observation from the hard variant: early in training the 128-iteration probe lagged the 16-iteration probe (744 vs 994) before converging — the long-horizon instability appears even on a task where depth buys nothing, one more sign it is a property of the loop itself.
-
-The program's standing after one day: the phenomenon (iteration scaling), the pathology (mid-training long-horizon collapse), and the cure (settledness fitness) all live below the symbol level; the architecture ports across tasks unchanged; and what iteration scaling feeds on is the task's inferential depth.
-
-## The Rescue-Law Cohort (July 5-6): Eight Unseeded Runs, the Law Gets Its Texture
-
-Before this cohort, the checkpoint-plus-ES recipe stood at four-for-four and read like a law: any plain-trained late checkpoint with healthy 128-iteration accuracy converts to 94+ at 1024 in 60 generations. Eight fresh unseeded runs of the canonical config, each put through the full pipeline (train 50K, evaluate 40K/45K/final checkpoints, ES the best 128-healthy late checkpoint), say the truth is rougher:
-
-| run | best material found | pipeline outcome |
+| experiment | change | result |
 |---|---|---|
-| e | final 97.1% at 1024 | success (direct) |
-| h | final **98.1%** at 1024 | success (direct) — second-best result in project history, unseeded |
-| b | 45K checkpoint 95.5%; ES polish certified **96.1%** full set | success (harvest, plus polish) |
-| g | 40K at 89.7%/128, 48.8%/1024 | partial: ES climbed 485 to 692 over 120 generations, decelerating |
-| d | 45K at **93.9%/128**, 1.6%/1024 | refused: flat under sparse (24/1000) AND dense (29/1000) fitness |
-| a | 40K at 84.4%/128, 0.2%/1024 | refused: flat at 5/1000 |
-| c | nothing above 74.7% at 128 | no material |
-| f | nothing above 0.9% at 128 | no material |
+| full model, solved or cell fitness | discrete score | stayed at chance |
+| tiny 52K model | 2000 generations at horizon 16 | zero solves |
+| scalar cross-entropy | smooth score | moved to uniform prediction, then stopped |
+| population 256 pairs | more samples near the uniform floor | zero solves after 1000 generations |
+| horizon-1 cross-entropy | removes recurrent credit assignment | pinned at `ln(9)` |
+| easy-puzzle curriculum | more givens | same uniform floor |
+| per-puzzle voting | vector-valued comparison | votes were nearly random |
+| reward-modulated Hebbian update | local input/output traces | stayed at chance; fine-tuning moved downhill |
 
-Verdict: **3 of 8 runs yielded 94+ material** (two finals, one checkpoint), one more is a slow partial conversion, and four had nothing the recipe could finish. Two findings revise the law. First, the original boundary — short-horizon health decides rescuability — is broken by cohort_d: the healthiest 128-iteration seed ever fed to ES (93.9%) refused under both fitness types, while hbsb's 89.0%/6.7% seed had rescued fully; the seed's 1024-level foothold matters too (every past success started at 5.4%+ there; d and a sit at 1.6% and 0.2%). Second, even the foothold does not predict speed — g's 48.8% foothold converted far slower than hbsb's 6.7% — so per-seed basin idiosyncrasy (the same phenomenon as the 2048 depth inversion) dominates any simple criterion. The honest operating law: the pipeline converts roughly half of what training produces cheaply, individual seeds are unpredictable, and the right yardstick for training-recipe comparisons is pipeline yield — the canonical config's is 3/8 at 94+ — rather than any single-run guarantee. Silver lining for the February mystery: two unseeded July runs landed at 97.1% and 98.1%, so nothing about the current fleet prevents near-record runs; February's four-for-four remains an outlier streak.
+CDRGE was the largest direct test on the full 796,937-parameter Sudoku model. It estimates a gradient from positive and negative Rademacher perturbations, using the perturbation radius as both finite-difference scale and update size.
+
+| CDRGE run | generations | final horizon-1 CE | cells | solved |
+|---|---:|---:|---:|---:|
+| 256 directions | 500 | 2.1973 | 11.50% | 0/1000 |
+| 512 directions | 500 | 2.1972 | 11.51% | 0/1000 |
+
+Both runs reached the uniform predictor. The horizon curriculum then switched from high-clue horizon-1 puzzles to horizon 4. Both population sizes diverged numerically because the fixed `0.01` update became too large at the new horizon. That curriculum result is a failed hyperparameter setting, not evidence against every CDRGE curriculum. A useful retry would recalibrate the update at each stage.
+
+The combined evidence points to missing credit assignment. Backprop supplies a separate gradient for every predicted cell; these methods reduce a whole model rollout to one or a few scores. Increasing generations, population, smoothness, or model capacity has not replaced that information at practical cost.
+
+Eggroll-style low-rank perturbations were discussed but not implemented. They remain distinct from the full random directions used by CDRGE and the standard ES runs.
+
+## Growth And Other Representations
+
+A 5K backprop bootstrap on the tiny model solved 51/1000 puzzles at 16 iterations and 228/1000 at 128. ES then moved the 128-iteration probe only into the 250-265 range.
+
+Function-preserving growth did not help:
+
+- Widening the feed-forward layer from 128 to 512 preserved fitness exactly, but did not change the ES slope.
+- Doubling the residual stream from 32 to 64 by duplicate-and-halve preserved the function within bf16 noise, then drifted slightly downward.
+- Compressing a trained width-128 model to width 64 by adjacent-channel averaging reduced every horizon to chance.
+
+Pixel Sudoku replaced each digit with an 8x8 glyph bitmap and trained the same iterative architecture to output pixels. Iteration scaling and late-training collapse both remained, showing that neither depends on one-hot digit encoding. Solved-and-settled ES at 256 iterations improved the pixel model's 1024 probe from 22/1000 to 357/1000.
+
+Two generated 9x9 maze tasks reached nearly perfect accuracy. They were useful architecture checks but too shallow for iteration scaling: 16 iterations already solved them.
