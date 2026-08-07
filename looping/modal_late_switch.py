@@ -10,7 +10,12 @@ SOURCE_CHECKPOINT = (
     "loop_stay_control_50k_trial0_checkpoint_step39000.pt"
 )
 SOURCE_STEP = 39000
-MODES = ("plain", "consistency")
+MODES = ("plain", "consistency", "margin_floor5")
+MODE_ARMS = {
+    "plain": "control",
+    "consistency": "stay_consistency",
+    "margin_floor5": "stay_margin_floor",
+}
 
 hf_cache_volume = modal.Volume.from_name(
     "sudoku-hf-cache",
@@ -91,7 +96,7 @@ def run_branch(mode: str, run_name: str):
 
     from looping.exp_stay_solved import train
 
-    arm = "control" if mode == "plain" else "stay_consistency"
+    arm = MODE_ARMS[mode]
     try:
         return train(
             output_dir="/outputs/looping",

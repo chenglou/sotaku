@@ -135,7 +135,7 @@ The useful discriminator is long-range direction. The stable model's iteration-1
 
 The repaired model's remaining 2048 weakness has the same explanation. Its median directional margin remains positive, but the 10th percentile moves from +0.0536 at iteration 1024 to -0.0024 at 2048, exactly where accuracy falls. The naturally stable model's 10th percentile remains near +0.070 throughout.
 
-**Conclusion:** These models approach a direction, or ray, rather than a finite hidden state. ES repairs long-horizon behavior by rotating the accumulated trajectory into a longer-lived correct decision region; it does not stop norm growth or create a fixed point. The rare naturally stable backprop model has a straighter trajectory and a substantially wider directional margin than the ES rescue.
+**Conclusion:** These models approach a direction, or ray, rather than a finite hidden state. ES repairs long-horizon behavior by moving the accumulated trajectory into a longer-lived correct decision region; it does not stop norm growth or create a fixed point. In this three-model comparison, the naturally stable backprop model has a straighter trajectory and a substantially wider directional margin than the ES rescue. Later RMSNorm and late-state comparisons show that total rotation is not a universal stability measure; minimum correct-answer margin is.
 
 ### Explicit Fixed-Point Losses — All Hurt
 
@@ -156,14 +156,14 @@ Training for 100K steps with cosine decay stretched over 100K (exp_bs2048_100k) 
 
 Stable test-time iteration scaling (more iters → monotonically better accuracy) requires all of the following:
 
-1. **LR in a narrow band** — for d=128, only LR=1.5e-3 to 2e-3 works. Both higher (2.5e-3, 3e-3) and lower (1e-3) collapse. The optimum is sharp at 2e-3. Higher LR causes oscillatory collapse; lower LR causes stagnation at a suboptimal fixed point.
-2. **BS=2048** — BS=4096 collapses at 48 iters (too little gradient noise → sharp minima), BS=1024 at 256 (too much noise). The right noise level finds flat minima with convergent nonlinear dynamics.
-3. **Small enough model** — d=128 scales to 1024+. d=192 collapses at every LR tested. d=96 peaks early and slowly degrades. More capacity makes the iteration map harder to stabilize (spectral radius rebounds past the collapse point for d=192).
+1. **LR in a narrow band** — for d=128, only LR=1.5e-3 to 2e-3 works. Both higher (2.5e-3, 3e-3) and lower (1e-3) collapse. The optimum is sharp at 2e-3. Higher LR causes oscillatory collapse; lower LR reaches a worse long-horizon answer trajectory.
+2. **BS=2048** — BS=4096 collapses at 48 iters, while BS=1024 collapses at 256. Gradient noise or minimum geometry may explain the difference, but these experiments did not isolate the cause.
+3. **Small enough model** — d=128 scales to 1024+. d=192 collapses at every LR tested. d=96 peaks early and slowly degrades. The d=192 spectral radius rebounds near its collapse point, but that correlation does not by itself explain why width hurts.
 4. **Full LR annealing** — cosine schedule must decay to near-zero by training end. Stretched schedules (100K steps) or redistributed phase durations collapse because LR is still high late in training.
 5. **Short training iterations (16)** — 32-iter training collapses at 128-256 test iters despite giving the model more "teacher forcing" signal. Fewer training iters are better for test-time scaling.
-6. **No explicit fixed-point pressure** — all 4 variants (preservation weighting, L2 toward target, self-consistency, gradient masking) hurt. Stable convergence emerges naturally from flat minima; explicit pressure disrupts it.
+6. **No explicit fixed-point pressure** — all 4 variants (preservation weighting, L2 toward target, self-consistency, gradient masking) hurt. Those losses target a finite state equilibrium that the successful accumulator does not use.
 
-The overall picture: stability comes from landing in a flat minimum where the nonlinear iteration dynamics converge (despite the Jacobian spectral radius being >> 1 everywhere — convergence is nonlinear, not linear). Gradient noise (BS), learning rate, and model capacity all control whether training finds that minimum. It's a narrow target — most hyperparameter changes break it.
+The empirical recipe is narrow: batch size, learning rate, model width, and annealing all affect whether the long trajectory retains correct-answer margin. These experiments do not establish a flat-minimum or hidden-state convergence mechanism.
 
 **Important caveat (July 2026):** these conditions are necessary but not sufficient. See the Reproducibility section below — with all six conditions satisfied, fresh runs settle only a fraction of the time.
 
@@ -268,7 +268,7 @@ Scripts: `eval_interventions.py`, `modal_eval_interventions.py`.
 | Rescued after ES | none | 80.09% | 93.32% | 95.99% | 81.68% |
 | Rescued after ES | 12 | 79.86% | 91.85% | 93.50% | 93.59% |
 
-The collapsed checkpoint's rescue is large and horizon-flat: cap 12 changes 5.61% at 1024 iterations and 3.26% at 2048 into 91.45% and 91.31%. The same cap leaves the stable checkpoint essentially intact. Threshold choice matters: on the 1,000-puzzle sweep, cap 12 was best for the collapsed checkpoint, while cap 24 was best after ES at 97.5% and 97.4% for 1024 and 2048 iterations. This is not the earlier `Pre_norm` experiment. `Pre_norm` normalized a temporary copy only before the output head and left the recurrent state untouched; the RMS cap constrains the state carried into the next iteration while preserving its direction. The result shows that runaway recurrent-state magnitude is a causal part of this collapse mode, although a cap selected on one checkpoint is not yet a universal inference rule.
+The collapsed checkpoint's rescue is large and horizon-flat: cap 12 changes 5.61% at 1024 iterations and 3.26% at 2048 into 91.45% and 91.31%. The same cap leaves the stable checkpoint essentially intact. Threshold choice matters: on the 1,000-puzzle sweep, cap 12 was best for the collapsed checkpoint, while cap 24 was best after ES at 97.5% and 97.4% for 1024 and 2048 iterations. This is not the earlier `Pre_norm` experiment. `Pre_norm` normalized a temporary copy only before the output head and left the recurrent state untouched; the RMS cap changes the state carried into the next iteration. A later radial-versus-tangential intervention showed that reducing state growth alone makes collapse worse, while reducing direction-changing motion repairs the same checkpoints. The cap succeeds by changing the subsequent trajectory, not because large state magnitude is itself the failure.
 
 ### Delayed Strong Damping (July 2026)
 
@@ -286,11 +286,13 @@ This does not contradict the tables above: those apply `alpha >= 0.5` from the f
 
 4. **Damping on the stable model slows convergence.** With constant damping, α=0.9 reaches 98.7% at 1024 (vs 98.9% baseline), while α=0.5 peaks at 95.6% at 512 then drops to 94.1% at 1024. Delaying damping until iteration 128 reduces the damage but still trails ordinary inference, so stable checkpoints should remain undamped.
 
-5. **Changing the late carried-state dynamics can fix collapse.** A direction-preserving per-token RMS cap rescues the collapsed checkpoint from 5.61% to 91.45% at 1024, while delayed damping reaches 95.66%. The cap projects excessively large states back to a bounded radius; delayed damping under-relaxes each proposed update after the healthy early trajectory. Neither intervention is a universal checkpoint-independent rule.
+5. **Changing the late carried-state dynamics can fix collapse.** A per-token RMS cap rescues the collapsed checkpoint from 5.61% to 91.45% at 1024, while delayed damping reaches 95.66%. Component interventions show that the immediate failure is accumulated direction drift across correct-answer boundaries, not state size alone. Neither intervention is a universal checkpoint-independent rule.
 
 ## Jacobian Spectral Radius Analysis
 
 Estimated the spectral radius (dominant eigenvalue magnitude) of the Jacobian df/dh at various operating points using power iteration with finite-difference JVP (100 power iterations, 50 puzzles, eps=1e-3). Script: `eval_spectral_radius.py`.
+
+A fixed point is a state `h*` with `F(h*) = h*`; it does not require a zero Jacobian. The Jacobian measures how a small perturbation to the current state changes the next state. These checkpoints do not approach a finite hidden-state fixed point, so spectral radii measured along their growing trajectories are sensitivity measurements, not a fixed-point convergence test.
 
 | Model | SR@16 | SR@32 | SR@64 | SR@128 | SR@256 | SR Trend |
 |---|---|---|---|---|---|---|
@@ -300,26 +302,26 @@ Estimated the spectral radius (dominant eigenvalue magnitude) of the Jacobian df
 | d=192 (collapse@128) | 88.0 | 69.8 | 67.1 | 76.9 | 79.2 | Decreasing then increasing |
 
 Key findings:
-1. **ALL models have SR >> 1 everywhere** — even the stable SOTA model (SR=14-56). The standard linear stability condition (SR < 1 ⟹ stable) does not apply. Convergence is entirely nonlinear.
-2. **The SR trend predicts stability, not the SR magnitude.** The stable model's SR decreases monotonically (56→14), approaching contractivity. Collapsing models' SR stays flat (LR=3e-3: 60-73) or rebounds (d=192: 67→79 past iter 64). The monotonic decrease in SR is the signature of approaching a nonlinear basin of attraction.
-3. **LR=1e-3 (stagnation) has the lowest SR** (26-36) — more "locally contractive" than the stable model, yet performs worse. It converges too aggressively to a suboptimal fixed point. The stable model's higher SR at early iterations means it explores more before settling.
-4. **d=192's SR rebounds at the collapse point.** SR decreases from 88→67 (iters 16-64) then increases to 79 at 128 — exactly where accuracy collapses. The iteration map becomes less contractive at the point where the model needs stability most.
+1. **All measured spectral radii are much greater than 1**, including the stable SOTA model at 14-56. The usual `SR < 1` fixed-point criterion cannot be applied because these measurements are taken along a moving, growing trajectory rather than at a hidden-state fixed point.
+2. **The trend correlates with stability in this small comparison.** The stable model's estimate decreases from 56 to 14, while two collapsing models flatten or rebound. The estimate remains much greater than 1, so "decreasing" does not mean that the map is approaching a contraction.
+3. **Magnitude is not sufficient.** LR=1e-3 has the lowest estimates, 26-36, but worse answers. A smaller worst-case local sensitivity does not guarantee a useful answer trajectory.
+4. **The d=192 estimate rebounds near its collapse point.** This is a useful warning signal in that run, not proof that the rebound causes collapse.
 
-**Implication:** The iteration dynamics are fundamentally nonlinear. The model doesn't converge because the Jacobian has eigenvalues < 1 — it converges because the nonlinear trajectory enters a basin of attraction despite local instability. The "flat minimum" hypothesis from training may be about the geometry of these basins, not linear contractivity.
+**Implication:** Treat the spectral-radius estimates as local sensitivity diagnostics. They do not show that the hidden state converges, enters a basin of attraction, or has a nearby fixed point. Direct trajectory and answer-margin measurements are more informative for the observed collapse.
 
 ## Key Findings
 
-1. **BS=2048 is the sweet spot for iteration stability** — BS=4096 collapses at 48 iters, BS=1024 collapses at 256 iters, BS=2048 never collapses even at 2048 iters. Likely due to flatter minima from gradient noise.
+1. **BS=2048 is the observed sweet spot for iteration stability** — BS=4096 collapses at 48 iters, BS=1024 collapses at 256 iters, and BS=2048 remains healthy through 2048. The experiments did not isolate why.
 2. **Sampling strategy doesn't matter** — curriculum vs mixed gives near-identical results in all comparisons.
 3. **32-iter training (teacher forcing) hurts iteration scaling** — both 32-iter models collapse past 128-256 iters, while 16-iter BS=2048 models scale to 2048+.
-4. **Model converges to an argmax-fixed-point** — at 1024 iterations, outputs are identical across consecutive steps (24513/25000 stable from iter 1022–1026). The cold-start fixed-point test was misleading — it used a cold h_prev, not the warm hidden state from iterative refinement.
-5. **Convergence is emergent** — the model converges monotonically without any explicit convergence loss, despite the Jacobian spectral radius being >> 1 at all operating points. Convergence is nonlinear — the trajectory enters a basin of attraction, not a linearly contractive fixed point.
-6. **Explicit fixed-point losses all degrade iteration scaling** — 4 variants tested, all collapse earlier than baseline. The extra loss terms push the model away from the flat minimum.
-7. **LR=2e-3 is the sharp optimum for iteration scaling** — at d_model=128: LR=3e-3 collapses at 64 iters (oscillatory), LR=2.5e-3 collapses at 128, LR=2e-3 scales to 1024 (98.9%), LR=1.5e-3 scales to 1024 (98.1%), LR=1e-3 stagnates at 128 (converges to suboptimal fixed point). Higher LR causes oscillatory divergence; lower LR causes premature convergence.
+4. **Predictions can settle without the hidden state settling** — at 1024 iterations, 24,513 of 25,000 puzzles had identical predictions from iterations 1022 through 1026. The hidden-state norm continues growing, so this is an argmax-stable output, not a hidden-state fixed point.
+5. **Useful answer trajectories emerge without a convergence loss** — successful models retain or improve answers over many iterations even though their hidden states keep moving.
+6. **Explicit fixed-point losses all degrade iteration scaling** — 4 variants tested, all collapse earlier than baseline. They optimize a finite-state property that the successful model does not exhibit.
+7. **LR=2e-3 is the sharp observed optimum for iteration scaling** — at d_model=128: LR=3e-3 collapses at 64 iters, LR=2.5e-3 at 128, LR=2e-3 scales to 1024 at 98.9%, LR=1.5e-3 scales to 1024 at 98.1%, and LR=1e-3 stalls at worse long-horizon accuracy.
 8. **Wider models (d=192) collapse regardless of LR** — LR=2e-3 peaks at 64 iters (94.3%, better per-iteration than d=128's 92.5%) but collapses at 128. LR=1e-3 collapses at 256, LR=1.5e-3 at 64. The spectral radius rebounds past the collapse point (67→79 at iters 64→128), confirming the wider model's dynamics destabilize rather than converge.
 9. **3-phase curriculum works if you keep phase durations** — dropping Medium+ with original durations (40K total) is stable at 95.9%, but redistributing to maintain 50K steps collapses because the LR schedule decays slower.
 10. **Smaller model (d=96) peaks early then degrades** — 87.8% at 128 iters, slowly degrades to 73.2% at 2048. Not enough capacity for clean convergence.
 11. **Q-head (learned halt) failed** — loss competition degrades main task.
 12. **Test-time carried-state interventions can fix collapse.** On 25,000 puzzles, cap 12 rescues one collapsed checkpoint to 91.45% at 1024 and 91.31% at 2048. Delayed damping after iteration 128 improves the same checkpoint further, to 95.66% and 96.20%. Constant damping from iteration 1, prediction scaling, and pre-output LayerNorm still fail.
-13. **Jacobian spectral radius >> 1 for ALL models, including stable** — SR ranges from 14-88 across all models at all operating points. Linear stability theory (SR<1) does not apply. What differentiates stable from collapsing models is the SR *trend*: stable model's SR decreases monotonically (56→14); collapsing models stay flat or rebound. Convergence is entirely nonlinear — the model enters a basin of attraction despite local instability.
-14. **SOTA: 98.9%** at 1024 test iters with LR=2e-3 (exp_baseline_lr2e3). Stable at 98.8% at 2048.
+13. **Jacobian spectral radius is much greater than 1 for every measured model, including stable ones** — estimates range from 14 to 88. A decreasing estimate correlates with stability in the original comparison, but does not establish fixed-point convergence. Later causal interventions identify loss of correct-answer margin from accumulated directional drift as the immediate collapse mechanism.
+14. **Historical released checkpoint: 98.9%** at 1024 test iterations with LR=2e-3 (`exp_baseline_lr2e3`), retaining 98.8% at 2048. The current recommended and highest-scoring training paths use detached late-state supervision and are documented in `looping/EXPERIMENTS_LOOPING.md`.

@@ -24,6 +24,21 @@ LATE_SUPERVISION_CONFIGS = {
         "late_supervision_probability": 0.5,
         "late_supervision_mix": 1.0,
     },
+    # Maximize recovery training without starving the ordinary input path:
+    # every batch receives equal-weight ordinary and detached late-state losses.
+    "random_aux_p100": {
+        "late_supervision_horizons": (32, 64, 128, 256, 512),
+        "late_supervision_probability": 1.0,
+        "late_supervision_mix": 0.5,
+    },
+    # The opposite timing extreme: learn only from ordinary 1-16 trajectories
+    # through half of the 20K schedule, then switch abruptly to the same p=1 arm.
+    "random_aux_p100_after_10k": {
+        "late_supervision_horizons": (32, 64, 128, 256, 512),
+        "late_supervision_probability": 1.0,
+        "late_supervision_mix": 0.5,
+        "late_supervision_start_step": 10000,
+    },
     # Combine randomized late states with the best compact loop schedule.
     "random_replace_aabb": {
         "late_supervision_horizons": (32, 64, 128, 256, 512),

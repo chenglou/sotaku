@@ -578,6 +578,42 @@ class LoopAblationTest(unittest.TestCase):
             late_supervision_start_step=2000,
         )
 
+    @patch("looping.exp_late_supervision.train_testbed")
+    def test_extreme_timing_arms_use_the_same_every_batch_auxiliary_loss(
+        self,
+        train_testbed,
+    ):
+        train_late_supervision(
+            "/tmp/output",
+            arm="random_aux_p100",
+            run_name="early_extreme",
+            random_seed=459,
+        )
+        early_settings = train_testbed.call_args.kwargs
+
+        train_testbed.reset_mock()
+        train_late_supervision(
+            "/tmp/output",
+            arm="random_aux_p100_after_10k",
+            run_name="late_extreme",
+            random_seed=459,
+        )
+        late_settings = train_testbed.call_args.kwargs
+
+        shared_keys = (
+            "late_supervision_horizons",
+            "late_supervision_probability",
+            "late_supervision_mix",
+        )
+        self.assertEqual(
+            {key: early_settings[key] for key in shared_keys},
+            {key: late_settings[key] for key in shared_keys},
+        )
+        self.assertEqual(early_settings["late_supervision_probability"], 1.0)
+        self.assertEqual(early_settings["late_supervision_mix"], 0.5)
+        self.assertNotIn("late_supervision_start_step", early_settings)
+        self.assertEqual(late_settings["late_supervision_start_step"], 10000)
+
     def test_late_supervision_configs_are_copied_before_returning(self):
         first = get_late_supervision_config("random_aux")
         first["late_supervision_horizons"] = ()

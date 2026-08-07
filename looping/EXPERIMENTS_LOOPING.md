@@ -6,8 +6,14 @@ Current conclusions:
 
 - Residual scaling and 64-iteration training did not stabilize the unnormalized Sotaku loop.
 - Two-block RMSNorm schedules are reliable and parameter-efficient, but peak around 85%.
-- Randomized detached late states are the strongest reproducible training intervention. Delayed damping keeps three independent final checkpoints at 94.7-96.9% through iteration 4096.
-- A second late supervised window is most useful after ordinary training has produced a healthy model. The first late-switch run reached 97.5% at 1024 without damping, but still degraded at deeper horizons.
+- Randomized detached late-state cross-entropy is the recommended default. It changes neither the architecture nor the loss, and all tested 20K and 50K final runs remained healthy at 1024. A clean 50K final checkpoint scored 98.80% at 1024 and 92.98% at 2048 without inference adjustments.
+- A second late supervised window is most useful after ordinary late-state training has produced a healthy model. Starting the extra objective from initialization did not improve the mean result.
+- Recovery and component interventions now locate the immediate failure at the correct-answer boundary: collapsed trajectories lose minimum answer margin. State magnitude, total hidden-state rotation, and gradient conflict do not distinguish healthy models reliably.
+- The current best checkpoint combines late-state cross-entropy through step 39K with a second future cross-entropy window and calibrated minimum-margin loss through step 50K. Its final weights reached 99.00% at 1024, 98.46% at 2048, and 82.17% at 4096 without inference adjustments. This staged result has not yet been replicated.
+- Delayed damping remains an optional inference policy for checkpoints that deteriorate deeply. It keeps three independent late-state final checkpoints at 94.69-96.91% through iteration 4096, but is unnecessary when an undamped checkpoint already remains healthy at the target horizon.
+- Use 20K runs for routine comparisons, then validate promising changes at 50K. The 20K schedule preserved the useful late-state signal across three seeds, while 10K did not reliably preserve later rankings. A 20K result can still miss a positive or negative phase change after step 20K.
+
+All current runs use the first 2.7M puzzles from the training split. The full schedule has 50K optimizer steps, batch size 2048, a 1,400-step warmup, and rating thresholds 21+, 6+, 1+, and 0+ over phases of 10K, 10K, 10K, and 20K steps. The 20K schedule is useful for screening. The 10K screens did not preserve the later ranking, and the current recipe has no clean reduced-puzzle-count ablation.
 
 ## First-wave training matrix
 
@@ -277,3 +283,94 @@ The late-state comparison points in the same direction:
 Extending sampled states to 1024 improves preservation of the puzzle-specific answer direction while leaving the broad digit subspace unchanged. Its hidden states are substantially larger, so lower magnitude is not the cause of the accuracy gain; delayed damping bounds that already-useful computation afterward.
 
 The iteration-loss gradient matrix did not show a corresponding reduction in conflict. For the clean-A transformer-block parameters, the mean early-versus-late cosine changed from 0.080 at 30K to 0.033 at 35K, while the fraction of negative off-diagonal pairs decreased from 0.200 to 0.142. In the two late-state models above, extending through 1024 changed the early-versus-late cosine from 0.051 to -0.058 and increased the negative-pair fraction from 0.117 to 0.350 despite improving long-horizon accuracy. Gradient conflict may still contribute to optimization noise, but these diagnostics do not support it as the immediate cause of collapse. The sharper description is that training changes a narrow, puzzle-specific causal direction while leaving the general digit-output geometry intact.
+
+## Recovery and update-component diagnostics
+
+`eval_recovery_diagnostics.py` follows the same 1,000 balanced test puzzles for 16 additional iterations from several horizons. It records solved-puzzle retention, unsolved recovery, prediction changes, hidden-state direction, and the minimum correct-answer margin. At iteration 512, the naturally stable, RMSNorm, and randomized-late-state checkpoints retained every solved puzzle through iteration 528. The collapsed clean-A checkpoint retained only 89.9%; 25.8% of all puzzles became worse while 5.4% improved. Its 10th-percentile directional minimum margin was already negative and continued falling.
+
+The delayed late-state switch shows what the objective does and does not learn. The step-12K checkpoint scored 62.0% at iteration 1024 and fell to 59.5% over the next 16 iterations. Some near-miss and semi-bad puzzles improved, but solved retention was only 92.7%. At step 13K, iteration-1024 accuracy recovered to 94.5% and solved retention rose to 99.8%; semi-bad recovery was still negligible. The late objective mainly repaired the trajectory's ability to preserve correct answers, not a general ability to recover arbitrary bad states.
+
+`eval_update_decomposition.py` splits each complete recurrent update into a radial component, which changes hidden-state size, and a tangential component, which changes direction. After an untouched 128-iteration warmup, it scales one component at a time:
+
+| clean-A checkpoint | undamped 1024 | radial only at 0.25 | tangential only at 0.25 |
+|---|---:|---:|---:|
+| 30K, healthy | 96.6% | 95.7% | 94.3% |
+| 35K, collapsed | 2.6% | 11.1% | 77.2% |
+| 40K, collapsed | 25.1% | 5.1% | 94.7% |
+| 45K, collapsed | 6.2% | 1.5% | 96.2% |
+| 50K, collapsed | 5.1% | 0.8% | 95.3% |
+
+Reducing radial growth does not repair collapse and often makes it worse. Reducing the aggregate direction-changing update repairs three collapsed checkpoints to 94.7-96.2% and substantially improves the harder 35K checkpoint. This establishes harmful directional drift as causal for this collapse family, but not as a complete predictor. RMSNorm remains healthy with much larger per-step direction changes, and randomized-late-state models can match a collapsed checkpoint's angular rate. Healthy models differ in how much they turn; they agree in keeping the weakest correct digit on the positive side of the output boundary.
+
+`eval_update_source_decomposition.py` separately scales direction changes from prediction feedback and from transformer layers. Scaling either source alone breaks their balance and can collapse the naturally stable model. Scaling both sources is better but still weaker than scaling the complete recurrent update. The evidence does not support blaming one recurrent subcomponent.
+
+The supported mechanism is therefore narrow: many small late updates accumulate until one or more cells cross a correct-answer boundary. Delayed damping slows that crossing, while RMSNorm and late-state training learn different trajectories that retain positive margin. A root-oriented training objective should act on future minimum answer margin or solved-puzzle retention, not force a fixed hidden state, a particular norm, or a universally small rotation.
+
+### Trajectory dimension and smoothness
+
+`eval_trajectory_geometry.py` sampled 50 balanced test puzzles and compared a naturally stable plain checkpoint, a collapsed plain checkpoint, the standalone late-state-CE checkpoint, and the combined margin checkpoint. It measured recurrent updates over 16-step windows beginning at iterations 16, 128, 512, and 1024.
+
+Late updates are temporally smooth in every model, including the collapsed checkpoint: consecutive-update cosine at iteration 1024 was 0.990-1.000. Smooth motion is therefore not sufficient for health. The relative change in the update was nevertheless much larger for the collapsed model: 0.0430 at iteration 1024, compared with 0.0066 for stable plain, 0.0039 for late-state CE, and 0.0016 for the combined checkpoint.
+
+The compact structure is shared most clearly in feature space, not as one whole-board path. A 16-component basis fitted to token updates from half the puzzles explained 87.6-97.3% of token-update variance on held-out puzzles at iteration 1024. By contrast, a 64-component basis fitted to whole-board updates explained only 8.5-19.1% on held-out puzzles. An early token basis also retained 75-97% explanatory power at iteration 1024. The evidence is consistent with a small shared set of feature-space motions whose strengths and cell locations depend on the puzzle. It does not establish one universal low-dimensional board trajectory, and the collapsed checkpoint shows that low dimension and straight motion alone do not prevent wrong answers.
+
+`eval_margin_floor_calibration.py` measured the exact burn-in, first 16-step window, detached gap, and second 16-step window used by stay-solved training. On the healthy step-39K source, a raw logit margin floor of 1 activated on less than 2% of future solved-puzzle states. A floor of 5 remained selective, activating on roughly 1-13% depending on burn-in horizon and gap; a floor of 10 activated on more than 95% of the longest-gap windows. The `stay_margin_floor` follow-up therefore uses floor 5 and weight 0.1. It preserves ordinary recheck cross-entropy for unsolved states and adds a hinge loss only when the weakest blank cell of an anchor-solved puzzle falls below the calibrated margin.
+
+This was a stacked mechanism test, not a margin-only training result. The branch inherited randomized late-state cross-entropy through step 39K. From step 39K onward it continued the first late supervised window, added a second future cross-entropy window, and added the margin floor. The branch loaded the same ordinary step-39K checkpoint and optimizer state as the earlier late switch, then trained through 50K. Its final 1,000-puzzle probe was 99.4% at 1024; the selected step-46K checkpoint was 99.5%. Full evaluation favored the final checkpoint:
+
+| full 25K evaluation | 128 | 1024 | 2048 | 4096 |
+|---|---:|---:|---:|---:|
+| margin-floor step-46K checkpoint | 95.97% | 98.88% | 98.32% | 75.11% |
+| margin-floor final checkpoint | **96.26%** | **99.00%** | **98.46%** | **82.17%** |
+| earlier consistency-switch final checkpoint | 96.34% | 97.52% | 88.98% | 30.20% |
+
+Replacing the consistency term with the margin term improved exactly the failure mode it targeted: relative to the earlier consistency switch, the final checkpoint gained 9.48 points at 2048 and 51.97 points at 4096 while leaving 128 unchanged. The result does not isolate the margin term from the two late cross-entropy windows. It also did not create indefinite stability. The latest state directly seen by this training objective is iteration 800, so its 2048 behavior is extrapolation and its eventual 4096 decline is unsurprising.
+
+A matched standalone matrix now separates the training-time health mechanisms. All five trial-0 runs use seed 20260730, the same 50K schedule, and ordinary 16-iteration cross-entropy:
+
+| standalone arm | only additional mechanism |
+|---|---|
+| vanilla | none |
+| RMSNorm | recurrent-state RMSNorm |
+| late-state CE | randomized detached late-window cross-entropy replaces ordinary cross-entropy on 20% of batches |
+| consistency-only | future consistency on 20% of batches; ordinary cross-entropy remains active and no late-window cross-entropy is optimized |
+| margin-only | future minimum-margin loss on 20% of batches; ordinary cross-entropy remains active and no late-window cross-entropy is optimized |
+
+The final 1,000-puzzle probes separate the methods clearly:
+
+| standalone arm | final at 128 | final at 1024 | best at 1024 | step-30K onward mean / floor at 1024 |
+|---|---:|---:|---:|---:|
+| vanilla | 10.6% | 0.4% | 90.7% | 0.56% / 0.0% |
+| RMSNorm | 88.2% | 89.3% | 90.3% | 88.73% / 85.6% |
+| late-state CE | **97.1%** | **98.9%** | 98.9% | 96.30% / 89.1% |
+| consistency-only | 92.5% | 88.2% | 89.6% | 83.20% / 58.3% |
+| margin-only | 96.4% | 98.7% | **99.3%** | **97.06%** / 81.9% |
+
+Full 25K evaluations show where margin-only stops being sufficient:
+
+| standalone checkpoint | 128 | 1024 | 2048 | 4096 |
+|---|---:|---:|---:|---:|
+| margin-only step-49K checkpoint | 96.20% | **98.93%** | 83.62% | 19.78% |
+| margin-only final checkpoint | 96.20% | 98.78% | 79.76% | 16.81% |
+| late-state CE final checkpoint | **96.47%** | 98.80% | **92.98%** | **43.70%** |
+
+The standalone runs are the valid comparison for asking which mechanism makes training healthy. Margin protection alone prevents the ordinary run's collapse and is competitive through 1024, but late-state cross-entropy generalizes substantially farther. The stacked margin recipe combines both mechanisms and reaches 98.46% at 2048 and 82.17% at 4096, much higher than either standalone result. The evidence therefore supports complementary roles: margin protection keeps correct predictions away from the decision boundary, while late-state cross-entropy teaches the model what computation to perform after reaching states far beyond its ordinary 16-iteration training window.
+
+A follow-up tested how little late-state exposure the margin-only recipe needs. The matched runs keep the seed, 50K schedule, objective weight, and 20% auxiliary-batch probability fixed. They change only the burn-in horizons and detached recheck gaps, limiting the latest state used by the margin loss to iteration 80, 128, or 192. The cap-800 standalone run above is the control.
+
+| latest state exposed during training | final at 128 | final at 1024 | best at 1024 | step-30K onward mean / floor at 1024 |
+|---:|---:|---:|---:|---:|
+| 80 | 95.2% | 56.4% | 93.5% at 25K | 56.09% / 25.9% |
+| 128 | 96.3% | 45.4% | **98.2% at 44K** | 80.33% / 35.0% |
+| 192 | 94.5% | 9.2% | 97.1% at 37K | 59.52% / 6.8% |
+| 800 | 96.4% | **98.7%** | 99.3% at 49K | **97.06% / 81.9%** |
+
+The cap-128 and cap-192 peaks were not artifacts of the 1,000-puzzle probe:
+
+| best checkpoint, full 25K evaluation | 128 | 1024 | 2048 | 4096 |
+|---|---:|---:|---:|---:|
+| cap 128, step 44K | **95.71%** | **98.18%** | **77.40%** | **22.85%** |
+| cap 192, step 37K | 94.10% | 96.00% | 67.71% | 10.41% |
+| cap 800, step 49K | 96.20% | 98.93% | 83.62% | 19.78% |
+
+Exposure only through iteration 128 can therefore produce a model that solves 98.18% at iteration 1024, but the reduced-cap runs do not make that behavior reliable: all three collapsed before the end of training. Broad exposure through iteration 800 is not necessary for a good checkpoint to exist, but it was necessary in this seed for margin-only training to finish healthy and maintain a high late-training floor. The non-monotonic cap-128 and cap-192 results also argue against treating 128 as a precise threshold without replication.

@@ -88,7 +88,10 @@ def _load_model(model_config, device):
     state = torch.load(
         model_config["path"],
         map_location=device,
-        weights_only=True,
+        weights_only=not model_config.get(
+            "trusted_full_checkpoint",
+            False,
+        ),
     )
     if "model_state_dict" in state:
         state = state["model_state_dict"]

@@ -43,6 +43,7 @@ RECHECK_SETTINGS = {
 
 STAY_SOLVED_CONFIGS = {
     "control": BASE_REPLACEMENT,
+    "late_state_ce": BASE_REPLACEMENT,
     "ramp_after_2k": RAMPED_REPLACEMENT,
     "curriculum_after_2k": CURRICULUM_REPLACEMENT,
     "clean_curriculum": CLEAN_REPLACEMENT,
@@ -59,6 +60,12 @@ STAY_SOLVED_CONFIGS = {
         **BASE_REPLACEMENT,
         **RECHECK_SETTINGS,
         "late_consistency_weight": 0.5,
+    },
+    "stay_margin_floor": {
+        **BASE_REPLACEMENT,
+        **RECHECK_SETTINGS,
+        "late_margin_floor_weight": 0.1,
+        "late_margin_floor": 5.0,
     },
     "clean_stay": {
         **CLEAN_REPLACEMENT,

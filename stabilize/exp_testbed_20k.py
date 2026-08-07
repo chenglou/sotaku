@@ -470,11 +470,45 @@ def correct_prediction_consistency_loss(
     return (per_cell_kl * eligible).sum() / eligible.sum().clamp_min(1)
 
 
+def solved_puzzle_margin_floor_loss(
+    anchor_logits,
+    future_logits,
+    targets,
+    mask,
+    margin_floor,
+):
+    empty_mask = mask.bool()
+    anchor_predictions = anchor_logits.detach().argmax(dim=-1)
+    anchor_solved = (
+        (anchor_predictions == targets) | ~empty_mask
+    ).all(dim=1)
+
+    target_logits = future_logits.gather(
+        -1,
+        targets.unsqueeze(-1),
+    ).squeeze(-1)
+    wrong_logits = future_logits.masked_fill(
+        F.one_hot(targets, num_classes=9).bool(),
+        -torch.inf,
+    )
+    margins = target_logits - wrong_logits.max(dim=-1).values
+    minimum_margin = margins.masked_fill(
+        ~empty_mask,
+        torch.inf,
+    ).min(dim=1).values
+    per_puzzle_loss = F.relu(margin_floor - minimum_margin)
+    return (
+        per_puzzle_loss * anchor_solved
+    ).sum() / anchor_solved.sum().clamp_min(1)
+
+
 def resolve_late_recheck(
     gaps,
     loss_weight,
     consistency_weight,
     late_supervision_enabled,
+    margin_floor_weight=0.0,
+    margin_floor=1.0,
 ):
     gaps = tuple(gaps)
     if any(
@@ -488,15 +522,26 @@ def resolve_late_recheck(
         raise ValueError("late recheck loss weight must be between 0 and 1")
     if consistency_weight < 0:
         raise ValueError("late consistency weight must be non-negative")
-    if bool(gaps) != (loss_weight > 0):
+    if margin_floor_weight < 0:
+        raise ValueError("late margin-floor weight must be non-negative")
+    if margin_floor <= 0:
+        raise ValueError("late margin floor must be positive")
+    has_recheck_objective = (
+        loss_weight > 0
+        or consistency_weight > 0
+        or margin_floor_weight > 0
+    )
+    if bool(gaps) != has_recheck_objective:
         raise ValueError(
-            "late recheck gaps and a positive recheck loss weight must be "
+            "late recheck gaps and a positive recheck objective must be "
             "enabled together"
         )
     if gaps and not late_supervision_enabled:
         raise ValueError("late rechecks require late supervision")
     if consistency_weight > 0 and not gaps:
         raise ValueError("late consistency requires late rechecks")
+    if margin_floor_weight > 0 and not gaps:
+        raise ValueError("late margin floor requires late rechecks")
     return gaps
 
 
@@ -527,6 +572,9 @@ def train(
     late_recheck_gaps=(),
     late_recheck_loss_weight=0.0,
     late_consistency_weight=0.0,
+    late_margin_floor_weight=0.0,
+    late_margin_floor=1.0,
+    late_auxiliary_only=False,
     branch_checkpoint_path=None,
 ):
     if run_name is not None and not re.fullmatch(r"[A-Za-z0-9_.-]+", run_name):
@@ -568,7 +616,19 @@ def train(
         late_recheck_loss_weight,
         late_consistency_weight,
         bool(late_supervision_horizons),
+        late_margin_floor_weight,
+        late_margin_floor,
     )
+    if late_auxiliary_only:
+        if not late_recheck_gaps:
+            raise ValueError(
+                "late auxiliary-only training requires a recheck objective"
+            )
+        if late_recheck_loss_weight > 0:
+            raise ValueError(
+                "late auxiliary-only training cannot use recheck "
+                "cross-entropy"
+            )
 
     resolved_layer_schedule = (
         tuple(range(unique_layers))
@@ -642,6 +702,13 @@ def train(
                 'late_recheck_loss_weight': late_recheck_loss_weight,
                 'late_consistency_weight': late_consistency_weight,
             })
+            if late_auxiliary_only:
+                run_config['late_auxiliary_only'] = True
+            if late_margin_floor_weight > 0:
+                run_config.update({
+                    'late_margin_floor_weight': late_margin_floor_weight,
+                    'late_margin_floor': late_margin_floor,
+                })
     if run_name is not None:
         run_config.update({
             'run_name': run_name,
@@ -774,6 +841,9 @@ def train(
             'late_consistency_weight',
             'late_recheck_gaps',
             'late_recheck_loss_weight',
+            'late_margin_floor',
+            'late_margin_floor_weight',
+            'late_auxiliary_only',
             'run_name',
         }
         print(f"Branching from checkpoint: {branch_source}")
@@ -907,8 +977,15 @@ def train(
                 "Late-state recheck: "
                 f"gaps={late_recheck_gaps}, "
                 f"loss weight={late_recheck_loss_weight:g}, "
-                f"consistency weight={late_consistency_weight:g}"
+                f"consistency weight={late_consistency_weight:g}, "
+                f"margin-floor weight={late_margin_floor_weight:g}, "
+                f"margin floor={late_margin_floor:g}"
             )
+            if late_auxiliary_only:
+                print(
+                    "Late-state objective mode: auxiliary only; ordinary "
+                    "cross-entropy remains active on every batch"
+                )
     else:
         print("Detached late-state supervision: none")
     print(f"Output directory: {output_dir}")
@@ -1127,6 +1204,7 @@ def train(
         recheck_gap = None
         recheck_loss = None
         consistency_loss = None
+        margin_floor_loss = None
 
         optimizer.zero_grad()
         if microbatch_size < run_batch_size:
@@ -1164,7 +1242,15 @@ def train(
             loss = base_loss
             train_acc = train_correct / train_mask_count
         else:
-            base_weight = 1 - late_supervision_mix if use_late_supervision else 1
+            base_weight = (
+                1
+                if late_auxiliary_only
+                else (
+                    1 - late_supervision_mix
+                    if use_late_supervision
+                    else 1
+                )
+            )
             if base_weight > 0:
                 with torch.autocast('cuda', dtype=torch.bfloat16):
                     base_loss, all_logits, mask, t_batch = compute_loss(
@@ -1207,9 +1293,13 @@ def train(
                         )
 
                 late_primary_weight = (
-                    1 - late_recheck_loss_weight
-                    if late_recheck_gaps
-                    else 1
+                    0
+                    if late_auxiliary_only
+                    else (
+                        1 - late_recheck_loss_weight
+                        if late_recheck_gaps
+                        else 1
+                    )
                 )
                 if late_primary_weight > 0:
                     (
@@ -1254,9 +1344,23 @@ def train(
                             ) / len(recheck_logits)
                         else:
                             consistency_loss = recheck_loss.new_zeros(())
+                        if late_margin_floor_weight > 0:
+                            margin_floor_loss = sum(
+                                solved_puzzle_margin_floor_loss(
+                                    late_logits[-1],
+                                    future_logits,
+                                    t_batch,
+                                    recheck_mask,
+                                    late_margin_floor,
+                                )
+                                for future_logits in recheck_logits
+                            ) / len(recheck_logits)
+                        else:
+                            margin_floor_loss = recheck_loss.new_zeros(())
                         recheck_objective = (
                             late_recheck_loss_weight * recheck_loss
                             + late_consistency_weight * consistency_loss
+                            + late_margin_floor_weight * margin_floor_loss
                         )
                     (
                         late_supervision_mix * recheck_objective
@@ -1285,16 +1389,25 @@ def train(
         optimizer.step()
 
         if step % 100 == 0 or step == run_total_steps - 1:
-            late_text = (
-                f" Late@{late_horizon}: {late_loss.item():.4f}"
-                if late_loss is not None
-                else ""
-            )
+            if late_loss is None:
+                late_text = ""
+            elif late_auxiliary_only:
+                late_text = (
+                    f" Anchor@{late_horizon}: {late_loss.item():.4f}"
+                )
+            else:
+                late_text = (
+                    f" Late@{late_horizon}: {late_loss.item():.4f}"
+                )
             if recheck_loss is not None:
                 late_text += (
                     f" Recheck+{recheck_gap}: {recheck_loss.item():.4f}"
                     f" Stable: {consistency_loss.item():.4f}"
                 )
+                if late_margin_floor_weight > 0:
+                    late_text += (
+                        f" Margin: {margin_floor_loss.item():.4f}"
+                    )
             do_eval = step % run_eval_every == 0 or step == run_total_steps - 1
             if do_eval:
                 results = evaluate_all()

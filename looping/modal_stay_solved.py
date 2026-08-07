@@ -7,12 +7,14 @@ app = modal.App("sudoku-stay-solved")
 
 ARM_NAMES = (
     "control",
+    "late_state_ce",
     "ramp_after_2k",
     "curriculum_after_2k",
     "clean_curriculum",
     "stay_recheck",
     "stay_consistency",
     "stay_consistency_strong",
+    "stay_margin_floor",
     "clean_stay",
     "clean_rmsnorm",
 )

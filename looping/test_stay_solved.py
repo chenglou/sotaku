@@ -31,6 +31,7 @@ from looping.modal_late_switch import (
 from stabilize.exp_testbed_20k import (
     SudokuTransformer,
     correct_prediction_consistency_loss,
+    solved_puzzle_margin_floor_loss,
     late_supervision_plan_for_step,
     resolve_late_recheck,
     resolve_late_supervision_timing,
@@ -132,10 +133,25 @@ class StaySolvedTest(unittest.TestCase):
             resolve_late_recheck(RECHECK_GAPS, 0.5, 0.1, True),
             RECHECK_GAPS,
         )
-        with self.assertRaises(ValueError):
-            resolve_late_recheck(RECHECK_GAPS, 0.0, 0.1, True)
+        self.assertEqual(
+            resolve_late_recheck(RECHECK_GAPS, 0.0, 0.1, True),
+            RECHECK_GAPS,
+        )
+        self.assertEqual(
+            resolve_late_recheck(
+                RECHECK_GAPS,
+                0.0,
+                0.0,
+                True,
+                margin_floor_weight=0.1,
+                margin_floor=5.0,
+            ),
+            RECHECK_GAPS,
+        )
         with self.assertRaises(ValueError):
             resolve_late_recheck((), 0.0, 0.1, True)
+        with self.assertRaises(ValueError):
+            resolve_late_recheck(RECHECK_GAPS, 0.0, 0.0, True)
         with self.assertRaises(ValueError):
             resolve_late_recheck((17,), 0.5, 0.0, True)
         with self.assertRaises(ValueError):
@@ -171,6 +187,39 @@ class StaySolvedTest(unittest.TestCase):
         changed_loss.backward()
         self.assertGreater(changed.grad[0, 0].abs().sum().item(), 0)
         self.assertEqual(changed.grad[0, 1].abs().sum().item(), 0)
+
+    def test_margin_floor_uses_weakest_cell_of_solved_anchor_puzzles(self):
+        anchor_logits = torch.zeros(2, 2, 9)
+        anchor_logits[0, :, 0] = 5
+        anchor_logits[1, 0, 0] = 5
+        anchor_logits[1, 1, 1] = 5
+        targets = torch.zeros(2, 2, dtype=torch.long)
+        mask = torch.ones(2, 2)
+        future_logits = anchor_logits.clone()
+        future_logits[0, 1, 0] = 0.25
+        future_logits.requires_grad_()
+
+        loss = solved_puzzle_margin_floor_loss(
+            anchor_logits,
+            future_logits,
+            targets,
+            mask,
+            margin_floor=1.0,
+        )
+        self.assertAlmostEqual(loss.item(), 0.75, places=6)
+        loss.backward()
+        self.assertGreater(
+            future_logits.grad[0, 1].abs().sum().item(),
+            0,
+        )
+        self.assertEqual(
+            future_logits.grad[0, 0].abs().sum().item(),
+            0,
+        )
+        self.assertEqual(
+            future_logits.grad[1].abs().sum().item(),
+            0,
+        )
 
     def test_detached_recheck_window_backpropagates_without_the_first_graph(self):
         torch.manual_seed(23)
@@ -216,9 +265,12 @@ class StaySolvedTest(unittest.TestCase):
             MODAL_FULL_50K_SUFFIX,
         )
         control = get_stay_solved_config("control")
+        late_state_ce = get_stay_solved_config("late_state_ce")
         clean = get_stay_solved_config("clean_curriculum")
         stay = get_stay_solved_config("stay_consistency")
+        margin = get_stay_solved_config("stay_margin_floor")
         self.assertNotIn("late_recheck_gaps", control)
+        self.assertEqual(late_state_ce, control)
         self.assertEqual(
             clean["late_supervision_horizon_start_steps"],
             HORIZON_START_STEPS,
@@ -229,6 +281,8 @@ class StaySolvedTest(unittest.TestCase):
         )
         self.assertEqual(stay["late_recheck_gaps"], RECHECK_GAPS)
         self.assertEqual(stay["late_consistency_weight"], 0.1)
+        self.assertEqual(margin["late_margin_floor_weight"], 0.1)
+        self.assertEqual(margin["late_margin_floor"], 5.0)
 
     def test_configs_are_copied_before_returning(self):
         config = get_stay_solved_config("clean_curriculum")
@@ -343,7 +397,7 @@ class StaySolvedTest(unittest.TestCase):
     def test_late_switch_uses_the_selected_control_checkpoint(self):
         self.assertEqual(
             set(LATE_SWITCH_MODES),
-            {"plain", "consistency"},
+            {"plain", "consistency", "margin_floor5"},
         )
         self.assertEqual(LATE_SWITCH_SOURCE_STEP, 39000)
         self.assertTrue(
