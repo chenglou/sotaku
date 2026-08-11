@@ -1,0 +1,1874 @@
+[
+  {
+    "puzzle_hash": "b49c7b433845f6b5",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.1435580111514061,
+      "difficulty_output": 0.14236613374839174,
+      "geometry": 0.1004784360938799,
+      "shuffled_iteration_geometry": 0.1336766976703339,
+      "difficulty_output_geometry": 0.05520243472317574,
+      "difficulty_output_shuffled_iteration_geometry": 0.0414488192402668,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03025704284415333,
+      "checkpoint_difficulty_output_geometry": 0.02491363643771651,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.021134530281818862
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999676722322973,
+      "difficulty_output_geometry": 0.9998928582158607
+    }
+  },
+  {
+    "puzzle_hash": "9d3c17c60368df59",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2663884288807646,
+      "early_output": 0.22939316532847945,
+      "difficulty_output": 0.22317216128871928,
+      "geometry": 0.10247220508490246,
+      "shuffled_iteration_geometry": 0.09023475030520219,
+      "difficulty_output_geometry": 0.06719221522268877,
+      "difficulty_output_shuffled_iteration_geometry": 0.05982409712021383,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03413144076138369,
+      "checkpoint_difficulty_output_geometry": 0.027180668573889392,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.023403077876955784
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999424767815206,
+      "difficulty_output_geometry": 0.9998504113123972
+    }
+  },
+  {
+    "puzzle_hash": "46de1128e6795029",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.18807970696408188,
+      "difficulty_output": 0.1866936752728107,
+      "geometry": 0.10831627989397057,
+      "shuffled_iteration_geometry": 0.11254961365103115,
+      "difficulty_output_geometry": 0.0668626298449748,
+      "difficulty_output_shuffled_iteration_geometry": 0.053229053528871265,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03245378941478952,
+      "checkpoint_difficulty_output_geometry": 0.027042420922192573,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.02300736866236211
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999517678945057,
+      "difficulty_output_geometry": 0.9998717184683895
+    }
+  },
+  {
+    "puzzle_hash": "eb312cfdbfc783ba",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2544058167140449,
+      "early_output": 0.1573531542685601,
+      "difficulty_output": 0.15966117066480154,
+      "geometry": 0.11272100029873004,
+      "shuffled_iteration_geometry": 0.08997876941150863,
+      "difficulty_output_geometry": 0.05770252170738748,
+      "difficulty_output_shuffled_iteration_geometry": 0.044061414284884456,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03128987263324502,
+      "checkpoint_difficulty_output_geometry": 0.025573095660967795,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.020648324581967935
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999518549633615,
+      "difficulty_output_geometry": 0.999864748732694
+    }
+  },
+  {
+    "puzzle_hash": "a5c17186f0bc9c97",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24896890975813912,
+      "early_output": 0.18210052542269595,
+      "difficulty_output": 0.1831531738312635,
+      "geometry": 0.06987902677516172,
+      "shuffled_iteration_geometry": 0.08945364589799241,
+      "difficulty_output_geometry": 0.03818699494831427,
+      "difficulty_output_shuffled_iteration_geometry": 0.03398307679832414,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.031257977090127204,
+      "checkpoint_difficulty_output_geometry": 0.02029264103759725,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.018012369573656515
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999696701653518,
+      "difficulty_output_geometry": 0.9998993998638944
+    }
+  },
+  {
+    "puzzle_hash": "21bbef9997760e03",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2548318899863812,
+      "early_output": 0.1237835660169023,
+      "difficulty_output": 0.12149998879342154,
+      "geometry": 0.09848813066353926,
+      "shuffled_iteration_geometry": 0.09014925537380601,
+      "difficulty_output_geometry": 0.04646664746952207,
+      "difficulty_output_shuffled_iteration_geometry": 0.0419200597521669,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.02886130101328489,
+      "checkpoint_difficulty_output_geometry": 0.022663033022953537,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.02095923571635679
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999746839428117,
+      "difficulty_output_geometry": 0.9999073535745779
+    }
+  },
+  {
+    "puzzle_hash": "b96ab2ce1873b0ef",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2053762334291706,
+      "early_output": 0.1971571295976032,
+      "difficulty_output": 0.23484264798117627,
+      "geometry": 0.09083451773326676,
+      "shuffled_iteration_geometry": 0.09159935722507849,
+      "difficulty_output_geometry": 0.048377651849385264,
+      "difficulty_output_shuffled_iteration_geometry": 0.07665468670402274,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03275831783199365,
+      "checkpoint_difficulty_output_geometry": 0.022848823469854028,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.02365900117510534
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.999919245511808,
+      "difficulty_output_geometry": 0.9998322195560947
+    }
+  },
+  {
+    "puzzle_hash": "ef3e418e709f4b84",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2607850102518699,
+      "early_output": 0.21545681671407593,
+      "difficulty_output": 0.20753829156365544,
+      "geometry": 0.14617631198908168,
+      "shuffled_iteration_geometry": 0.13379612873651983,
+      "difficulty_output_geometry": 0.09952821011141202,
+      "difficulty_output_shuffled_iteration_geometry": 0.08470921109801963,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03409917652697454,
+      "checkpoint_difficulty_output_geometry": 0.03331345687605811,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.027906165666538287
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999056659971564,
+      "difficulty_output_geometry": 0.999789134424583
+    }
+  },
+  {
+    "puzzle_hash": "094a6ec710c3ca1f",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.21669187001661874,
+      "difficulty_output": 0.2160766353182326,
+      "geometry": 0.09668047323893945,
+      "shuffled_iteration_geometry": 0.13889644370502843,
+      "difficulty_output_geometry": 0.05433536582051343,
+      "difficulty_output_shuffled_iteration_geometry": 0.06257212505762477,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03204031251881482,
+      "checkpoint_difficulty_output_geometry": 0.02384948687299634,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.023304039166896245
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999690425485247,
+      "difficulty_output_geometry": 0.9999032786052182
+    }
+  },
+  {
+    "puzzle_hash": "04f8b3c5f2b4661d",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.17982596816404256,
+      "difficulty_output": 0.17904766382631965,
+      "geometry": 0.17012617494787402,
+      "shuffled_iteration_geometry": 0.059178429798297544,
+      "difficulty_output_geometry": 0.10796659895798132,
+      "difficulty_output_shuffled_iteration_geometry": 0.04434551422231972,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.032641341790188905,
+      "checkpoint_difficulty_output_geometry": 0.03458462516050509,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.01866517053940348
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9998973095722811,
+      "difficulty_output_geometry": 0.9997776066648228
+    }
+  },
+  {
+    "puzzle_hash": "c107050a90d26891",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.17465393791152015,
+      "difficulty_output": 0.17399765870716796,
+      "geometry": 0.2399380678841781,
+      "shuffled_iteration_geometry": 0.20549061745418795,
+      "difficulty_output_geometry": 0.11490846994534619,
+      "difficulty_output_shuffled_iteration_geometry": 0.08645094484374218,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03133254655992769,
+      "checkpoint_difficulty_output_geometry": 0.0354915712533366,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.025446164596414092
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999552117415338,
+      "difficulty_output_geometry": 0.9998719385440827
+    }
+  },
+  {
+    "puzzle_hash": "6604dbf2c8daf69c",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.232327753245201,
+      "early_output": 0.1926846522595094,
+      "difficulty_output": 0.20059910756639085,
+      "geometry": 0.08889637593393987,
+      "shuffled_iteration_geometry": 0.16384810846928988,
+      "difficulty_output_geometry": 0.046429630528342675,
+      "difficulty_output_shuffled_iteration_geometry": 0.06605150080186019,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03194070800422266,
+      "checkpoint_difficulty_output_geometry": 0.02213715915432497,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.023367377996466383
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999555496141351,
+      "difficulty_output_geometry": 0.9998680883532722
+    }
+  },
+  {
+    "puzzle_hash": "f84b11e7e9c9f686",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2440241416384153,
+      "early_output": 0.2371518768898978,
+      "difficulty_output": 0.22982251562554454,
+      "geometry": 0.08136517974341868,
+      "shuffled_iteration_geometry": 0.19283935083774503,
+      "difficulty_output_geometry": 0.0422992733820849,
+      "difficulty_output_shuffled_iteration_geometry": 0.08685709334991074,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03339440673494332,
+      "checkpoint_difficulty_output_geometry": 0.021000896821906437,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0265888343820891
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999589075522507,
+      "difficulty_output_geometry": 0.9998504074802771
+    }
+  },
+  {
+    "puzzle_hash": "40e62622dd8c87cb",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24980942338925194,
+      "early_output": 0.15524572190662486,
+      "difficulty_output": 0.14629238516830678,
+      "geometry": 0.04479495976347488,
+      "shuffled_iteration_geometry": 0.08762348500710337,
+      "difficulty_output_geometry": 0.030268727253882407,
+      "difficulty_output_shuffled_iteration_geometry": 0.03258875875417268,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.029244851086430206,
+      "checkpoint_difficulty_output_geometry": 0.01791434966605875,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.01863106578128751
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999791554436058,
+      "difficulty_output_geometry": 0.9999157928082854
+    }
+  },
+  {
+    "puzzle_hash": "6ee2c073650f9d61",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 0.1816077860412105,
+      "difficulty_output": 0.18331493540335073,
+      "geometry": 0.16966989577233269,
+      "shuffled_iteration_geometry": 0.22583786748830523,
+      "difficulty_output_geometry": 0.08056203490363675,
+      "difficulty_output_shuffled_iteration_geometry": 0.1319170542968204,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03165512390066449,
+      "checkpoint_difficulty_output_geometry": 0.02924422997382516,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.03190378970584431
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999449470737453,
+      "difficulty_output_geometry": 0.9998459347660179
+    }
+  },
+  {
+    "puzzle_hash": "16522851693b7733",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 0.20244723077300777,
+      "difficulty_output": 0.20443868742312427,
+      "geometry": 0.04018417893183508,
+      "shuffled_iteration_geometry": 0.12494603373472833,
+      "difficulty_output_geometry": 0.02671180221151702,
+      "difficulty_output_shuffled_iteration_geometry": 0.047555245680951805,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03200954130100336,
+      "checkpoint_difficulty_output_geometry": 0.016570640320815924,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.020286159262858445
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999595756098648,
+      "difficulty_output_geometry": 0.999863689219986
+    }
+  },
+  {
+    "puzzle_hash": "a28f2969025de2c2",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.21162185743905537,
+      "early_output": 0.2248781128434861,
+      "difficulty_output": 0.23973736394608802,
+      "geometry": 0.05417089204331405,
+      "shuffled_iteration_geometry": 0.2641816165800561,
+      "difficulty_output_geometry": 0.02779856810945314,
+      "difficulty_output_shuffled_iteration_geometry": 0.09055647674864035,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03273691773386893,
+      "checkpoint_difficulty_output_geometry": 0.016620054280950217,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.02542454537324996
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999588721451391,
+      "difficulty_output_geometry": 0.999843754292401
+    }
+  },
+  {
+    "puzzle_hash": "685b6cc159929aaf",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22761332804065387,
+      "early_output": 0.2788442044734689,
+      "difficulty_output": 0.2793356592138212,
+      "geometry": 0.13265096840543478,
+      "shuffled_iteration_geometry": 0.2820041800199497,
+      "difficulty_output_geometry": 0.07232049518848328,
+      "difficulty_output_shuffled_iteration_geometry": 0.13757931491328315,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03408037047449849,
+      "checkpoint_difficulty_output_geometry": 0.026630777903159236,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.030971228676978556
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.999958205429822,
+      "difficulty_output_geometry": 0.9998676768448437
+    }
+  },
+  {
+    "puzzle_hash": "bc47e424cfc77169",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23873806008138443,
+      "early_output": 0.23075790712402341,
+      "difficulty_output": 0.2215380694052188,
+      "geometry": 0.13255746725501713,
+      "shuffled_iteration_geometry": 0.191722869656169,
+      "difficulty_output_geometry": 0.09033343900826234,
+      "difficulty_output_shuffled_iteration_geometry": 0.08150135076711222,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03235745002238494,
+      "checkpoint_difficulty_output_geometry": 0.029948898632496716,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.024133031317899574
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999640447135058,
+      "difficulty_output_geometry": 0.9998838297495377
+    }
+  },
+  {
+    "puzzle_hash": "3cea1dbbbf1fef24",
+    "checkpoint": "stable_plain",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22218984814411186,
+      "early_output": 0.2743243949037375,
+      "difficulty_output": 0.2803441518181639,
+      "geometry": 0.042599513586232374,
+      "shuffled_iteration_geometry": 0.2906457548416989,
+      "difficulty_output_geometry": 0.022566635990080946,
+      "difficulty_output_shuffled_iteration_geometry": 0.08173647171880376,
+      "checkpoint_identity": 0.03521143342220273,
+      "checkpoint_difficulty_output": 0.03469062847100336,
+      "checkpoint_difficulty_output_geometry": 0.0150257971524156,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.024847527031965945
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9999503833116005,
+      "difficulty_output_geometry": 0.9998128922289635
+    }
+  },
+  {
+    "puzzle_hash": "b49c7b433845f6b5",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "0",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.6282840715197882,
+      "difficulty_output": 0.6263430137425213,
+      "geometry": 0.9260127370076304,
+      "shuffled_iteration_geometry": 0.8934818321669626,
+      "difficulty_output_geometry": 0.94445784852439,
+      "difficulty_output_shuffled_iteration_geometry": 0.8922864894832689,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9454718560055128,
+      "checkpoint_difficulty_output_geometry": 0.9707188479436217,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9597666475041826
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "9d3c17c60368df59",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "0",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2663884288807646,
+      "early_output": 0.5751745751040995,
+      "difficulty_output": 0.566451580764601,
+      "geometry": 0.7560617579292035,
+      "shuffled_iteration_geometry": 0.6134730553216041,
+      "difficulty_output_geometry": 0.8836223813527215,
+      "difficulty_output_shuffled_iteration_geometry": 0.710470656451604,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9424775910541825,
+      "checkpoint_difficulty_output_geometry": 0.9544433438159099,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9402299961808909
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "46de1128e6795029",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "0",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.720522084247985,
+      "difficulty_output": 0.7190842013233203,
+      "geometry": 0.8380644953243968,
+      "shuffled_iteration_geometry": 0.7366308738540666,
+      "difficulty_output_geometry": 0.9198399343792044,
+      "difficulty_output_shuffled_iteration_geometry": 0.8365923595317076,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9489788862742169,
+      "checkpoint_difficulty_output_geometry": 0.9628949449839415,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9516381415233957
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "eb312cfdbfc783ba",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "0",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2544058167140449,
+      "early_output": 0.683927945704799,
+      "difficulty_output": 0.6879946144443096,
+      "geometry": 0.858187098666078,
+      "shuffled_iteration_geometry": 0.7445491214312913,
+      "difficulty_output_geometry": 0.9319571762449307,
+      "difficulty_output_shuffled_iteration_geometry": 0.8225853095209229,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9490935196118053,
+      "checkpoint_difficulty_output_geometry": 0.9674595950896903,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9505501336386675
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "a5c17186f0bc9c97",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "1-2",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24896890975813912,
+      "early_output": 0.611961025119131,
+      "difficulty_output": 0.6136718739490741,
+      "geometry": 0.8975376195802882,
+      "shuffled_iteration_geometry": 0.8441128090231399,
+      "difficulty_output_geometry": 0.9410242502782651,
+      "difficulty_output_shuffled_iteration_geometry": 0.8760818932546729,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9444288952230283,
+      "checkpoint_difficulty_output_geometry": 0.9696889578856132,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9545350370895989
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "21bbef9997760e03",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "1-2",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2548318899863812,
+      "early_output": 0.7726816260350882,
+      "difficulty_output": 0.7694250248206108,
+      "geometry": 0.8805103699476101,
+      "shuffled_iteration_geometry": 0.7897262103176953,
+      "difficulty_output_geometry": 0.9531482398203366,
+      "difficulty_output_shuffled_iteration_geometry": 0.8744021792500346,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9530224805716014,
+      "checkpoint_difficulty_output_geometry": 0.9729419437965683,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9616412657165799
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "b96ab2ce1873b0ef",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "1-2",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2053762334291706,
+      "early_output": 0.7013704752394366,
+      "difficulty_output": 0.7462445883991812,
+      "geometry": 0.8464883025818805,
+      "shuffled_iteration_geometry": 0.7199478994476807,
+      "difficulty_output_geometry": 0.9112800258503683,
+      "difficulty_output_shuffled_iteration_geometry": 0.8835084412668389,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9472021063642271,
+      "checkpoint_difficulty_output_geometry": 0.9604376708410318,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9549819764458479
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "ef3e418e709f4b84",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "1-2",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2607850102518699,
+      "early_output": 0.4945575130628337,
+      "difficulty_output": 0.4828689166050298,
+      "geometry": 0.7955823705244581,
+      "shuffled_iteration_geometry": 0.7107023659996924,
+      "difficulty_output_geometry": 0.8391840773835364,
+      "difficulty_output_shuffled_iteration_geometry": 0.7372023927810756,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9357416989192757,
+      "checkpoint_difficulty_output_geometry": 0.9440477159427338,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9389077666911573
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "094a6ec710c3ca1f",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "3-10",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.6065316593218447,
+      "difficulty_output": 0.6056046779716009,
+      "geometry": 0.8736543616870255,
+      "shuffled_iteration_geometry": 0.8577285102103575,
+      "difficulty_output_geometry": 0.9266686988221642,
+      "difficulty_output_shuffled_iteration_geometry": 0.8768905057815229,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.942991413799094,
+      "checkpoint_difficulty_output_geometry": 0.9649652170260429,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9566322710971651
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "04f8b3c5f2b4661d",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "3-10",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.6330595392470697,
+      "difficulty_output": 0.6322104961620544,
+      "geometry": 0.8442832754561228,
+      "shuffled_iteration_geometry": 0.5315727925766675,
+      "difficulty_output_geometry": 0.8884796984588256,
+      "difficulty_output_shuffled_iteration_geometry": 0.7454326038664736,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9449680317112481,
+      "checkpoint_difficulty_output_geometry": 0.9566437024083647,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9297905945841497
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "c107050a90d26891",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "3-10",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.6641664874422557,
+      "difficulty_output": 0.6634684362011076,
+      "geometry": 0.860250524657723,
+      "shuffled_iteration_geometry": 0.7174906009889288,
+      "difficulty_output_geometry": 0.9398128140120601,
+      "difficulty_output_shuffled_iteration_geometry": 0.8300531154306994,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.945467530707318,
+      "checkpoint_difficulty_output_geometry": 0.9676984015160942,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9434743782770292
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "40e62622dd8c87cb",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "11-50",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24980942338925194,
+      "early_output": 0.7281328324229743,
+      "difficulty_output": 0.7139771160973691,
+      "geometry": 0.6489040966274064,
+      "shuffled_iteration_geometry": 0.5694834237125002,
+      "difficulty_output_geometry": 0.9397179968980085,
+      "difficulty_output_shuffled_iteration_geometry": 0.6904687397000643,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9538458429319807,
+      "checkpoint_difficulty_output_geometry": 0.9711978213554989,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9477446750027669
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "6ee2c073650f9d61",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "11-50",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 0.6757154882520128,
+      "difficulty_output": 0.6783675660027124,
+      "geometry": 0.8624519850099615,
+      "shuffled_iteration_geometry": 0.8554038623693713,
+      "difficulty_output_geometry": 0.9600799027367026,
+      "difficulty_output_shuffled_iteration_geometry": 0.9207332464856819,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9488283679524275,
+      "checkpoint_difficulty_output_geometry": 0.9741141155184458,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9666687542257855
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "16522851693b7733",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "11-50",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 0.6476072520187358,
+      "difficulty_output": 0.6509641185888608,
+      "geometry": 0.79211789981256,
+      "shuffled_iteration_geometry": 0.8569247903954227,
+      "difficulty_output_geometry": 0.7542806688294941,
+      "difficulty_output_shuffled_iteration_geometry": 0.8109276663851971,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9432737305222902,
+      "checkpoint_difficulty_output_geometry": 0.9260233162005402,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.939087478114135
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "a28f2969025de2c2",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "51+",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.21162185743905537,
+      "early_output": 0.5754412767624415,
+      "difficulty_output": 0.5955546068858555,
+      "geometry": 0.8217869884489286,
+      "shuffled_iteration_geometry": 0.8615999914505046,
+      "difficulty_output_geometry": 0.8618084505518154,
+      "difficulty_output_shuffled_iteration_geometry": 0.8554798763985815,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9385598447122743,
+      "checkpoint_difficulty_output_geometry": 0.9467892126402615,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9450866062385341
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "685b6cc159929aaf",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "51+",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22761332804065387,
+      "early_output": 0.6746697715056389,
+      "difficulty_output": 0.6750015213522844,
+      "geometry": 0.7480367955785336,
+      "shuffled_iteration_geometry": 0.6320949471673486,
+      "difficulty_output_geometry": 0.9119574215447153,
+      "difficulty_output_shuffled_iteration_geometry": 0.7892213639673343,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.944709988455083,
+      "checkpoint_difficulty_output_geometry": 0.9589802611818513,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9393426850042168
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "bc47e424cfc77169",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "51+",
+    "collapse": 1,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23873806008138443,
+      "early_output": 0.5943625396745137,
+      "difficulty_output": 0.581267031451436,
+      "geometry": 0.8725719790057517,
+      "shuffled_iteration_geometry": 0.6422309090615304,
+      "difficulty_output_geometry": 0.9496947072502205,
+      "difficulty_output_shuffled_iteration_geometry": 0.8140502949151586,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9429541076179306,
+      "checkpoint_difficulty_output_geometry": 0.9717613559648721,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9437207063767111
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "3cea1dbbbf1fef24",
+    "checkpoint": "collapsed_plain",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22218984814411186,
+      "early_output": 0.9652466589715556,
+      "difficulty_output": 0.9664007111448173,
+      "geometry": 2.587439725018824e-08,
+      "shuffled_iteration_geometry": 0.9563993190504424,
+      "difficulty_output_geometry": 2.7447771385770114e-07,
+      "difficulty_output_shuffled_iteration_geometry": 0.9968864685246279,
+      "checkpoint_identity": 0.9408638546674881,
+      "checkpoint_difficulty_output": 0.9887795061780457,
+      "checkpoint_difficulty_output_geometry": 0.0007412184628587294,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.9863904630289897
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.8737338850072207e-12,
+      "difficulty_output_geometry": 1.8737338850072207e-12
+    }
+  },
+  {
+    "puzzle_hash": "b49c7b433845f6b5",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.12270552409585239,
+      "difficulty_output": 0.12138338922381124,
+      "geometry": 0.006014585793942805,
+      "shuffled_iteration_geometry": 0.03397951420127727,
+      "difficulty_output_geometry": 0.01543565464143328,
+      "difficulty_output_shuffled_iteration_geometry": 0.006665097492652387,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.014231212438142038,
+      "checkpoint_difficulty_output_geometry": 0.009098793968213868,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.005867543554583944
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.5016074159256564,
+      "difficulty_output_geometry": 0.9816568532739685
+    }
+  },
+  {
+    "puzzle_hash": "9d3c17c60368df59",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2663884288807646,
+      "early_output": 0.03914104988205783,
+      "difficulty_output": 0.03787054716830176,
+      "geometry": 0.012657976496469988,
+      "shuffled_iteration_geometry": 0.04165148644225365,
+      "difficulty_output_geometry": 0.006905399692578377,
+      "difficulty_output_shuffled_iteration_geometry": 0.022277042617639423,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.010746046317067324,
+      "checkpoint_difficulty_output_geometry": 0.006251291258006953,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.011699671295582727
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.21973618355415206,
+      "difficulty_output_geometry": 0.9989696577235991
+    }
+  },
+  {
+    "puzzle_hash": "46de1128e6795029",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.02270113875045062,
+      "difficulty_output": 0.022546556887515803,
+      "geometry": 0.023550600630506718,
+      "shuffled_iteration_geometry": 0.14297539132195333,
+      "difficulty_output_geometry": 0.012274063771954311,
+      "difficulty_output_shuffled_iteration_geometry": 0.022316434998287366,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.00943449018838431,
+      "checkpoint_difficulty_output_geometry": 0.008307989643325792,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.010575602633745372
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.1520218514874422,
+      "difficulty_output_geometry": 0.994889283490804
+    }
+  },
+  {
+    "puzzle_hash": "eb312cfdbfc783ba",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2544058167140449,
+      "early_output": 0.08142495374324538,
+      "difficulty_output": 0.08267586032851194,
+      "geometry": 0.012112307760942772,
+      "shuffled_iteration_geometry": 0.07758073251872077,
+      "difficulty_output_geometry": 0.042123361889548905,
+      "difficulty_output_shuffled_iteration_geometry": 0.03337680174324228,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.01279502457871045,
+      "checkpoint_difficulty_output_geometry": 0.014789947133301229,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.012163495044176263
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.4181071104460149,
+      "difficulty_output_geometry": 0.9986173393402041
+    }
+  },
+  {
+    "puzzle_hash": "a5c17186f0bc9c97",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24896890975813912,
+      "early_output": 0.08741577202561769,
+      "difficulty_output": 0.08777503943825513,
+      "geometry": 0.00035070535106978174,
+      "shuffled_iteration_geometry": 0.005610821904498385,
+      "difficulty_output_geometry": 0.0010544154906107748,
+      "difficulty_output_shuffled_iteration_geometry": 0.0004887391042846327,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.012933817545624123,
+      "checkpoint_difficulty_output_geometry": 0.0019254614821492568,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.001976075535911353
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.43540034854692167,
+      "difficulty_output_geometry": 0.9999671617860694
+    }
+  },
+  {
+    "puzzle_hash": "21bbef9997760e03",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2548318899863812,
+      "early_output": 0.16350803285588908,
+      "difficulty_output": 0.16027377115358604,
+      "geometry": 0.08602122407877356,
+      "shuffled_iteration_geometry": 0.20863285206268464,
+      "difficulty_output_geometry": 0.06530647874226797,
+      "difficulty_output_shuffled_iteration_geometry": 0.12959073666117277,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.014928178221889965,
+      "checkpoint_difficulty_output_geometry": 0.02012768728503772,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.021609128777588766
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.5617873844461679,
+      "difficulty_output_geometry": 0.986412121836066
+    }
+  },
+  {
+    "puzzle_hash": "b96ab2ce1873b0ef",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2053762334291706,
+      "early_output": 0.044052524491141644,
+      "difficulty_output": 0.05449354470855159,
+      "geometry": 0.006947073015210792,
+      "shuffled_iteration_geometry": 0.0068213574887545725,
+      "difficulty_output_geometry": 0.001527166804250273,
+      "difficulty_output_shuffled_iteration_geometry": 0.011861594919771649,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.010956360061759585,
+      "checkpoint_difficulty_output_geometry": 0.0027965974684481185,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0068174312611978555
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.4785391940556655,
+      "difficulty_output_geometry": 0.9999840708532296
+    }
+  },
+  {
+    "puzzle_hash": "ef3e418e709f4b84",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2607850102518699,
+      "early_output": 0.12404295218328473,
+      "difficulty_output": 0.11871222252619339,
+      "geometry": 0.016634166448393845,
+      "shuffled_iteration_geometry": 0.10082931469715416,
+      "difficulty_output_geometry": 0.03292233143036825,
+      "difficulty_output_shuffled_iteration_geometry": 0.08480813769770952,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.014064405759064934,
+      "checkpoint_difficulty_output_geometry": 0.012263889114083661,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.018094268868168336
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.47143947846192324,
+      "difficulty_output_geometry": 0.9998394341037292
+    }
+  },
+  {
+    "puzzle_hash": "094a6ec710c3ca1f",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.013460830017146763,
+      "difficulty_output": 0.013475048475561325,
+      "geometry": 0.01184001191877046,
+      "shuffled_iteration_geometry": 0.015690883906713762,
+      "difficulty_output_geometry": 0.004474609749346521,
+      "difficulty_output_shuffled_iteration_geometry": 0.0008642557846704733,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.008169647005703723,
+      "checkpoint_difficulty_output_geometry": 0.004699962978961334,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0026559965836430322
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.10546216439763394,
+      "difficulty_output_geometry": 0.995256615425946
+    }
+  },
+  {
+    "puzzle_hash": "04f8b3c5f2b4661d",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.10490705234774214,
+      "difficulty_output": 0.10429810325173164,
+      "geometry": 4.487554411149338e-06,
+      "shuffled_iteration_geometry": 0.0017204187337341585,
+      "difficulty_output_geometry": 0.00015545091240605748,
+      "difficulty_output_shuffled_iteration_geometry": 0.0003133041555663163,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.013265285066761055,
+      "checkpoint_difficulty_output_geometry": 0.000806414314813127,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0017660471931312852
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.4702913166477541,
+      "difficulty_output_geometry": 0.9970523473921814
+    }
+  },
+  {
+    "puzzle_hash": "c107050a90d26891",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.3491904023104759,
+      "difficulty_output": 0.34697589632370657,
+      "geometry": 0.0008423337061485502,
+      "shuffled_iteration_geometry": 0.04782111325967077,
+      "difficulty_output_geometry": 0.004695965564494986,
+      "difficulty_output_shuffled_iteration_geometry": 0.019402523317438827,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.018463928353678223,
+      "checkpoint_difficulty_output_geometry": 0.00408450735278481,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.00824569323122945
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.7852386687737225,
+      "difficulty_output_geometry": 0.9999933626466402
+    }
+  },
+  {
+    "puzzle_hash": "6604dbf2c8daf69c",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.232327753245201,
+      "early_output": 0.1483655711958938,
+      "difficulty_output": 0.15439491047113854,
+      "geometry": 0.00047072005461037855,
+      "shuffled_iteration_geometry": 0.007464599166202534,
+      "difficulty_output_geometry": 0.001810875094452089,
+      "difficulty_output_shuffled_iteration_geometry": 0.0012961645694677703,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.01444211607980573,
+      "checkpoint_difficulty_output_geometry": 0.0024737236580839542,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0029331412084261945
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.6137957512052403,
+      "difficulty_output_geometry": 0.999997859459357
+    }
+  },
+  {
+    "puzzle_hash": "f84b11e7e9c9f686",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2440241416384153,
+      "early_output": 0.928387623562763,
+      "difficulty_output": 0.9260952381653504,
+      "geometry": 5.234271515966024e-07,
+      "shuffled_iteration_geometry": 0.23992090824894613,
+      "difficulty_output_geometry": 0.04860069137956913,
+      "difficulty_output_shuffled_iteration_geometry": 0.9954729529855221,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.06809343922498576,
+      "checkpoint_difficulty_output_geometry": 0.0028891733334790166,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.09896568120985878
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9762525232332314,
+      "difficulty_output_geometry": 1.0
+    }
+  },
+  {
+    "puzzle_hash": "40e62622dd8c87cb",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24980942338925194,
+      "early_output": 0.030887372214820658,
+      "difficulty_output": 0.028891251867584997,
+      "geometry": 0.20263378326462897,
+      "shuffled_iteration_geometry": 0.37648994825789844,
+      "difficulty_output_geometry": 0.16341127972048558,
+      "difficulty_output_shuffled_iteration_geometry": 0.12410105590051267,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.009763017043463487,
+      "checkpoint_difficulty_output_geometry": 0.0343865323738404,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.02018996017041553
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.16818947879257484,
+      "difficulty_output_geometry": 0.9883842855835797
+    }
+  },
+  {
+    "puzzle_hash": "6ee2c073650f9d61",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 0.047361278077168,
+      "difficulty_output": 0.047826832412097675,
+      "geometry": 0.00042550419095764173,
+      "shuffled_iteration_geometry": 0.033331735935012666,
+      "difficulty_output_geometry": 0.0007595080627513194,
+      "difficulty_output_shuffled_iteration_geometry": 0.00466630851229112,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.010769008023712867,
+      "checkpoint_difficulty_output_geometry": 0.0017531980741915885,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.005147313621306431
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.2952765454602215,
+      "difficulty_output_geometry": 0.999747320850645
+    }
+  },
+  {
+    "puzzle_hash": "16522851693b7733",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 0.837164270122855,
+      "difficulty_output": 0.8399834422599478,
+      "geometry": 7.0660137258755e-05,
+      "shuffled_iteration_geometry": 0.10717104261519254,
+      "difficulty_output_geometry": 0.9862112524173761,
+      "difficulty_output_shuffled_iteration_geometry": 0.9890815447978788,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.04980811503413276,
+      "checkpoint_difficulty_output_geometry": 0.1399691623314113,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.08383848632813129
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.9541304357008944,
+      "difficulty_output_geometry": 0.9999999999975158
+    }
+  },
+  {
+    "puzzle_hash": "a28f2969025de2c2",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.21162185743905537,
+      "early_output": 0.21553016949945306,
+      "difficulty_output": 0.22891317143812281,
+      "geometry": 0.006016518890369482,
+      "shuffled_iteration_geometry": 0.004625675957820669,
+      "difficulty_output_geometry": 0.011130326863513835,
+      "difficulty_output_shuffled_iteration_geometry": 0.003346907544768129,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.015550674065601325,
+      "checkpoint_difficulty_output_geometry": 0.00665516468438745,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.00419606607104774
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.7412705696361538,
+      "difficulty_output_geometry": 0.9989754853565098
+    }
+  },
+  {
+    "puzzle_hash": "685b6cc159929aaf",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22761332804065387,
+      "early_output": 0.20289294110858253,
+      "difficulty_output": 0.2022684351720099,
+      "geometry": 0.02709088932576364,
+      "shuffled_iteration_geometry": 0.08969430466831645,
+      "difficulty_output_geometry": 0.02913455444388791,
+      "difficulty_output_shuffled_iteration_geometry": 0.025807057360918654,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.015205182397582864,
+      "checkpoint_difficulty_output_geometry": 0.010293240962429891,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.009965024878867393
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.6542941167245093,
+      "difficulty_output_geometry": 0.9999910053957212
+    }
+  },
+  {
+    "puzzle_hash": "bc47e424cfc77169",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23873806008138443,
+      "early_output": 0.12939163972684864,
+      "difficulty_output": 0.12335051449508846,
+      "geometry": 0.005000400440985869,
+      "shuffled_iteration_geometry": 0.005391541369895289,
+      "difficulty_output_geometry": 0.006332539586098228,
+      "difficulty_output_shuffled_iteration_geometry": 0.0013838130447880186,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.01349285097012668,
+      "checkpoint_difficulty_output_geometry": 0.004554325992533898,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0029232444443688943
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.48279752144815974,
+      "difficulty_output_geometry": 0.999990644905598
+    }
+  },
+  {
+    "puzzle_hash": "3cea1dbbbf1fef24",
+    "checkpoint": "late_state_ce",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22218984814411186,
+      "early_output": 0.10122654517441598,
+      "difficulty_output": 0.10359945539139172,
+      "geometry": 3.460183400832678e-07,
+      "shuffled_iteration_geometry": 0.0017991637733724974,
+      "difficulty_output_geometry": 1.2971964256555726e-05,
+      "difficulty_output_shuffled_iteration_geometry": 0.00042182235623764233,
+      "checkpoint_identity": 0.011259763592411869,
+      "checkpoint_difficulty_output": 0.012746929986484608,
+      "checkpoint_difficulty_output_geometry": 0.0002310525387555304,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0019654844249930472
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.49772866559692386,
+      "difficulty_output_geometry": 0.996279843833127
+    }
+  },
+  {
+    "puzzle_hash": "b49c7b433845f6b5",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 0.006278856306837617,
+      "difficulty_output": 0.006238711653485211,
+      "geometry": 0.0548662043484587,
+      "shuffled_iteration_geometry": 0.06408404532231023,
+      "difficulty_output_geometry": 0.007551881316990523,
+      "difficulty_output_shuffled_iteration_geometry": 0.0060702450198219906,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.009566629327044078,
+      "checkpoint_difficulty_output_geometry": 0.007071102610527323,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.007588657318457665
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 2.320289640318388e-06,
+      "difficulty_output_geometry": 0.01698778843550314
+    }
+  },
+  {
+    "puzzle_hash": "9d3c17c60368df59",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2663884288807646,
+      "early_output": 0.03570240657874373,
+      "difficulty_output": 0.03461810804587664,
+      "geometry": 0.05875639135305357,
+      "shuffled_iteration_geometry": 0.04610295093116496,
+      "difficulty_output_geometry": 0.028151409368461385,
+      "difficulty_output_shuffled_iteration_geometry": 0.03552758804994131,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.013879910038124136,
+      "checkpoint_difficulty_output_geometry": 0.013401023825814751,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.01532322206473939
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.0008227207403058084,
+      "difficulty_output_geometry": 0.24918298238182485
+    }
+  },
+  {
+    "puzzle_hash": "46de1128e6795029",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.26035244665489116,
+      "early_output": 1.0945768923671752e-08,
+      "difficulty_output": 1.1229985026951335e-08,
+      "geometry": 0.00010218259932531021,
+      "shuffled_iteration_geometry": 4.149743488843868e-05,
+      "difficulty_output_geometry": 2.092080221632756e-07,
+      "difficulty_output_shuffled_iteration_geometry": 1.2723426741452002e-09,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.0004876652142047554,
+      "checkpoint_difficulty_output_geometry": 2.9948724185574787e-05,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 2.2572197574479167e-05
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 4.248354255291589e-18,
+      "difficulty_output_geometry": 1.1196612032669905e-11
+    }
+  },
+  {
+    "puzzle_hash": "eb312cfdbfc783ba",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "0",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2544058167140449,
+      "early_output": 0.0027713168230662543,
+      "difficulty_output": 0.002830435758340567,
+      "geometry": 0.005194814315395568,
+      "shuffled_iteration_geometry": 0.0027373838594347034,
+      "difficulty_output_geometry": 0.0009787333768862465,
+      "difficulty_output_shuffled_iteration_geometry": 0.0006819838233593183,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.008050566714315276,
+      "checkpoint_difficulty_output_geometry": 0.0026199654884749915,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.003240240574547493
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 2.615437355305971e-07,
+      "difficulty_output_geometry": 0.001107019662492882
+    }
+  },
+  {
+    "puzzle_hash": "a5c17186f0bc9c97",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24896890975813912,
+      "early_output": 0.03926170461667314,
+      "difficulty_output": 0.03954479353046392,
+      "geometry": 0.013686825340051507,
+      "shuffled_iteration_geometry": 0.003036001654562499,
+      "difficulty_output_geometry": 0.010059933904955786,
+      "difficulty_output_shuffled_iteration_geometry": 0.0011164544058146725,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.014365583808554992,
+      "checkpoint_difficulty_output_geometry": 0.008210697682358629,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.002856271134843869
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.0008487966164942007,
+      "difficulty_output_geometry": 0.10422081091006595
+    }
+  },
+  {
+    "puzzle_hash": "21bbef9997760e03",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2548318899863812,
+      "early_output": 4.4156290243561094e-05,
+      "difficulty_output": 4.389404532711873e-05,
+      "geometry": 0.059593442139635314,
+      "shuffled_iteration_geometry": 0.08563844046416473,
+      "difficulty_output_geometry": 0.0013471960884553769,
+      "difficulty_output_shuffled_iteration_geometry": 0.0005353661520196843,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.0030484011969213326,
+      "checkpoint_difficulty_output_geometry": 0.003341652348647785,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0035436730671739923
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 2.6121371004372217e-12,
+      "difficulty_output_geometry": 0.00016005679292960555
+    }
+  },
+  {
+    "puzzle_hash": "b96ab2ce1873b0ef",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2053762334291706,
+      "early_output": 0.0007770125168798643,
+      "difficulty_output": 0.0009836406724244278,
+      "geometry": 0.09844981181295102,
+      "shuffled_iteration_geometry": 0.11097697382500495,
+      "difficulty_output_geometry": 0.004028543837444892,
+      "difficulty_output_shuffled_iteration_geometry": 0.005955919398305307,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.005731987914706549,
+      "checkpoint_difficulty_output_geometry": 0.005029426755424179,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.006866024329496759
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 2.1798161557337342e-08,
+      "difficulty_output_geometry": 0.0010273297171037156
+    }
+  },
+  {
+    "puzzle_hash": "ef3e418e709f4b84",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "1-2",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2607850102518699,
+      "early_output": 0.016567601066928606,
+      "difficulty_output": 0.015826091952446428,
+      "geometry": 0.008266906915545056,
+      "shuffled_iteration_geometry": 0.027891047183763725,
+      "difficulty_output_geometry": 0.011439993156662928,
+      "difficulty_output_shuffled_iteration_geometry": 0.016142519791009235,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.011915013891219663,
+      "checkpoint_difficulty_output_geometry": 0.007012738831761322,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.011207900097426926
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 6.08385822186129e-05,
+      "difficulty_output_geometry": 0.0283508435808284
+    }
+  },
+  {
+    "puzzle_hash": "094a6ec710c3ca1f",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.0022411227894648814,
+      "difficulty_output": 0.0022412468767353875,
+      "geometry": 0.11139677739230705,
+      "shuffled_iteration_geometry": 0.20103170320565406,
+      "difficulty_output_geometry": 0.010598425031669587,
+      "difficulty_output_shuffled_iteration_geometry": 0.01007925606960057,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.007352934904715759,
+      "checkpoint_difficulty_output_geometry": 0.009130930805795577,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.009832685046210944
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.0447857722482428e-07,
+      "difficulty_output_geometry": 0.014923388198007417
+    }
+  },
+  {
+    "puzzle_hash": "04f8b3c5f2b4661d",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.0006228521655544695,
+      "difficulty_output": 0.0006232134880574422,
+      "geometry": 0.05411674570866728,
+      "shuffled_iteration_geometry": 0.012022274664898648,
+      "difficulty_output_geometry": 0.005018019921932244,
+      "difficulty_output_shuffled_iteration_geometry": 0.00020046721984758408,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.005588955651112277,
+      "checkpoint_difficulty_output_geometry": 0.006104078916329472,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0015540404321578711
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 2.41571713410465e-09,
+      "difficulty_output_geometry": 0.0022239253309065724
+    }
+  },
+  {
+    "puzzle_hash": "c107050a90d26891",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2436102311372668,
+      "early_output": 0.002805973829527042,
+      "difficulty_output": 0.0028054173276556528,
+      "geometry": 0.04632101307159981,
+      "shuffled_iteration_geometry": 0.0028359561164061544,
+      "difficulty_output_geometry": 0.011389237173483557,
+      "difficulty_output_shuffled_iteration_geometry": 0.00011717848884491687,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.007860423555681381,
+      "checkpoint_difficulty_output_geometry": 0.008048049332247039,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0011747252203238117
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 3.6857198996563475e-07,
+      "difficulty_output_geometry": 0.01327320796298186
+    }
+  },
+  {
+    "puzzle_hash": "6604dbf2c8daf69c",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "3-10",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.232327753245201,
+      "early_output": 0.0005938063741603031,
+      "difficulty_output": 0.0006256777602010833,
+      "geometry": 0.04150143864670358,
+      "shuffled_iteration_geometry": 0.0026663306831845933,
+      "difficulty_output_geometry": 0.01174873229763314,
+      "difficulty_output_shuffled_iteration_geometry": 0.0007352739726322237,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.0056206324229935295,
+      "checkpoint_difficulty_output_geometry": 0.009777954992957527,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.003467908550629256
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.6398463665004867e-09,
+      "difficulty_output_geometry": 0.007683209063383118
+    }
+  },
+  {
+    "puzzle_hash": "f84b11e7e9c9f686",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.2440241416384153,
+      "early_output": 0.1563279610370849,
+      "difficulty_output": 0.15280597905309432,
+      "geometry": 4.485789461051766e-10,
+      "shuffled_iteration_geometry": 0.7840440206363837,
+      "difficulty_output_geometry": 9.99096978891414e-07,
+      "difficulty_output_shuffled_iteration_geometry": 0.9641031256975567,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.03695572871845302,
+      "checkpoint_difficulty_output_geometry": 5.515470421259814e-06,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.04874451895257759
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.00010943426627296141,
+      "difficulty_output_geometry": 2.8429046751135156e-11
+    }
+  },
+  {
+    "puzzle_hash": "40e62622dd8c87cb",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.24980942338925194,
+      "early_output": 0.018864201060796847,
+      "difficulty_output": 0.01764293526878398,
+      "geometry": 0.07374187168619183,
+      "shuffled_iteration_geometry": 0.38162471742516363,
+      "difficulty_output_geometry": 0.03775763266878539,
+      "difficulty_output_shuffled_iteration_geometry": 0.03717409682395851,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.011803954326703482,
+      "checkpoint_difficulty_output_geometry": 0.014193954700694612,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.013112506291602868
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 8.346518992584236e-05,
+      "difficulty_output_geometry": 0.1668527162032026
+    }
+  },
+  {
+    "puzzle_hash": "6ee2c073650f9d61",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 4.10230184205542e-12,
+      "difficulty_output": 4.400779665119654e-12,
+      "geometry": 0.037732341051478775,
+      "shuffled_iteration_geometry": 0.026726993958652426,
+      "difficulty_output_geometry": 8.325349480359962e-06,
+      "difficulty_output_shuffled_iteration_geometry": 3.062478289065512e-08,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 7.644154558888502e-05,
+      "checkpoint_difficulty_output_geometry": 0.00032196678754220536,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0001115290297482337
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 4.248354255291589e-18,
+      "difficulty_output_geometry": 1.5297549558619373e-10
+    }
+  },
+  {
+    "puzzle_hash": "16522851693b7733",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "11-50",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23272839223724107,
+      "early_output": 3.260753627599133e-05,
+      "difficulty_output": 3.322677005534276e-05,
+      "geometry": 6.255729905223868e-05,
+      "shuffled_iteration_geometry": 0.0009366036434814519,
+      "difficulty_output_geometry": 1.4949605950645446e-05,
+      "difficulty_output_shuffled_iteration_geometry": 6.795640188262877e-07,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.0028827302421007258,
+      "checkpoint_difficulty_output_geometry": 0.00018924331867631054,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.00019786788687546592
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 3.4030682218861946e-13,
+      "difficulty_output_geometry": 3.046625150377865e-08
+    }
+  },
+  {
+    "puzzle_hash": "a28f2969025de2c2",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.21162185743905537,
+      "early_output": 0.11101518037646071,
+      "difficulty_output": 0.11917286786937338,
+      "geometry": 0.012210616566895023,
+      "shuffled_iteration_geometry": 0.009840600919580418,
+      "difficulty_output_geometry": 0.015216971676645092,
+      "difficulty_output_shuffled_iteration_geometry": 0.00789887546920306,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.017527994753683468,
+      "checkpoint_difficulty_output_geometry": 0.00828023110397362,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.005600459073678895
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 0.019085796522553978,
+      "difficulty_output_geometry": 0.10466819393345354
+    }
+  },
+  {
+    "puzzle_hash": "685b6cc159929aaf",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22761332804065387,
+      "early_output": 5.317373031124376e-05,
+      "difficulty_output": 5.381081254323599e-05,
+      "geometry": 0.01570989035287765,
+      "shuffled_iteration_geometry": 0.009105884326878243,
+      "difficulty_output_geometry": 0.0006976465386704671,
+      "difficulty_output_shuffled_iteration_geometry": 0.00014775288705073527,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.003082318278697604,
+      "checkpoint_difficulty_output_geometry": 0.0025577867660425122,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.001978077475636594
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 2.6610018294266242e-12,
+      "difficulty_output_geometry": 0.00010664308538673124
+    }
+  },
+  {
+    "puzzle_hash": "bc47e424cfc77169",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.23873806008138443,
+      "early_output": 6.160701740959194e-07,
+      "difficulty_output": 5.950355009790064e-07,
+      "geometry": 0.0014948239931196203,
+      "shuffled_iteration_geometry": 0.0026811227887165233,
+      "difficulty_output_geometry": 1.3238280738155192e-05,
+      "difficulty_output_shuffled_iteration_geometry": 1.6427144036238273e-07,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.001152780122576035,
+      "checkpoint_difficulty_output_geometry": 0.00025173212677248054,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 9.940263240554695e-05
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 1.5711137825638074e-17,
+      "difficulty_output_geometry": 2.5607143515294328e-08
+    }
+  },
+  {
+    "puzzle_hash": "3cea1dbbbf1fef24",
+    "checkpoint": "combined_margin",
+    "rating_bucket": "51+",
+    "collapse": 0,
+    "pooled_probabilities": {
+      "prevalence": 0.2435897435897436,
+      "difficulty": 0.22218984814411186,
+      "early_output": 0.00017771701824427437,
+      "difficulty_output": 0.00018325119194308404,
+      "geometry": 5.492265703141416e-06,
+      "shuffled_iteration_geometry": 0.002515908076988925,
+      "difficulty_output_geometry": 0.000201764681093143,
+      "difficulty_output_shuffled_iteration_geometry": 1.6348549100731696e-06,
+      "checkpoint_identity": 0.01146871272238166,
+      "checkpoint_difficulty_output": 0.004190538972876073,
+      "checkpoint_difficulty_output_geometry": 0.0004650032818539912,
+      "checkpoint_difficulty_output_shuffled_iteration_geometry": 0.0002548267148272382
+    },
+    "leave_one_checkpoint_out_probabilities": {
+      "difficulty_output": 3.7332298354233645e-11,
+      "difficulty_output_geometry": 5.621180821342453e-08
+    }
+  }
+]

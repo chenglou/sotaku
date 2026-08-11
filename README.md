@@ -116,6 +116,7 @@ modal volume get sudoku-outputs viz_diagnostics/ viz/output/
 - `looping/exp_health_methods.py` - matched vanilla, RMSNorm, late-state CE, consistency, and margin ablations
 - `looping/exp_late_supervision.py` - 20K late-state screening and horizon ablations
 - `looping/eval_trajectory_geometry.py` - recurrent-update dimension, smoothness, and cross-puzzle basis diagnostics
+- `looping/trajectory_viz/study/README.md` - held-out and shuffle-controlled recurrent-state interpretability study
 - `iters/exp_baseline_lr2e3.py` - historical 98.9% released-checkpoint recipe; difficult to reproduce reliably
 - `looping/eval_late_recipe.py` - optional delayed-damping evaluation for models that still deteriorate deeply
 - `stabilize/exp_lr2e3_outer_rmsnorm.py` - simpler reliable alternative with no extra burn-in forwards

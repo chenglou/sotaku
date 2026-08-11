@@ -1,0 +1,424 @@
+{
+  "rows": [
+    {
+      "dataset_index": 321543,
+      "puzzle_sha256": "904c3027ef575916c63548c858eac24a30629f748443d05bdc8988b45b33e2ea",
+      "rating_bucket": "0",
+      "sample_index": 0,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 355547,
+      "puzzle_sha256": "de9a9b62eff40d6b6c06ab3db16b7ab67151fe7a5e93819ccbda424359f2354a",
+      "rating_bucket": "0",
+      "sample_index": 1,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 28738,
+      "puzzle_sha256": "ab855926e3f44e289a3577bde85c93f27bd57c7275ee82b931eaccb63ec2df7e",
+      "rating_bucket": "0",
+      "sample_index": 2,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 40238,
+      "puzzle_sha256": "c6c9b5099c4eae856412d8fbbbb0f56c14e3959fc40aaf2255de74f1922e6ef3",
+      "rating_bucket": "0",
+      "sample_index": 3,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 359614,
+      "puzzle_sha256": "21037b44b9ce39ea7d8be22fb526e391f10c3b692efce9049ec2a34178dd32f1",
+      "rating_bucket": "0",
+      "sample_index": 4,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 207861,
+      "puzzle_sha256": "3f5cefb93c9461d8be5eca1ade9a1ef43e7656ea7eb4af4481122ec0a7af3813",
+      "rating_bucket": "0",
+      "sample_index": 5,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 321606,
+      "puzzle_sha256": "6c0be720ab06adb04e25c327d6c910d393a5dd672ea43e7f756120211077b65a",
+      "rating_bucket": "0",
+      "sample_index": 6,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 288153,
+      "puzzle_sha256": "a83f569e7d7e7f48004ccb45e9c90def865d4837edc06af65fd98d0edcd354bc",
+      "rating_bucket": "0",
+      "sample_index": 7,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 259878,
+      "puzzle_sha256": "83322796d3938e6cd6355d3de1d1a955905513a49e65ec2b77e6a65f5f97ee95",
+      "rating_bucket": "0",
+      "sample_index": 8,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 117119,
+      "puzzle_sha256": "9f42c9fa144209f65db763fbfd460a905b0010945e3871bc3ed22aca52fdf943",
+      "rating_bucket": "0",
+      "sample_index": 9,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 374909,
+      "puzzle_sha256": "4e71562f1e80d3582c1b268a9cc06d98c328f0849b9b433abceac45ead8dc4a3",
+      "rating_bucket": "0",
+      "sample_index": 10,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 312186,
+      "puzzle_sha256": "a815ca59b466688ea7abcc8d78cc93e4dd7676e84b9700e9e0591a7059bb4422",
+      "rating_bucket": "0",
+      "sample_index": 11,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 358581,
+      "puzzle_sha256": "c3d042920de5494df8e2e04f5b74b6df3ea2bfa85257b6d9f8d7ab599a894a91",
+      "rating_bucket": "1-2",
+      "sample_index": 12,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 304785,
+      "puzzle_sha256": "24755820ae99b4b2ba16b1e6d07c1cc107f70be8551131d86073e3e30005a59e",
+      "rating_bucket": "1-2",
+      "sample_index": 13,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 12036,
+      "puzzle_sha256": "e9c7d0aa97a083cd573fe1f489c7b2fd7b57d5e5e2de775680d176d1ef13d0b2",
+      "rating_bucket": "1-2",
+      "sample_index": 14,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 114294,
+      "puzzle_sha256": "7075dbebff20cbbd446989f7ec235cea20abe2ebb20897130f1ea02c51c70d6d",
+      "rating_bucket": "1-2",
+      "sample_index": 15,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 103409,
+      "puzzle_sha256": "a2e01c70bf977e02e09c33796bea5a7490435f13335d1ed2a41c27167a932a29",
+      "rating_bucket": "1-2",
+      "sample_index": 16,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 275298,
+      "puzzle_sha256": "f7f10c7bfbea9649f15ae2d32eb5fc3a7b3f29b37fa0afb2af272eacb845aa4a",
+      "rating_bucket": "1-2",
+      "sample_index": 17,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 82265,
+      "puzzle_sha256": "f54e487c92a00a70b58a6d3b57096ca40d08c29f3968a94df1f97ab39582fd88",
+      "rating_bucket": "1-2",
+      "sample_index": 18,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 414498,
+      "puzzle_sha256": "1301b1cc9ead8b8ca236fa8c87435915260125d99344fac34d0fc04abdb95cdc",
+      "rating_bucket": "1-2",
+      "sample_index": 19,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 211700,
+      "puzzle_sha256": "51e671a4be7dbf83dc7a9cb813430ec2a56ab3cf79fb7b003f9434cc63aa3cdb",
+      "rating_bucket": "1-2",
+      "sample_index": 20,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 95513,
+      "puzzle_sha256": "f0b2e0e8cba55ca8ef7ada0c000d5edd9ebe949809954330a0361ced5254411b",
+      "rating_bucket": "1-2",
+      "sample_index": 21,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 305784,
+      "puzzle_sha256": "c9cd6a0690c312bf47c45c5df4660cd9673441dfdbdd4462a08d629da064b835",
+      "rating_bucket": "1-2",
+      "sample_index": 22,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 130036,
+      "puzzle_sha256": "66d2e8f250e2fec811c541db0c342e253e957d5edc247b9e05419eb7881824bf",
+      "rating_bucket": "1-2",
+      "sample_index": 23,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 248115,
+      "puzzle_sha256": "e979431a2e50107a86f757b9071074e62e289b40d9202c6b3f70922bb396065a",
+      "rating_bucket": "3-10",
+      "sample_index": 24,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 111100,
+      "puzzle_sha256": "13832f408614dc3a1eedcfd4b62d1c602031162adff684b7d6dd75416b666db0",
+      "rating_bucket": "3-10",
+      "sample_index": 25,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 360722,
+      "puzzle_sha256": "2e0699b465674e3381c6d6fb71f912ac1f3e84184ecbb89b3b856219c8c4278d",
+      "rating_bucket": "3-10",
+      "sample_index": 26,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 10100,
+      "puzzle_sha256": "b36f6a19139e04528a1f76d1fc3fc1ab8b369b1f740f102bbae73f9e8cd133ce",
+      "rating_bucket": "3-10",
+      "sample_index": 27,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 257183,
+      "puzzle_sha256": "598aa28a23d04c078ace961b39062e4421b8b7197df2f51fb9e7be96d14e4de3",
+      "rating_bucket": "3-10",
+      "sample_index": 28,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 121682,
+      "puzzle_sha256": "ec6a83338286e7349612ecb8e5b14c27588b5dec0566237812c0f29391777d92",
+      "rating_bucket": "3-10",
+      "sample_index": 29,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 333823,
+      "puzzle_sha256": "eacd66c6abfad40272da63c7a880fa944af084ab15ea7f6f91cdf536708fda40",
+      "rating_bucket": "3-10",
+      "sample_index": 30,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 246730,
+      "puzzle_sha256": "93b3001734a957414ad15ab46f6a999e628b01f3e31051c61249602c8eb8f841",
+      "rating_bucket": "3-10",
+      "sample_index": 31,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 267538,
+      "puzzle_sha256": "3ec4a9c5349044948d67e2578c8e0737614e0d5662abbedbd693d25403a8b217",
+      "rating_bucket": "3-10",
+      "sample_index": 32,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 12407,
+      "puzzle_sha256": "bc99b62a815bbb25d456d5249ab1f83ce5aac040854da350f0d645d77cdfa4ed",
+      "rating_bucket": "3-10",
+      "sample_index": 33,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 245744,
+      "puzzle_sha256": "0bfa8a888890a0b8fc2d6e3bee3caa20ea6c4f9a9c6451c76f6db760067bb1b1",
+      "rating_bucket": "3-10",
+      "sample_index": 34,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 3934,
+      "puzzle_sha256": "1d13453dcd8dfcc4089df2e313a7524ead518c8f2a1db36116ebfe8c288386f2",
+      "rating_bucket": "3-10",
+      "sample_index": 35,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 416878,
+      "puzzle_sha256": "b79f56578cff24b2bd535a1b2e8966bf7de349dfa4e8140c59718ee26c98f44f",
+      "rating_bucket": "11-50",
+      "sample_index": 36,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 255795,
+      "puzzle_sha256": "b37fb23ce7c18cad5c071b51257a2681e058d97cdc27a41d7f8fb735f2ef33cf",
+      "rating_bucket": "11-50",
+      "sample_index": 37,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 340565,
+      "puzzle_sha256": "26da0470d33b99596140e2dd335e489cee241721b3885960afbca8b15ee016c0",
+      "rating_bucket": "11-50",
+      "sample_index": 38,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 41337,
+      "puzzle_sha256": "ea2710bb8498cc43837114d9ba504564d5ef55985d9db2e87514e7414e4bc276",
+      "rating_bucket": "11-50",
+      "sample_index": 39,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 51066,
+      "puzzle_sha256": "1fafcfa10ae2b70a71bd7084d2b365da284c33d261ab21604def18284a6b331a",
+      "rating_bucket": "11-50",
+      "sample_index": 40,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 350264,
+      "puzzle_sha256": "d7929d445d079b02c010146f1c26be4484dee6af255a02ccba2dfa770a8d4494",
+      "rating_bucket": "11-50",
+      "sample_index": 41,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 106262,
+      "puzzle_sha256": "c9f160e24ff8e515bb9bd1247106c6b1a3a912e9cca0f9a29c5830dc9ab69cdd",
+      "rating_bucket": "11-50",
+      "sample_index": 42,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 339152,
+      "puzzle_sha256": "0971a34d54bda274d8c82a03ae0ceaa3a294ccd73596540b4e013ea538cf86b0",
+      "rating_bucket": "11-50",
+      "sample_index": 43,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 419359,
+      "puzzle_sha256": "02a1cb4178ea77c6245e3dfff984b918f09b5cc9e55dffa12ec9d3b2c7bb6d4c",
+      "rating_bucket": "11-50",
+      "sample_index": 44,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 44059,
+      "puzzle_sha256": "97454de59640d9510a0f929ae6c806f3e1938e7d359365c5c45363756e8d91e2",
+      "rating_bucket": "11-50",
+      "sample_index": 45,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 16981,
+      "puzzle_sha256": "855134e354668ebfad7e4b0e105ab652286af276ad2ad205d42fb8695c323bdb",
+      "rating_bucket": "11-50",
+      "sample_index": 46,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 211951,
+      "puzzle_sha256": "4b785f1686df8775e6bec51e3ad1de6ddba47569322f872db3ba3e7251379ee2",
+      "rating_bucket": "11-50",
+      "sample_index": 47,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 402860,
+      "puzzle_sha256": "81ac2ed427edbf797ad0b2cc1f0f4850583d1c9373299c87a18a9a5525dbae6b",
+      "rating_bucket": "51+",
+      "sample_index": 48,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 41165,
+      "puzzle_sha256": "4986119337f03cc0e365a9cf22214ee78e874baaacfbf39df554d179550dcadb",
+      "rating_bucket": "51+",
+      "sample_index": 49,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 16534,
+      "puzzle_sha256": "d7cffa5b73cefceb585abbc00fccc48bb360ff3d933229cc5811e5a1a0e3fb3b",
+      "rating_bucket": "51+",
+      "sample_index": 50,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 326318,
+      "puzzle_sha256": "e59b6b44d51a90f65147f3c1d972cc0a8c4669f61c8facb6c8bd4b7abccbe784",
+      "rating_bucket": "51+",
+      "sample_index": 51,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 138754,
+      "puzzle_sha256": "d96de7e70aba35c6dce34666a931e0a2e3d1ee15f6ec30fff52422a7bf6557e4",
+      "rating_bucket": "51+",
+      "sample_index": 52,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 222359,
+      "puzzle_sha256": "7991fcc43883763564609fde4e0d777f3116ee2efde9f1b0755326f906c6a046",
+      "rating_bucket": "51+",
+      "sample_index": 53,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 33542,
+      "puzzle_sha256": "2e613fbfcfe023d79ce9237ffcfc743f220ca0050d9134ac2e3d61616422498a",
+      "rating_bucket": "51+",
+      "sample_index": 54,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 49079,
+      "puzzle_sha256": "676f1d173d1262cbe12df49541d79687af81db32451cf2ea4549f15ed320c528",
+      "rating_bucket": "51+",
+      "sample_index": 55,
+      "split": "holdout"
+    },
+    {
+      "dataset_index": 226531,
+      "puzzle_sha256": "02dfc02935cdfb0c5a75bdf919bf312754e6ec0e3f95ec7c753779fbce616afa",
+      "rating_bucket": "51+",
+      "sample_index": 56,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 263593,
+      "puzzle_sha256": "5fef380fff7f5741994a73c3f710f5ba6d171905e614a714c13094b531698dc8",
+      "rating_bucket": "51+",
+      "sample_index": 57,
+      "split": "validation"
+    },
+    {
+      "dataset_index": 272005,
+      "puzzle_sha256": "513ffecfd3277b7e0d3ca562c4f4f9c640eab59b116d97a511ae491ddba0b38b",
+      "rating_bucket": "51+",
+      "sample_index": 58,
+      "split": "discovery"
+    },
+    {
+      "dataset_index": 360491,
+      "puzzle_sha256": "5ae7e7c8f5961219607f5fe56a80962ad23687211f06e011bd5172c87a8aeb2f",
+      "rating_bucket": "51+",
+      "sample_index": 59,
+      "split": "holdout"
+    }
+  ]
+}

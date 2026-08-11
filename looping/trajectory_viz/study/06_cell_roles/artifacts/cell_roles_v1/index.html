@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sotaku cell-role geometry</title><style>
+body{font-family:system-ui,sans-serif;max-width:1280px;margin:32px auto;padding:0 20px;color:#202124} h1{font-size:28px} h2{font-size:20px;margin-top:36px} img{width:100%;height:auto;border:1px solid #ddd} table{border-collapse:collapse;width:100%} th,td{padding:8px 10px;border-bottom:1px solid #ddd;text-align:right} th:first-child,td:first-child{text-align:left} code{background:#f2f2f2;padding:2px 4px}</style></head><body>
+<h1>Sotaku cell-role geometry</h1><p>All readouts were fit on 20 discovery puzzles, selected on 20 validation puzzles, and evaluated once on 20 final puzzles. The table uses iteration 1024 and input-symbol residuals.</p>
+<table><thead><tr><th>Model</th><th>Puzzle accuracy</th><th>Row balanced accuracy</th><th>Column balanced accuracy</th><th>Candidate within-puzzle Spearman</th></tr></thead><tbody><tr><td>Stable plain</td><td>1.000</td><td>0.778</td><td>0.655</td><td>0.002</td></tr><tr><td>Collapsed plain</td><td>0.050</td><td>0.257</td><td>0.276</td><td>0.026</td></tr><tr><td>Late-state CE</td><td>1.000</td><td>0.286</td><td>0.333</td><td>0.100</td></tr><tr><td>Combined</td><td>0.983</td><td>0.231</td><td>0.213</td><td>0.328</td></tr></tbody></table>
+<section><h2>Probe Trajectories</h2><img src="probe_trajectories.png" alt="probe_trajectories.png"></section>
+<section><h2>Candidate Size Geometry</h2><img src="candidate_size_geometry.png" alt="candidate_size_geometry.png"></section>
+<section><h2>Direction And Input Controls</h2><img src="direction_and_input_controls.png" alt="direction_and_input_controls.png"></section>
+<section><h2>Shuffle And Subspace Controls</h2><img src="shuffle_and_subspace_controls.png" alt="shuffle_and_subspace_controls.png"></section><p>Full machine-readable results: <a href="metrics.json"><code>metrics.json</code></a>.</p></body></html>

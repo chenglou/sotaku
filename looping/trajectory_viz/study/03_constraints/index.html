@@ -1,0 +1,19 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>Sotaku Sudoku-constraint geometry</title>
+<style>
+body { font: 15px system-ui, sans-serif; margin: 28px; color: #1b1b1b; background: #f5f5f2; }
+main { max-width: 1200px; margin: auto; }
+table { border-collapse: collapse; background: white; }
+th, td { border: 1px solid #ccc; padding: 6px 9px; text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+section { margin: 32px 0; }
+img { max-width: 100%; background: white; border: 1px solid #ccc; }
+h1, h2 { letter-spacing: 0; }
+</style>
+<main>
+<h1>Sotaku Sudoku-constraint geometry</h1>
+<p>Projections are fit on 20 discovery puzzles, selected on 20 validation puzzles, and reported on 20 final-holdout puzzles. Dotted probe lines are shuffled-label controls.</p>
+<table><thead><tr><th>Model</th><th>Iteration</th><th>Expected conflicts</th><th>|Candidates - 1|</th><th>Correct digit legal</th><th>Cell accuracy</th></tr></thead><tbody><tr><td>Stable plain</td><td>16</td><td>0.370</td><td>0.105</td><td>0.848</td><td>0.895</td></tr><tr><td>Stable plain</td><td>128</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td></tr><tr><td>Stable plain</td><td>1024</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td></tr><tr><td>Collapsed plain</td><td>16</td><td>0.462</td><td>0.139</td><td>0.792</td><td>0.846</td></tr><tr><td>Collapsed plain</td><td>128</td><td>0.173</td><td>0.049</td><td>0.921</td><td>0.934</td></tr><tr><td>Collapsed plain</td><td>1024</td><td>0.846</td><td>0.307</td><td>0.754</td><td>0.773</td></tr><tr><td>Late-state CE</td><td>16</td><td>0.247</td><td>0.096</td><td>0.885</td><td>0.927</td></tr><tr><td>Late-state CE</td><td>128</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td></tr><tr><td>Late-state CE</td><td>1024</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td></tr><tr><td>Combined</td><td>16</td><td>0.296</td><td>0.101</td><td>0.865</td><td>0.899</td></tr><tr><td>Combined</td><td>128</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td></tr><tr><td>Combined</td><td>1024</td><td>0.000</td><td>0.000</td><td>1.000</td><td>1.000</td></tr></tbody></table>
+<section><h2>constraint_dynamics.png</h2><img src="constraint_dynamics.png"></section><section><h2>constraint_components.png</h2><img src="constraint_components.png"></section><section><h2>numeric_probe_transfer.png</h2><img src="numeric_probe_transfer.png"></section><section><h2>categorical_probe_transfer.png</h2><img src="categorical_probe_transfer.png"></section><section><h2>probe_calibration_16.png</h2><img src="probe_calibration_16.png"></section><section><h2>future_improvement_prediction.png</h2><img src="future_improvement_prediction.png"></section><section><h2>cross_checkpoint_transfer.png</h2><img src="cross_checkpoint_transfer.png"></section>
+</main>

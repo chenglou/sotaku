@@ -1,0 +1,17 @@
+# Large reproducible intermediates. Reports, summary metrics, and plots stay tracked.
+helix_tests/statistics/permutation_nulls.npz
+helix_tests/statistics/results.json
+helix_tests/visual/helix_metrics.json
+study/03_constraints/constraints_states_v1.pt
+study/11_causal_axes/final_metrics.partial.json
+study/12_adversarial_audit/frozen_projection_choices.npz
+
+# Duplicate downloaded/rendered copies.
+study/02_margin/artifacts/
+spatial/artifacts_downloaded/spatial/index-duplicate.html
+
+# Local plotting caches and execution logs.
+**/.mplconfig/
+**/run.log
+**/progress.log
+**/analysis.log

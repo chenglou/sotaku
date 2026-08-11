@@ -1,0 +1,84 @@
+{
+  "protocol_version": 1,
+  "frozen_before_holdout": true,
+  "seed": 2026081112,
+  "sample": {
+    "rating_buckets": ["0", "1-2", "3-10", "11-50", "51+"],
+    "puzzles_per_bucket_per_split": 4,
+    "puzzles_per_split": 20,
+    "splits": ["discovery", "validation", "holdout"],
+    "split_unit": "whole_puzzle"
+  },
+  "trajectory": {
+    "iterations": [0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 480, 512, 544, 576, 608, 640, 672, 704, 736, 768, 800, 832, 864, 896, 928, 960, 992, 1024],
+    "representations": [
+      "raw_state",
+      "normalized_state",
+      "raw_update",
+      "normalized_update"
+    ],
+    "state_anchor": "subtract_iteration_0_after_optional_board_l2_normalization",
+    "update_normalization": "board_l2"
+  },
+  "projection": {
+    "reported_rank": 3,
+    "ambient_pca_rank": 32,
+    "fit_split": "discovery",
+    "plane_selection_split": "validation",
+    "matched_rank_random_projections": 128,
+    "per_puzzle_full_trajectory_pca_is_control_only": true
+  },
+  "resampling": {
+    "time_shuffles": 499,
+    "puzzle_bootstraps": 1000,
+    "development_split_repeats": 8,
+    "familywise_adjustment": "Benjamini-Hochberg within each claim family"
+  },
+  "primary_source_checkpoint": "stable_plain",
+  "criteria": {
+    "single_cell_common": {
+      "maximum_adjusted_time_shuffle_q": 0.05,
+      "minimum_ordered_minus_shuffle_effect": 0.10,
+      "bootstrap_95_percent_lower_bound_must_exceed": 0.0,
+      "minimum_random_projection_percentile": 0.95
+    },
+    "temporal_continuity": {
+      "minimum_passing_checkpoints": 2,
+      "minimum_passing_representations_per_checkpoint": 3,
+      "requires_projection_control": false,
+      "requires_checkpoint_transfer": false
+    },
+    "shared_arc": {
+      "minimum_heldout_rank3_dynamic_variance_fraction": 0.25,
+      "minimum_global_to_favorable_local_score_ratio": 0.50,
+      "minimum_passing_checkpoints": 2,
+      "minimum_passing_representations_per_checkpoint": 3,
+      "minimum_development_split_pass_fraction": 0.75,
+      "minimum_distinct_non_source_transfer_checkpoints": 2
+    },
+    "shared_loop": {
+      "minimum_median_net_turns": 0.75,
+      "minimum_median_angular_linearity_r2": 0.50,
+      "maximum_median_radius_cv": 0.50,
+      "minimum_passing_checkpoints": 2,
+      "minimum_passing_representations_per_checkpoint": 3,
+      "minimum_development_split_pass_fraction": 0.75,
+      "minimum_distinct_non_source_transfer_checkpoints": 2
+    },
+    "shared_helix": {
+      "minimum_median_helix_score": 0.35,
+      "minimum_median_net_turns": 0.75,
+      "minimum_median_angular_linearity_r2": 0.50,
+      "maximum_median_radius_cv": 0.50,
+      "minimum_median_absolute_axial_spearman": 0.70,
+      "minimum_passing_checkpoints": 2,
+      "minimum_passing_representations_per_checkpoint": 3,
+      "minimum_development_split_pass_fraction": 0.75,
+      "minimum_distinct_non_source_transfer_checkpoints": 2
+    }
+  },
+  "categorical_probe_control": {
+    "applicable": false,
+    "reason": "This arm tests temporal board-state geometry and makes no claim about ordered or cyclic digit identity."
+  }
+}

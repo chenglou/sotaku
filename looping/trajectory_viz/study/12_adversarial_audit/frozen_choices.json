@@ -1,0 +1,312 @@
+{
+  "checkpoint_metadata": {
+    "collapsed_plain": {
+      "canonical": true,
+      "path_at_run_time": "/tmp/sotaku-arm12-checkpoints/model_baseline_lr2e3_clean_a.pt",
+      "sha256": "00feddc9179314679f1d7869c552cdd5dbf2df98aa564c35376731263c5e4c98",
+      "size_bytes": 3211469
+    },
+    "combined_margin": {
+      "canonical": true,
+      "path_at_run_time": "/tmp/sotaku-arm12-checkpoints/model_loop_stay_late_switch_margin_floor5_from39k.pt",
+      "sha256": "b5aa3cda9a770153b977e6df32cb9fb80ba076cedb251d4ac26e2ad1e3c70b77",
+      "size_bytes": 3214309
+    },
+    "late_state_ce": {
+      "canonical": true,
+      "path_at_run_time": "/tmp/sotaku-arm12-checkpoints/model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt",
+      "sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198",
+      "size_bytes": 3214969
+    },
+    "stable_plain": {
+      "canonical": true,
+      "path_at_run_time": "/Users/chenglou/github/sotaku/model_baseline_lr2e3.pt",
+      "sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e",
+      "size_bytes": 3210797
+    }
+  },
+  "choices": {
+    "collapsed_plain": {
+      "normalized_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          0,
+          1,
+          2
+        ],
+        "loop_plane": [
+          0,
+          2,
+          1
+        ]
+      },
+      "normalized_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          0,
+          2,
+          1
+        ]
+      },
+      "raw_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "raw_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      }
+    },
+    "combined_margin": {
+      "normalized_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "normalized_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          0,
+          1,
+          2
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "raw_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "raw_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      }
+    },
+    "late_state_ce": {
+      "normalized_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          0,
+          1,
+          2
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "normalized_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          0,
+          1,
+          2
+        ],
+        "loop_plane": [
+          0,
+          1,
+          2
+        ]
+      },
+      "raw_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "raw_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      }
+    },
+    "stable_plain": {
+      "normalized_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "normalized_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "raw_state": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      },
+      "raw_update": {
+        "arc_plane": [
+          0,
+          1,
+          2
+        ],
+        "helix_plane": [
+          1,
+          2,
+          0
+        ],
+        "loop_plane": [
+          1,
+          2,
+          0
+        ]
+      }
+    }
+  },
+  "criteria_sha256": "263907c3b60469bfbdbd2ea4cbd917a7719a712188f4c73bc22dd2d7e40eb3f6",
+  "frozen_projection_file_sha256": "b1c47e451d359517a5a843c4ca4fcf470eea5653d70f7f644328066e6a51921f"
+}

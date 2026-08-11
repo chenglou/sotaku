@@ -1,0 +1,14 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Arm 12 adversarial audit</title>
+<style>body{font:16px system-ui;max-width:1100px;margin:2rem auto;padding:0 1rem;color:#222}
+img{max-width:100%;border:1px solid #ddd;margin:1rem 0}table{border-collapse:collapse}
+th,td{border:1px solid #bbb;padding:.45rem;text-align:left}code{background:#eee;padding:.1rem .25rem}</style>
+</head><body><h1>Arm 12 — adversarial audit</h1>
+<p>The plots illustrate the preregistered held-out measurements. Visual appeal is not an acceptance criterion.</p>
+<table><thead><tr><th>Claim</th><th>Verdict</th><th>Checkpoints meeting representation rule</th></tr></thead>
+<tbody><tr><td>shared_arc</td><td>FAIL</td><td>none</td></tr><tr><td>shared_helix</td><td>FAIL</td><td>none</td></tr><tr><td>shared_loop</td><td>FAIL</td><td>none</td></tr><tr><td>temporal_continuity</td><td>PASS</td><td>stable_plain, collapsed_plain, late_state_ce, combined_margin</td></tr></tbody></table>
+<h2>Null and real gallery</h2><img src="adversarial_gallery.png" alt="Adversarial gallery">
+<h2>Robustness matrix</h2><img src="robustness_summary.png" alt="Robustness summary">
+<h2>Checkpoint transfer</h2><img src="checkpoint_transfer.png" alt="Checkpoint transfer">
+<p>Exact values: <a href="robustness_metrics.json">robustness_metrics.json</a>. Frozen criteria:
+<a href="acceptance_criteria.json">acceptance_criteria.json</a>.</p></body></html>

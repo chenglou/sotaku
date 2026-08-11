@@ -1,0 +1,425 @@
+{
+  "config": {
+    "examples_per_bucket": 1,
+    "sample_size": 5,
+    "final_iteration": 1024,
+    "stride": 4,
+    "seed": 42,
+    "models": [
+      {
+        "name": "stable_plain_local",
+        "path": "model_baseline_lr2e3.pt",
+        "model_kwargs": {}
+      }
+    ]
+  },
+  "sample": {
+    "puzzles": [
+      ".5..8......3....2........4.18..........2...7...6........2....6...7.9........138..",
+      "48........1.5.4....92.1.....2..4....5....8.72......946..91..62......63.92...8...1",
+      "...68..3....2....7.1...42..5...6.....2.4..5.8..8.25...9.41..8...8..4.6.1.......7.",
+      ".8..7...4..6..97..5.7....1.8...5...7..4....35......1...2.94......8.2...67..3...2.",
+      ".....6..3...1....76..73..5.3..6..5....7..1....9...4.76.....7.8...2......7..86...5"
+    ],
+    "buckets": [
+      "0",
+      "1-2",
+      "3-10",
+      "11-50",
+      "51+"
+    ]
+  },
+  "models": {
+    "stable_plain_local": {
+      "raw states": [
+        {
+          "puzzle": 0,
+          "local_pca_explained_3d": 0.9999803900718689,
+          "global_train_pca_explained_3d": 0.9997931718826294,
+          "local": {
+            "path_efficiency": 0.9965440034866333,
+            "turn_cosine": 0.9998840093612671
+          },
+          "global": {
+            "path_efficiency": 0.9985485076904297,
+            "turn_cosine": 0.9999438524246216
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.005527440458536148,
+            "turn_cosine": -0.29424914717674255
+          },
+          "random_path_efficiency_median": 0.9923979640007019,
+          "random_turn_cosine_median": 0.9967641234397888
+        },
+        {
+          "puzzle": 1,
+          "local_pca_explained_3d": 0.9999702572822571,
+          "global_train_pca_explained_3d": 0.9997931718826294,
+          "local": {
+            "path_efficiency": 0.9963158965110779,
+            "turn_cosine": 0.9999505281448364
+          },
+          "global": {
+            "path_efficiency": 0.9975428581237793,
+            "turn_cosine": 0.9998249411582947
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00550529919564724,
+            "turn_cosine": -0.29430654644966125
+          },
+          "random_path_efficiency_median": 0.9923464059829712,
+          "random_turn_cosine_median": 0.9967080652713776
+        },
+        {
+          "puzzle": 2,
+          "local_pca_explained_3d": 0.9999703168869019,
+          "global_train_pca_explained_3d": 0.9997931718826294,
+          "local": {
+            "path_efficiency": 0.9965303540229797,
+            "turn_cosine": 0.9999116659164429
+          },
+          "global": {
+            "path_efficiency": 0.9999537467956543,
+            "turn_cosine": 0.9999974966049194
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0054813046008348465,
+            "turn_cosine": -0.29412296414375305
+          },
+          "random_path_efficiency_median": 0.9852755963802338,
+          "random_turn_cosine_median": 0.9953956305980682
+        },
+        {
+          "puzzle": 3,
+          "local_pca_explained_3d": 0.9999688267707825,
+          "global_train_pca_explained_3d": 0.9997931718826294,
+          "local": {
+            "path_efficiency": 0.9964070320129395,
+            "turn_cosine": 0.9999517202377319
+          },
+          "global": {
+            "path_efficiency": 0.9999367594718933,
+            "turn_cosine": 0.9999948740005493
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0054970188066363335,
+            "turn_cosine": -0.2941223084926605
+          },
+          "random_path_efficiency_median": 0.9898641705513,
+          "random_turn_cosine_median": 0.9972704946994781
+        },
+        {
+          "puzzle": 4,
+          "local_pca_explained_3d": 0.999976634979248,
+          "global_train_pca_explained_3d": 0.9997931718826294,
+          "local": {
+            "path_efficiency": 0.9972036480903625,
+            "turn_cosine": 0.999942421913147
+          },
+          "global": {
+            "path_efficiency": 0.9999846816062927,
+            "turn_cosine": 0.9999862909317017
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00550715671852231,
+            "turn_cosine": -0.2941179573535919
+          },
+          "random_path_efficiency_median": 0.9862249493598938,
+          "random_turn_cosine_median": 0.996869683265686
+        }
+      ],
+      "normalized states": [
+        {
+          "puzzle": 0,
+          "local_pca_explained_3d": 0.946207582950592,
+          "global_train_pca_explained_3d": 0.9649527668952942,
+          "local": {
+            "path_efficiency": 0.5071028470993042,
+            "turn_cosine": 0.9956966638565063
+          },
+          "global": {
+            "path_efficiency": 0.9615867137908936,
+            "turn_cosine": 0.9993200898170471
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0003225501859560609,
+            "turn_cosine": -0.3573372960090637
+          },
+          "random_path_efficiency_median": 0.49115321040153503,
+          "random_turn_cosine_median": 0.9889225661754608
+        },
+        {
+          "puzzle": 1,
+          "local_pca_explained_3d": 0.955998420715332,
+          "global_train_pca_explained_3d": 0.9649527668952942,
+          "local": {
+            "path_efficiency": 0.48065972328186035,
+            "turn_cosine": 0.9941362738609314
+          },
+          "global": {
+            "path_efficiency": 0.566132128238678,
+            "turn_cosine": 0.9961754679679871
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00041782244807109237,
+            "turn_cosine": -0.35843369364738464
+          },
+          "random_path_efficiency_median": 0.46364860236644745,
+          "random_turn_cosine_median": 0.9897480607032776
+        },
+        {
+          "puzzle": 2,
+          "local_pca_explained_3d": 0.9463092088699341,
+          "global_train_pca_explained_3d": 0.9649527668952942,
+          "local": {
+            "path_efficiency": 0.48395922780036926,
+            "turn_cosine": 0.9957159757614136
+          },
+          "global": {
+            "path_efficiency": 0.8749371767044067,
+            "turn_cosine": 0.998544454574585
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0002965253952424973,
+            "turn_cosine": -0.3788468539714813
+          },
+          "random_path_efficiency_median": 0.3716990798711777,
+          "random_turn_cosine_median": 0.9907156229019165
+        },
+        {
+          "puzzle": 3,
+          "local_pca_explained_3d": 0.9430282115936279,
+          "global_train_pca_explained_3d": 0.9649527668952942,
+          "local": {
+            "path_efficiency": 0.4977559447288513,
+            "turn_cosine": 0.9955527186393738
+          },
+          "global": {
+            "path_efficiency": 0.9194910526275635,
+            "turn_cosine": 0.998664379119873
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00038233993109315634,
+            "turn_cosine": -0.38367190957069397
+          },
+          "random_path_efficiency_median": 0.41208697855472565,
+          "random_turn_cosine_median": 0.9894291758537292
+        },
+        {
+          "puzzle": 4,
+          "local_pca_explained_3d": 0.9504792094230652,
+          "global_train_pca_explained_3d": 0.9649527668952942,
+          "local": {
+            "path_efficiency": 0.523063063621521,
+            "turn_cosine": 0.9966313242912292
+          },
+          "global": {
+            "path_efficiency": 0.9824036955833435,
+            "turn_cosine": 0.998418927192688
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00011297009768895805,
+            "turn_cosine": -0.37035071849823
+          },
+          "random_path_efficiency_median": 0.4728742390871048,
+          "random_turn_cosine_median": 0.9899884760379791
+        }
+      ],
+      "raw updates": [
+        {
+          "puzzle": 0,
+          "local_pca_explained_3d": 0.8889157176017761,
+          "global_train_pca_explained_3d": 0.8268994092941284,
+          "local": {
+            "path_efficiency": 0.38505464792251587,
+            "turn_cosine": 0.979479968547821
+          },
+          "global": {
+            "path_efficiency": 0.3793574571609497,
+            "turn_cosine": 0.9843555092811584
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00222024112008512,
+            "turn_cosine": -0.26947876811027527
+          },
+          "random_path_efficiency_median": 0.288012832403183,
+          "random_turn_cosine_median": 0.797220766544342
+        },
+        {
+          "puzzle": 1,
+          "local_pca_explained_3d": 0.9307439923286438,
+          "global_train_pca_explained_3d": 0.8268994092941284,
+          "local": {
+            "path_efficiency": 0.40154799818992615,
+            "turn_cosine": 0.9817541241645813
+          },
+          "global": {
+            "path_efficiency": 0.5184615850448608,
+            "turn_cosine": 0.9859818816184998
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.002110432367771864,
+            "turn_cosine": -0.25988370180130005
+          },
+          "random_path_efficiency_median": 0.35675302147865295,
+          "random_turn_cosine_median": 0.888422429561615
+        },
+        {
+          "puzzle": 2,
+          "local_pca_explained_3d": 0.9326985478401184,
+          "global_train_pca_explained_3d": 0.8268994092941284,
+          "local": {
+            "path_efficiency": 0.35444220900535583,
+            "turn_cosine": 0.9861576557159424
+          },
+          "global": {
+            "path_efficiency": 0.35042354464530945,
+            "turn_cosine": 0.9837038516998291
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0020422691013664007,
+            "turn_cosine": -0.2545296847820282
+          },
+          "random_path_efficiency_median": 0.25597406923770905,
+          "random_turn_cosine_median": 0.9250377416610718
+        },
+        {
+          "puzzle": 3,
+          "local_pca_explained_3d": 0.9214915037155151,
+          "global_train_pca_explained_3d": 0.8268994092941284,
+          "local": {
+            "path_efficiency": 0.43133944272994995,
+            "turn_cosine": 0.9866392016410828
+          },
+          "global": {
+            "path_efficiency": 0.4156956374645233,
+            "turn_cosine": 0.9852491021156311
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0021359098609536886,
+            "turn_cosine": -0.2602093517780304
+          },
+          "random_path_efficiency_median": 0.3489643931388855,
+          "random_turn_cosine_median": 0.9360892474651337
+        },
+        {
+          "puzzle": 4,
+          "local_pca_explained_3d": 0.9199936389923096,
+          "global_train_pca_explained_3d": 0.8268994092941284,
+          "local": {
+            "path_efficiency": 0.4819721281528473,
+            "turn_cosine": 0.9812498092651367
+          },
+          "global": {
+            "path_efficiency": 0.506158173084259,
+            "turn_cosine": 0.9787302613258362
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0027329116128385067,
+            "turn_cosine": -0.26877546310424805
+          },
+          "random_path_efficiency_median": 0.4169331341981888,
+          "random_turn_cosine_median": 0.7508813142776489
+        }
+      ],
+      "normalized updates": [
+        {
+          "puzzle": 0,
+          "local_pca_explained_3d": 0.7919631004333496,
+          "global_train_pca_explained_3d": 0.9534584879875183,
+          "local": {
+            "path_efficiency": 0.3326621651649475,
+            "turn_cosine": 0.940028965473175
+          },
+          "global": {
+            "path_efficiency": 0.3750665485858917,
+            "turn_cosine": 0.9224964380264282
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0011722701601684093,
+            "turn_cosine": -0.3667895197868347
+          },
+          "random_path_efficiency_median": 0.2056448683142662,
+          "random_turn_cosine_median": 0.7868366837501526
+        },
+        {
+          "puzzle": 1,
+          "local_pca_explained_3d": 0.8136290311813354,
+          "global_train_pca_explained_3d": 0.9534584879875183,
+          "local": {
+            "path_efficiency": 0.28542277216911316,
+            "turn_cosine": 0.9772522449493408
+          },
+          "global": {
+            "path_efficiency": 0.38525956869125366,
+            "turn_cosine": 0.9691348671913147
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0010635878425091505,
+            "turn_cosine": -0.36927658319473267
+          },
+          "random_path_efficiency_median": 0.24251358211040497,
+          "random_turn_cosine_median": 0.8698817789554596
+        },
+        {
+          "puzzle": 2,
+          "local_pca_explained_3d": 0.8093966245651245,
+          "global_train_pca_explained_3d": 0.9534584879875183,
+          "local": {
+            "path_efficiency": 0.2871800363063812,
+            "turn_cosine": 0.9866015315055847
+          },
+          "global": {
+            "path_efficiency": 0.2774900794029236,
+            "turn_cosine": 0.9622163772583008
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.00159826735034585,
+            "turn_cosine": -0.35862696170806885
+          },
+          "random_path_efficiency_median": 0.20000793784856796,
+          "random_turn_cosine_median": 0.9048748314380646
+        },
+        {
+          "puzzle": 3,
+          "local_pca_explained_3d": 0.8002645969390869,
+          "global_train_pca_explained_3d": 0.9534584879875183,
+          "local": {
+            "path_efficiency": 0.323204904794693,
+            "turn_cosine": 0.9763208627700806
+          },
+          "global": {
+            "path_efficiency": 0.316066712141037,
+            "turn_cosine": 0.9699089527130127
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0015313507756218314,
+            "turn_cosine": -0.3561764359474182
+          },
+          "random_path_efficiency_median": 0.23337262123823166,
+          "random_turn_cosine_median": 0.9053672552108765
+        },
+        {
+          "puzzle": 4,
+          "local_pca_explained_3d": 0.7681565284729004,
+          "global_train_pca_explained_3d": 0.9534584879875183,
+          "local": {
+            "path_efficiency": 0.3037390112876892,
+            "turn_cosine": 0.9290797710418701
+          },
+          "global": {
+            "path_efficiency": 0.31706249713897705,
+            "turn_cosine": 0.9142245650291443
+          },
+          "global_shuffled_time": {
+            "path_efficiency": 0.0013442107010632753,
+            "turn_cosine": -0.34047335386276245
+          },
+          "random_path_efficiency_median": 0.20088061690330505,
+          "random_turn_cosine_median": 0.699775367975235
+        }
+      ]
+    }
+  },
+  "elapsed_seconds": 8.23914885520935
+}
