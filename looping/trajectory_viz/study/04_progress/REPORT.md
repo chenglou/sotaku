@@ -10,9 +10,9 @@ The run used all four reference checkpoints and 60 balanced test puzzles, split 
 
 ## Held-out result
 
-One pooled coordinate tracked the three predefined progress targets with mean within-puzzle Spearman 0.811 across checkpoints. For correct-cell fraction, mean within-puzzle correlations were 0.735 for stable plain, 0.797 for collapsed plain, 0.734 for late-state CE, and 0.736 for combined margin. Correlation with remaining wrong cells had the opposite sign. Correlation with stable solved duration was especially high: 0.988, 0.879, 0.935, and 0.974 respectively.
+One pooled coordinate tracked the three predefined progress targets with mean within-puzzle Spearman 0.811 across checkpoints. For correct-cell fraction, mean within-puzzle correlations were 0.735 for stable plain, 0.797 for collapsed plain, 0.734 for later-iteration training, and 0.736 for combined margin. Correlation with remaining wrong cells had the opposite sign. Correlation with stable solved duration was especially high: 0.988, 0.879, 0.935, and 0.974 respectively.
 
-The coordinate was mostly monotonic for the healthy checkpoints but not perfectly so. The fraction of adjacent sampled iterations that did not decrease was 0.958 for stable plain, 0.719 for late-state CE, 0.853 for combined margin, and 0.733 for collapsed plain. The collapsed checkpoint's coordinate also had a much weaker direct relation to iteration, consistent with its later reversal.
+The coordinate was mostly monotonic for the healthy checkpoints but not perfectly so. The fraction of adjacent sampled iterations that did not decrease was 0.958 for stable plain, 0.719 for later-iteration training, 0.853 for combined margin, and 0.733 for collapsed plain. The collapsed checkpoint's coordinate also had a much weaker direct relation to iteration, consistent with its later reversal.
 
 Iteration shuffling destroyed the result: the per-checkpoint shuffled-fit medians ranged from -0.015 to 0.162, versus observed values near 0.821. Random directions were weaker, with 95th percentiles from 0.694 to 0.748. Shuffling puzzle identities reduced the score only slightly for healthy checkpoints. That control matters: most puzzles follow a similar solve-time curve, so the coordinate is largely a shared time/progress axis rather than a precise puzzle-specific counter of wrong cells.
 

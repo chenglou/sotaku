@@ -18,8 +18,8 @@ Four checkpoints are compared:
 
 - `stable_plain`: the stable plain baseline.
 - `collapsed_plain`: the plain checkpoint that solves by iteration 128 and then degrades.
-- `late_state_ce`: the late-state cross-entropy checkpoint.
-- `combined_margin`: the combined late-state/margin checkpoint.
+- `late_state_ce`: the checkpoint trained on later iterations.
+- `combined_margin`: later-iteration training through step 39K, then a second supervised window and margin penalty through step 50K.
 
 The run records every hidden state `h_t`, update `u_t = h_{t+1} - h_t`, and output distribution for iterations 0–1024. Geometry is summarized in five phases: 0–16, 16–64, 64–128, 128–512, and 512–1024. Long phases use at most 65 evenly spaced samples; correctness transitions use every iteration.
 
@@ -87,7 +87,7 @@ Digit centroids use unit-normalized token vectors and are computed separately on
 | `late_state_ce` | -0.171 / 0.912 | 0.529 / 1 | `1-2-6-3-8-4-9-7-5` |
 | `combined_margin` | -0.003 / 0.452 | 0.162 / 12 | `1-4-3-5-9-8-2-7-6` |
 
-Across five endpoints, four models, and both full-dimensional and output-head-nullspace centroids, the natural order has exact tail fraction below 0.05 in 0 of 40 tests. A fit-selected nonnumeric cycle has tail fraction below 0.05 in all 40 tests. The cycles are model- and endpoint-specific, and an unoriented cycle is equivalent under reversal and cyclic rotation. Removing output-head contrast directions leaves the t=1024 results almost unchanged, so the model-specific organization is not confined to the readout-discriminative subspace.
+Across five endpoints and four models, we tested centroids both before and after removing the output head's eight digit-contrast directions. That removal centers the nine output-weight rows and projects states perpendicular to their row space; it does not remove all digit information. Natural order has exact tail fraction below 0.05 in 0 of 40 tests. A fit-selected nonnumeric cycle has tail fraction below 0.05 in all 40 tests. The cycles are model- and endpoint-specific, and an unoriented cycle is equivalent under reversal and cyclic rotation. Removing those directions leaves the t=1024 results almost unchanged, so the model-specific organization is not confined to the output head's direct digit contrasts.
 
 Planarity does not rescue the numeric interpretation. At t=1024, the train-fitted digit plane explains 0.401, 0.740, 0.622, and 0.755 of held-out centroid energy, yet the natural cycle remains nonspecific. The output-head rows themselves are nearly equidistant, with pairwise-distance CV 0.014–0.020, and have natural-order tail fractions 0.675–0.919. This is consistent with exchangeable class geometry rather than a numeric circle.
 

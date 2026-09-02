@@ -14,7 +14,7 @@ The existing whole-board controls found a large state-norm direction and smooth 
 
 ## Data and validation
 
-- Checkpoints: stable plain, collapsed plain, late-state CE, and combined margin.
+- Checkpoints: stable plain, collapsed plain, later-iteration training, and combined margin.
 - Data: 100 held-out Sudoku puzzles, balanced as 20 puzzles from each of the five rating buckets used by the trajectory diagnostics.
 - Split: 50 train, 25 validation, and 25 test puzzles, stratified within rating bucket. All cells from a puzzle stay in one split.
 - Population: cells that were blank in the input puzzle. Given cells are excluded because their input embeddings expose digit identity directly.
@@ -37,8 +37,8 @@ For each representation, the full 128-dimensional train and test digit centroids
 | stable plain | unit update | 24.5% | 46.7% | 7.50 | .990 | -.087 | .254 | 98.56% |
 | collapsed plain | unit state | 37.8% | 49.4% | 7.12 | .962 | .031 | .045 | 16.62% |
 | collapsed plain | unit update | 26.6% | 52.0% | 7.03 | .975 | .057 | .223 | 9.95% |
-| late-state CE | unit state | 32.6% | 45.2% | 7.64 | .899 | -.122 | -.046 | 40.63% |
-| late-state CE | unit update | 17.3% | 56.2% | 6.72 | .983 | -.076 | -.186 | 46.52% |
+| later-iteration training | unit state | 32.6% | 45.2% | 7.64 | .899 | -.122 | -.046 | 40.63% |
+| later-iteration training | unit update | 17.3% | 56.2% | 6.72 | .983 | -.076 | -.186 | 46.52% |
 | combined margin | unit state | 34.2% | 47.8% | 7.46 | .976 | -.030 | .267 | 54.04% |
 | combined margin | unit update | 15.5% | 57.7% | 5.95 | .966 | -.044 | .201 | 36.53% |
 
@@ -54,7 +54,7 @@ The table reports one readout fitted across all recorded iterations. Sector accu
 |---|---:|---:|---:|---:|
 | stable plain | 71.9% [67.6, 75.3] | 57.0% [52.2, 60.5] | 72.8% | 57.0% |
 | collapsed plain | 67.3% [62.5, 71.1] | 50.9% [45.6, 55.4] | 68.6% | 51.1% |
-| late-state CE | 72.4% [68.1, 76.8] | 42.7% [39.9, 45.4] | 72.7% | 42.7% |
+| later-iteration training | 72.4% [68.1, 76.8] | 42.7% [39.9, 45.4] | 72.7% | 42.7% |
 | combined margin | 72.0% [68.9, 75.3] | 38.0% [35.0, 40.5] | 72.1% | 38.8% |
 
 Removing the output-head span changes sector accuracy by at most 1.25 percentage points. Digit identity is therefore distributed outside the exact linear decoder directions; the periodic plots are not merely a visualization of the output weights.
@@ -65,7 +65,7 @@ Readability also evolves differently for states and updates. State identity beco
 |---|---:|---:|
 | stable plain | 84.1 / 96.9 / 100.0 / 100.0% | 82.5 / 80.4 / 31.9 / 14.6% |
 | collapsed plain | 84.4 / 96.4 / 91.5 / 64.7% | 78.7 / 76.3 / 20.3 / 12.4% |
-| late-state CE | 82.6 / 94.2 / 99.2 / 97.5% | 74.7 / 41.8 / 20.7 / 17.1% |
+| later-iteration training | 82.6 / 94.2 / 99.2 / 97.5% | 74.7 / 41.8 / 20.7 / 17.1% |
 | combined margin | 81.4 / 100.0 / 100.0 / 98.4% | 75.5 / 28.5 / 20.6 / 15.1% |
 
 The supervised circle coordinate has pooled test circular R² of .660–.706 for states and .200–.490 for updates. The natural helix target has pooled overall R² of .667–.708 for states and .225–.507 for updates. These are useful measures of linear digit readability under the chosen codes, not intrinsic helix scores. An exact cycle-order null applied to the readout centroids likewise finds no compelling natural-order-specific advantage over other target permutations.

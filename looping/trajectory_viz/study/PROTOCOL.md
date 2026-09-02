@@ -6,10 +6,12 @@ This study tests predefined, interpretable hypotheses about Sotaku's recurrent h
 
 Use the same four checkpoints as `eval_trajectory_geometry.py` whenever the hypothesis permits:
 
-- naturally stable plain backpropagation
-- collapsed plain backpropagation
-- standalone late-state cross-entropy
-- staged late-state cross-entropy plus recheck and margin protection
+- `stable_plain`: a selected checkpoint from the original 16-iteration training recipe that retains high accuracy at 1024 inference iterations
+- `collapsed_plain`: another checkpoint from that recipe that is accurate at 128 but loses most of its accuracy by 1024
+- `late_state_ce`: training on later iterations, with the architecture and cross-entropy loss unchanged
+- combined model: training on later iterations through step 39K, then adding a second supervised window and a minimum-margin penalty through step 50K
+
+Reports and plots retain these short labels for matching artifacts. They refer to these four checkpoints, not whole families of models or guarantees of indefinite stability. The training recipes are defined in [the experiment notes](../../EXPERIMENTS_LOOPING.md#training-on-later-iterations).
 
 ## Data split
 

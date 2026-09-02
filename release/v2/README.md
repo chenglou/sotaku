@@ -1,6 +1,6 @@
 # Prepared V2 Assets
 
-The reference checkpoint is late-state CE only: the same four-layer looped transformer, with ordinary cross-entropy applied after longer detached preparation on 20% of training batches. No auxiliary loss, normalization, ES, or inference damping is required.
+The reference checkpoint uses training on later iterations: the same four-layer looped transformer, with ordinary cross-entropy applied to the next 16 iterations after running an initial 32, 64, 128, 256, or 512 iterations without gradients on 20% of training batches. The other 80% train on iterations 1-16. No auxiliary loss, normalization, ES, or inference damping is required.
 
 The unchanged final weights from seed `20260730`, trained for 50,000 optimizer updates, solve **99.116% at 1024 iterations** and **98.632% at 4096** on the repository's frozen 25K-puzzle benchmark using eager FP32 inference. See the [complete numerical results](../PRECISION_RESULTS.md). The benchmark has been reused for development and selection; it is not an untouched holdout.
 
@@ -11,7 +11,7 @@ The unchanged final weights from seed `20260730`, trained for 50,000 optimizer u
 - `validation_records_20260902.zip`: all 34 evaluated conditions, per-puzzle predictions, benchmark indices, training summaries, and source snapshots. Verify the extracted records without a GPU using the [record verification instructions](../validation/README.md).
 - `validation_records_20260902.checksums.json`: SHA-256 and byte counts for the weights, manifest, and validation archive. Large assets are excluded from Git.
 
-Publication is separate from preparation. No v2 tag, public release, merge, or default-branch change has been made by this audit. Keep the v1 release available.
+Publication is separate from preparation. The release-preparation commits have been merged into local `master` at `ec3febe`, but `master` has not been pushed. No v2 tag, public release, or default-branch change has been made. Keep the v1 release available.
 
 ## Local Verification
 

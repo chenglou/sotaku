@@ -8,33 +8,33 @@ Batch size 256, ordinary recurrence. FP32 uses `matmul_precision=highest`; BF16 
 
 | Weights | Execution | 128 | 1024 | 2048 | 4096 |
 |---|---|---:|---:|---:|---:|
-| Late-state CE | FP32, eager | 96.288% | 99.116% | 99.048% | 98.632% |
-| Late-state CE | BF16, eager | 96.472% | 98.796% | 92.976% | 43.704% |
-| Late-state CE | BF16, compiled | 96.372% | 98.952% | 97.600% | 92.512% |
+| Later-iteration training | FP32, eager | 96.288% | 99.116% | 99.048% | 98.632% |
+| Later-iteration training | BF16, eager | 96.472% | 98.796% | 92.976% | 43.704% |
+| Later-iteration training | BF16, compiled | 96.372% | 98.952% | 97.600% | 92.512% |
 | Published v1 | FP32, eager | 95.704% | 98.888% | 99.028% | 99.020% |
 | Published v1 | BF16, eager | 95.256% | 98.876% | 98.844% | 84.888% |
 | Published v1 | BF16, compiled | 95.572% | 98.744% | 98.784% | 98.748% |
 
-The selected late-state checkpoint's large 4096 decline largely disappears with FP32: 24,658 puzzles solved instead of 10,926. Compilation also helps BF16 at that depth, but does not reproduce FP32. The arithmetic matters much more at 4096 than at 1024 for these checkpoints.
+The selected checkpoint trained on later iterations largely avoids its 4096-iteration decline with FP32: 24,658 puzzles solved instead of 10,926. Compilation also helps BF16 at that iteration count, but does not reproduce FP32. The arithmetic matters much more at 4096 than at 1024 for these checkpoints.
 
 FP32 is now the default in `solve.py`, `iters.eval_more_iters`, and `modal_eval.py`. Use `--precision bf16` for historical reproduction. Training remains unchanged: BF16 autocast, compiled execution, and dropout during both burn-in and supervised training unless an experiment explicitly overrides the burn-in setting.
 
-These are two selected checkpoints, not a retest of every earlier failed training seed. The result does not prove that FP32 repairs all collapses or that trajectories remain correct indefinitely. V1 still has the higher FP32 score at 4096, despite the late-state model's higher 1024 score.
+These are two selected checkpoints, not a retest of every earlier failed training run. The result does not prove that FP32 repairs all accuracy drops or that predictions remain correct indefinitely. V1 still has the higher FP32 score at 4096, despite the model trained on later iterations scoring higher at 1024.
 
-## Fixed 1K Matrix
+## Precision Comparisons On 1K Puzzles
 
 The sample is the first 200 puzzles per bucket from the frozen 25K, selected before model outputs were inspected. Its row-content checksum is `a9fc44c2c39b39e862e91396c99cd0ad131cd70a94eb47e0d36950d768623f84`. Raw results retain paired puzzle disagreements, not just total scores.
 
 | Weights | Precision | Execution | Batch | 128 | 1024 | 2048 | 4096 |
 |---|---|---|---:|---:|---:|---:|---:|
-| Late-state CE | BF16 | eager | 256 | 96.1% | 98.1% | 93.3% | 42.2% |
-| Late-state CE | BF16 | eager | 32 | 95.7% | 98.5% | 93.3% | 43.3% |
-| Late-state CE | BF16 | compiled | 256 | 96.3% | 98.7% | 97.2% | 93.4% |
-| Late-state CE | BF16 | compiled | 32 | 95.7% | 98.3% | 97.2% | 93.0% |
-| Late-state CE | FP32 | eager | 256 | 95.5% | 99.0% | 98.7% | 97.9% |
-| Late-state CE | FP32 | eager | 32 | 95.5% | 99.0% | 98.7% | 97.9% |
-| Late-state CE | FP32 | compiled | 256 | 95.1% | 99.0% | 98.8% | 98.0% |
-| Late-state CE | FP32 | compiled | 32 | 95.7% | 98.9% | 98.6% | 97.8% |
+| Later-iteration training | BF16 | eager | 256 | 96.1% | 98.1% | 93.3% | 42.2% |
+| Later-iteration training | BF16 | eager | 32 | 95.7% | 98.5% | 93.3% | 43.3% |
+| Later-iteration training | BF16 | compiled | 256 | 96.3% | 98.7% | 97.2% | 93.4% |
+| Later-iteration training | BF16 | compiled | 32 | 95.7% | 98.3% | 97.2% | 93.0% |
+| Later-iteration training | FP32 | eager | 256 | 95.5% | 99.0% | 98.7% | 97.9% |
+| Later-iteration training | FP32 | eager | 32 | 95.5% | 99.0% | 98.7% | 97.9% |
+| Later-iteration training | FP32 | compiled | 256 | 95.1% | 99.0% | 98.8% | 98.0% |
+| Later-iteration training | FP32 | compiled | 32 | 95.7% | 98.9% | 98.6% | 97.8% |
 | Published v1 | BF16 | eager | 256 | 95.0% | 98.7% | 98.6% | 85.2% |
 | Published v1 | BF16 | eager | 32 | 95.5% | 98.7% | 98.5% | 86.0% |
 | Published v1 | BF16 | compiled | 256 | 95.5% | 98.5% | 98.5% | 98.4% |
@@ -46,16 +46,16 @@ The sample is the first 200 puzzles per bucket from the frozen 25K, selected bef
 
 ## Solution Retention
 
-Observe every iteration through 4096 in eager execution at batch size 256. A regression means a board was correct and became incorrect on the next iteration. This is distinct from counting only failures at the final horizon. An additional check requires the observation pass to reproduce the original endpoint predictions exactly.
+Observe every iteration through 4096 in eager execution at batch size 256. A regression means a board was correct and became incorrect on the next iteration. This is distinct from counting only failures at the final iteration. An additional check requires the observation pass to reproduce the original endpoint predictions exactly.
 
 | Weights | Precision | Ever solved | Never lost after first solve | At least one regression |
 |---|---|---:|---:|---:|
-| Late-state CE | BF16 | 991 | 243 | 748 |
-| Late-state CE | FP32 | 993 | 976 | 17 |
+| Later-iteration training | BF16 | 991 | 243 | 748 |
+| Later-iteration training | FP32 | 993 | 976 | 17 |
 | Published v1 | BF16 | 988 | 825 | 163 |
 | Published v1 | FP32 | 990 | 990 | 0 |
 
-All four observation passes reproduced their corresponding eager endpoint predictions exactly, including the unscored given cells. FP32 sharply reduces regressions in this 1K sample, but the late-state model still loses some correct solutions. The full 25K tables above record endpoint gains and losses, not every intermediate event.
+All four observation passes reproduced their corresponding eager endpoint predictions exactly, including the unscored given cells. FP32 sharply reduces regressions in this 1K sample, but the model trained on later iterations still loses some correct solutions. The full 25K tables above record endpoint gains and losses, not every intermediate event.
 
 ## Interpretation And Records
 

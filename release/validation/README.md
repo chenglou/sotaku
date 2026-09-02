@@ -2,7 +2,7 @@
 
 These are the 2026-09-02 release checks. [Numerical results](../PRECISION_RESULTS.md) explain the fixed-weight comparisons; the [dropout protocol](../../looping/BURNIN_DROPOUT.md) describes the separate training experiment. None of these runs changes the prepared reference checkpoint.
 
-- `late_state_ce/` and `v1/`: full 25K evaluations and the fixed 1K precision matrix. Each condition retains its identity, dataset indices, runtime, source hashes, score, and per-puzzle predictions.
+- `late_state_ce/` and `v1/`: full 25K evaluations and precision comparisons on a fixed 1K sample. Each condition retains its identity, dataset indices, runtime, source hashes, score, and per-puzzle predictions.
 - `dropout/`: matched continuation results and final-checkpoint evaluations. Training summaries are named `training_result.json`; evaluator records are named `result.json`.
 - `smoke_*_result.json`: CUDA training, save/resume, and module-mode checks. These use a tiny fixture, not the Sudoku benchmark.
 - `jobs.json`: Modal app IDs and durable output locations.

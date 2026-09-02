@@ -1,15 +1,14 @@
 # Iteration Experiments
 
-Experiments on test-time iteration scaling, adaptive stopping, and confound isolation.
+Experiments on running more model iterations at inference, adaptive stopping, and controlled comparisons.
 
-This file is the current source of truth for sudoku-extreme iteration results.
-Older pre-sudoku-extreme experiments live in `../STALE_EXPERIMENTS_DOC.md`.
+This file records the original `sudoku-extreme` iteration experiments. See the [README](../README.md) for current recommended results. Older pre-`sudoku-extreme` experiments live in `../STALE_EXPERIMENTS_DOC.md`. Here, an iteration is one pass through the model's shared blocks; a training step is one optimizer update. Accuracy loss across inference iterations is distinct from accuracy loss across training checkpoints.
 
 ## Key Files
 
 - `eval_more_iters.py` - Test model at different iteration counts (no retraining)
 - `eval_confidence_stop.py` - Confidence-based and oscillation-based adaptive stopping
-- `eval_fixed_point.py` - Test if correct solution is a stable fixed point of f
+- `eval_fixed_point.py` - Test whether one model iteration preserves an injected correct answer
 - `exp_baseline_lr2e3.py` - LR=2e-3 (**SOTA: 98.9%** at 1024 test iters)
 - `exp_bs2048_baseline.py` - BS=2048, 16-iter, reverse curriculum (prev SOTA: 98.2%)
 - `exp_bs2048_mixed.py` - BS=2048, 16-iter, mixed sampling (isolates curriculum effect)
@@ -17,10 +16,10 @@ Older pre-sudoku-extreme experiments live in `../STALE_EXPERIMENTS_DOC.md`.
 - `exp_32iters.py` - BS=2048, 32-iter, mixed sampling
 - `exp_32iters_curriculum.py` - BS=2048, 32-iter, reverse curriculum (isolates training iter effect)
 - `exp_bs2048_100k.py` - BS=2048, 100K steps with stretched LR (negative result)
-- `exp_bs2048_fixedpoint.py` - FP: 2x CE weight on correct cells (negative result)
-- `exp_bs2048_fp_l2.py` - FP: L2 loss toward target on correct cells (negative result)
-- `exp_bs2048_fp_copy.py` - FP: self-consistency copy loss (negative result)
-- `exp_bs2048_fp_gradmask.py` - FP: gradient masking on correct cells (negative result)
+- `exp_bs2048_fixedpoint.py` - 2x cross-entropy weight on already-correct cells (negative result)
+- `exp_bs2048_fp_l2.py` - L2 loss toward the target on already-correct cells (negative result)
+- `exp_bs2048_fp_copy.py` - Prediction-consistency loss on already-correct cells (negative result)
+- `exp_bs2048_fp_gradmask.py` - Remove cross-entropy on already-correct cells (negative result)
 - `exp_wider_6h.py` - d_model=192, 6 heads (tests wider model)
 - `exp_wider_6h_lr2e3.py` - d_model=192, LR=2e-3 (peaks at 64 iters, collapses at 128)
 - `exp_wider_6h_lowlr.py` - d_model=192, LR=1e-3 (tests if lower LR fixes wider collapse)
@@ -28,13 +27,13 @@ Older pre-sudoku-extreme experiments live in `../STALE_EXPERIMENTS_DOC.md`.
 - `exp_baseline_lr25e4.py` - LR=2.5e-3 (collapses at 128 iters)
 - `exp_baseline_lr3e3.py` - LR=3e-3 (collapses at 64 iters)
 - `exp_baseline_lr1e3.py` - LR=1e-3 (collapses at 128 iters)
-- `exp_3phase_40k.py` - 3-phase curriculum, 40K steps (stable but lower ceiling)
+- `exp_3phase_40k.py` - 3-phase curriculum, 40K steps (retains accuracy at 2048, with a lower best score)
 - `exp_3phase_50k.py` - 3-phase curriculum, 50K steps (collapses)
 - `exp_qhead.py` - Q-head learned halt signal (16 iters, negative result)
 - `exp_qhead_32.py` - Q-head learned halt signal (32 iters, negative result)
 - `eval_interventions.py` - Test-time interventions (damping, pred scaling, pre-norm)
-- `eval_state_rms_cap.py` - Direction-preserving recurrent-state RMS cap diagnostic
-- `modal_state_rms_cap.py` - Modal wrapper for recurrent-state RMS cap sweeps
+- `eval_state_rms_cap.py` - Test a direction-preserving limit on recurrent-state RMS
+- `modal_state_rms_cap.py` - Modal wrapper for state RMS limit sweeps
 - `eval_spectral_radius.py` - Jacobian spectral radius via power iteration
 - `modal_eval_interventions.py` - Modal wrapper for intervention sweeps
 - `modal_spectral_stable.py` - Modal wrapper for spectral radius + stable model interventions
@@ -63,10 +62,10 @@ Accuracy at various test-time iteration counts:
 | exp_32iters | 32-iter, mixed | 72.4% | 83.2% | 88.7% | — | 91.8% | 88.3% | — | — |
 | exp_32iters_curriculum | 32-iter | — | 83.4% | 89.6% | 78.7% | 61.6% | 47.3% | 20.7% | — |
 | exp_bs2048_100k | 100K steps (stretched LR) | 83.1% | 89.5% | 74.5% | 9.2% | 3.2% | 1.5% | 0.5% | — |
-| exp_bs2048_fixedpoint | FP: 2x CE on correct | 80.8% | 86.9% | 90.5% | 92.9% | 94.0% | 71.5% | 39.4% | — |
-| exp_bs2048_fp_l2 | FP: L2 toward target | 80.5% | 86.9% | 90.6% | 89.3% | 19.1% | 16.2% | 14.9% | — |
-| exp_bs2048_fp_copy | FP: self-consistency | 81.7% | 88.1% | 90.9% | 92.5% | 93.1% | 93.3% | 83.7% | — |
-| exp_bs2048_fp_gradmask | FP: zero CE on correct | 3.2% | — | — | — | — | — | — | — |
+| exp_bs2048_fixedpoint | 2x CE on correct cells | 80.8% | 86.9% | 90.5% | 92.9% | 94.0% | 71.5% | 39.4% | — |
+| exp_bs2048_fp_l2 | L2 toward target | 80.5% | 86.9% | 90.6% | 89.3% | 19.1% | 16.2% | 14.9% | — |
+| exp_bs2048_fp_copy | Prediction consistency | 81.7% | 88.1% | 90.9% | 92.5% | 93.1% | 93.3% | 83.7% | — |
+| exp_bs2048_fp_gradmask | Zero CE on correct cells | 3.2% | — | — | — | — | — | — | — |
 
 ## Other Results
 
@@ -77,13 +76,13 @@ Accuracy at various test-time iteration counts:
 | Q-head (16 iters) | 79.4% | Loss competition hurts main task |
 | Q-head (32 iters) | 78.4% | Same issue |
 
-## Fixed-Point Analysis
+## Answer Preservation And Fixed Points
 
-### Teacher Forcing — Disproven
+### Injecting Answers And Training For 32 Iterations
 
-Both test-time and training-time teacher forcing were tested. Neither works.
+These experiments tested whether injecting a correct answer or training through more iterations would help preserve solutions. Neither provided the intended improvement. The 32-iteration trainers use their own predictions as feedback, so this is not teacher forcing, which supplies target answers as the next inputs.
 
-**Cold-start fixed-point test:** Feed the correct solution (as one-hot softmax predictions) into f with a cold hidden state (h_prev = initial_encoder(puzzle)). (`eval_fixed_point.py`)
+**Answer injection at initialization:** Supply the correct solution as one-hot prediction feedback while the hidden state is still `h_prev = initial_encoder(puzzle)`, then run one model iteration (`eval_fixed_point.py`).
 
 | Model | Cells preserved | Puzzles perfectly preserved |
 |---|---|---|
@@ -92,19 +91,19 @@ Both test-time and training-time teacher forcing were tested. Neither works.
 | exp_baseline_lr2e3 (Mar 17 recheck) | 16.9% | 0/25000 |
 | exp_bs2048_mixed (Mar 17 recheck) | 32.1% | 4/25000 |
 
-f destroys the correct solution when starting from a cold hidden state. But this test is misleading — during normal inference, h_prev is warm after hundreds of iterations.
+The model loses the injected correct digits when its hidden state has not yet gone through any iterations. This does not test the states reached during ordinary solving, which have already undergone many updates.
 
-**Warm-state fixed-point test:** Run model for 1022–1026 iterations and compare outputs at each step. Result: 24513/25000 puzzles solved identically at every iteration. The model converges to a perfect argmax-fixed-point — once h_prev is warm, f preserves its own predictions exactly.
+**Answer preservation after many iterations:** Compare predictions at every iteration from 1022 through 1026. In this test, 24,513 of 25,000 puzzles had correct, identical predictions at all five iterations. This shows preservation over that measured interval, not an unchanged hidden state or a guarantee of indefinite preservation.
 
-**Training-time teacher forcing (32-iter training):** Train with 32 iterations so easy puzzles are solved by iter ~10, giving f 20+ iterations of "correct input → stay correct" signal.
+**32-iteration training with intermediate supervision:** Apply cross-entropy after each of 32 model iterations. The hypothesis was that puzzles solved by about iteration 10 would contribute another 20+ iterations of training on already-correct predictions. Feedback still comes from the model, not the answer key.
 
-Both 32-iter models (mixed and curriculum) collapse past 128-256 test iters, while 16-iter BS=2048 models scale to 2048+. The implicit teacher forcing signal is too weak — f still learns to re-solve rather than preserve.
+Neither 32-iteration model matched the strongest 16-iteration-trained models at large inference iteration counts. The tables above show the measured decline for each run. Extra intermediate supervision did not ensure that correct predictions would remain correct.
 
-**Conclusion:** The cold-start test disproved teacher forcing (f can't preserve solutions it didn't derive itself), but the warm-state test shows f naturally converges to an argmax-fixed-point. Fixed-point behavior is emergent — no explicit loss needed.
+**Conclusion:** The initialization test and the later-state test measure different behavior. A model can fail to preserve an injected answer initially yet preserve answers it reaches after many iterations. Neither experiment establishes a hidden-state fixed point, and these results do not disprove teacher forcing as a training method.
 
-### Latent-State Equilibrium Probe — Negative
+### Checking For A Hidden-State Fixed Point
 
-The argmax result above does not mean the continuous hidden state reaches a DEQ-style equilibrium. `eval_deq_root.py` measured the full residual `F(h) - h` in FP32 on 1,000 held-out puzzles, stratified evenly across rating buckets, using the 98.9% `model_baseline_lr2e3.pt` checkpoint.
+Unchanged predicted digits do not mean the continuous hidden state reaches an equilibrium of the kind used by a deep equilibrium model (DEQ). `eval_deq_root.py` measured the full update `F(h) - h` in FP32 on 1,000 held-out puzzles, stratified evenly across rating buckets, using the 98.9% `model_baseline_lr2e3.pt` checkpoint.
 
 | Iteration | Puzzles solved | Hidden-state RMS | RMS of `F(h) - h` | Predictions unchanged one step later |
 |---:|---:|---:|---:|---:|
@@ -117,55 +116,55 @@ The hidden-state magnitude grows approximately linearly while its absolute step 
 
 Two independent root solvers were given 64 function evaluations from warm states at iterations 16, 64, 128, and 1024. Anderson acceleration reported strict convergence for only 1.1–2.2% of puzzles and drove the median hidden-state RMS to `1e5`; Broyden reported 2.4–8.3% and drove it to `1e8`. At those magnitudes, FP32 rounds away the model's update and can produce a numerical `F(h) == h`; these are not useful equilibria. Neither solver accelerated the warm prediction toward the iteration-1024 answer.
 
-**Conclusion:** The SOTA checkpoint has a settled answer but no useful latent-state equilibrium. Its pre-norm residual stream acts as a growing accumulator after the answer stabilizes. A genuine DEQ experiment must change and retrain the update so the hidden state is bounded; implicit differentiation cannot simply be attached to this checkpoint.
+**Conclusion:** The original checkpoint often preserves its predicted answer, but this test found no useful hidden-state equilibrium. Its residual state keeps accumulating updates after the answer stops changing. Using it as a DEQ would require changing and retraining the update to support convergence; implicit differentiation cannot simply be attached to the existing checkpoint.
 
-### Stable-Ray Probe — Confirmed
+### Reading Answers From State Direction
 
-`eval_ray_dynamics.py` compared three same-architecture checkpoints on the same 1,000-puzzle FP32 sample through 2,048 iterations: the naturally stable 98.9% backprop model, the 5.4%-at-1024 collapsed clean-A model, and that exact collapsed model after ES rescued it to 96.2%. For each state `h`, the probe also evaluated the bias-free output head on `h / ||h||`. This "ray" prediction discards the growing magnitude and retains only direction.
+`eval_ray_dynamics.py` compared three same-architecture checkpoints on the same 1,000-puzzle FP32 sample through 2,048 iterations: the original 98.9% backpropagation model, the `clean-A` model with 5.4% at 1024, and that failing model after ES fine-tuning to 96.2%. For each cell state `h`, the diagnostic also evaluated the output head on `h / ||h||` with its bias omitted. This readout uses state direction alone. Neither normalization nor bias removal affects the recurrent trajectory; both apply only to the diagnostic readout.
 
-Ray accuracy matched ordinary accuracy to within 0.3 percentage points at every measured horizon for all three models, and normally matched exactly. The readout therefore depends on the residual stream's direction, not its unbounded magnitude. Successive updates were also almost perfectly aligned locally after iteration 16 (`cos(delta_t, delta_{t+1}) > 0.999`), including in the collapsed model; simple adjacent-step smoothness does not distinguish stability.
+Direction-only accuracy matched ordinary accuracy to within 0.3 percentage points at every measured iteration count for all three models, and normally matched exactly. The growing magnitude was therefore not needed to recover almost all of those predicted digits. Successive updates were also almost perfectly aligned locally after iteration 16 (`cos(delta_t, delta_{t+1}) > 0.999`), including in the failing model; smoothness between adjacent steps does not distinguish accurate from inaccurate predictions. The direction-only margin below is the correct digit's logit minus the largest incorrect logit in this normalized, bias-free readout.
 
-| Model | @128 | @512 | @1024 | @2048 | 10th-percentile ray margin @1024 | Update cosine, iter 128 vs 2048 |
+| Model | @128 | @512 | @1024 | @2048 | 10th-percentile direction-only margin @1024 | Update cosine, iter 128 vs 2048 |
 |---|---:|---:|---:|---:|---:|---:|
 | Naturally stable BP | 95.4% | 98.0% | 98.4% | 98.7% | +0.0698 | 0.9948 |
 | Collapsed before ES | 93.9% | 83.7% | 7.3% | 2.6% | -0.0327 | 0.4479 |
-| Same weights after ES | 94.2% | 97.4% | 97.8% | 84.3% | +0.0536 | 0.9172 |
+| After ES fine-tuning | 94.2% | 97.4% | 97.8% | 84.3% | +0.0536 | 0.9172 |
 
-The useful discriminator is long-range direction. The stable model's iteration-128 update already points almost exactly along its iteration-2048 update. The collapsed model moves smoothly but follows a broad curve: its lower-tail directional target margin crosses zero by iteration 512, then most puzzle trajectories enter wrong decision regions. ES changes the seed weights by only 0.30% in relative L2 (parameter cosine 0.999995), yet compounds that small change over recurrence: collapsed-versus-rescued update cosine falls from 0.944 at iteration 128 to 0.678 at 1024 and 0.484 at 2048.
+Direction changes across distant iterations distinguish these three checkpoints. The accurate original model's iteration-128 update already points almost exactly along its iteration-2048 update. The failing model moves smoothly but follows a broad curve: its lower-percentile direction-only margin crosses zero by iteration 512, after which many states favor incorrect digits. ES changes the starting weights by only 0.30% in relative L2 (parameter cosine 0.999995), yet that small change compounds over recurrence: the cosine between updates before and after ES falls from 0.944 at iteration 128 to 0.678 at 1024 and 0.484 at 2048.
 
 The repaired model's remaining 2048 weakness has the same explanation. Its median directional margin remains positive, but the 10th percentile moves from +0.0536 at iteration 1024 to -0.0024 at 2048, exactly where accuracy falls. The naturally stable model's 10th percentile remains near +0.070 throughout.
 
-**Conclusion:** These models approach a direction, or ray, rather than a finite hidden state. ES repairs long-horizon behavior by moving the accumulated trajectory into a longer-lived correct decision region; it does not stop norm growth or create a fixed point. In this three-model comparison, the naturally stable backprop model has a straighter trajectory and a substantially wider directional margin than the ES rescue. Later RMSNorm and late-state comparisons show that total rotation is not a universal stability measure; minimum correct-answer margin is.
+**Conclusion:** Over the measured iterations, state direction explains the predicted digits while hidden-state magnitude keeps growing. ES changes the trajectory so correct digits remain preferred for longer; it does not stop norm growth or create a fixed point. In this three-model comparison, the accurate original model has a straighter trajectory and a wider direction-only margin than the ES-fine-tuned model. Later RMSNorm and later-iteration training comparisons show that total rotation is not a universal stability measure; minimum correct-answer margin is a more direct measure of impending prediction errors.
 
-### Explicit Fixed-Point Losses — All Hurt
+### Loss Changes To Preserve Correct Predictions
 
-Four variants tested, all degrade iteration scaling. The stronger the pressure, the earlier the collapse:
+Four training modifications were tested. All reduced accuracy at large inference iteration counts relative to the baseline:
 
 1. **Preservation weighting** (exp_bs2048_fixedpoint) — 2x CE weight on cells correct at previous iteration. Collapses at 512 iters.
 2. **L2 toward target** (exp_bs2048_fp_l2) — MSE between softmax and one-hot target on correct cells. Collapses at 128 iters.
 3. **Self-consistency copy** (exp_bs2048_fp_copy) — MSE between softmax at iter t and t-1 on correct cells. Gentlest; collapses at 1024 iters (83.7%).
 4. **Gradient masking** (exp_bs2048_fp_gradmask) — zero CE on correct cells. Catastrophic failure (3.2%).
 
-The baseline with no fixed-point loss reaches 98.1% at 1024 iters. Every explicit fixed-point intervention disrupts the training dynamics that enable stable iteration scaling.
+The baseline without these modifications reaches 98.1% at 1024 iterations. These experiments modify losses on predictions; they do not penalize hidden-state motion or explicitly seek `F(h) = h`.
 
 ### 100K Training Steps — LR Schedule Confound
 
 Training for 100K steps with cosine decay stretched over 100K (exp_bs2048_100k) collapses at 64 test iters. The step-50K checkpoint already collapses — confirming the cause is the stretched LR schedule (LR still high at step 50K), not overtraining. The baseline's 50K cosine fully anneals by training end, enabling the flat minimum.
 
-## Conditions for Stable Iteration Scaling
+## Settings In The Early Successful Runs
 
-Stable test-time iteration scaling (more iters → monotonically better accuracy) requires all of the following:
+The early successful checkpoints used the following settings. These comparisons concern the original training recipe; they do not establish necessary conditions for every architecture or later training method.
 
 1. **LR in a narrow band** — for d=128, only LR=1.5e-3 to 2e-3 works. Both higher (2.5e-3, 3e-3) and lower (1e-3) collapse. The optimum is sharp at 2e-3. Higher LR causes oscillatory collapse; lower LR reaches a worse long-horizon answer trajectory.
 2. **BS=2048** — BS=4096 collapses at 48 iters, while BS=1024 collapses at 256. Gradient noise or minimum geometry may explain the difference, but these experiments did not isolate the cause.
 3. **Small enough model** — d=128 scales to 1024+. d=192 collapses at every LR tested. d=96 peaks early and slowly degrades. The d=192 spectral radius rebounds near its collapse point, but that correlation does not by itself explain why width hurts.
 4. **Full LR annealing** — cosine schedule must decay to near-zero by training end. Stretched schedules (100K steps) or redistributed phase durations collapse because LR is still high late in training.
-5. **Short training iterations (16)** — 32-iter training collapses at 128-256 test iters despite giving the model more "teacher forcing" signal. Fewer training iters are better for test-time scaling.
-6. **No explicit fixed-point pressure** — all 4 variants (preservation weighting, L2 toward target, self-consistency, gradient masking) hurt. Those losses target a finite state equilibrium that the successful accumulator does not use.
+5. **16 supervised training iterations**: the 32-iteration runs did not match the strongest 16-iteration runs at large inference iteration counts. This comparison changes the differentiable training length, unlike later experiments that run initial iterations without gradients.
+6. **No added prediction-preservation loss**: all four tested modifications (preservation weighting, L2 toward target, self-consistency, and gradient masking) hurt. They modify prediction losses, not the hidden-state fixed-point condition.
 
 The empirical recipe is narrow: batch size, learning rate, model width, and annealing all affect whether the long trajectory retains correct-answer margin. These experiments do not establish a flat-minimum or hidden-state convergence mechanism.
 
-**Important caveat (July 2026):** these conditions are necessary but not sufficient. See the Reproducibility section below — with all six conditions satisfied, fresh runs settle only a fraction of the time.
+**Important caveat (July 2026):** these settings are not sufficient for reliable training. See the reproduction results below: even with the same settings, only a fraction of fresh runs retain high accuracy at 1024 iterations.
 
 ## Reproducibility (July 2026)
 
@@ -173,9 +172,9 @@ A reproduction attempt on external GPUs collapsed at 1024 test iterations, which
 
 Run convention: the July repeats ran through per-run copies of the base config files (exp_baseline_lr2e3_clean_a.py, exp_bs2048_baseline_rerun.py, and so on) because log and checkpoint filenames derive from module constants. The copies were byte-identical to their base files apart from those names and have been deleted; artifacts on the sudoku-outputs Modal volume keep the per-run names, and evaluating them works with the base config module (the architecture is identical).
 
-Results at 1024 test iterations (all runs scored ~81% at 16 iterations — the 16-iteration objective gives no signal about long-iteration fate):
+Results at 1024 test iterations (all runs scored ~81% at 16 iterations, which did not distinguish their later accuracy):
 
-| run | config | platform | clean? | @1024 |
+| run | config | platform | uninterrupted? | @1024 |
 |---|---|---|---|---|
 | Feb 2026 originals | lr2e3 / bs2048 / mixed / 3phase_40k | H200 | yes | **98.9 / 98.1 / 97.3 / 95.9** |
 | Mar 17 (undocumented until now) | lr2e3 + mixed sampling | H200 | resumed at 35K | 1.3% |
@@ -194,19 +193,19 @@ The recreated and canonical loops both produced successes and failures. Seeded a
 
 The February environment cannot be reconstructed precisely. The runs requested H200s but did not record the actual hardware, and a possible image rebuild between the four runs was noticed but not resolved. Current wrappers record `nvidia-smi`, PyTorch, and CUDA versions.
 
-Long-horizon accuracy can change abruptly while training loss remains smooth. One run moved 18% -> 92.5% -> 2.2% at 1024 iterations between steps 32K, 34K, and 36K. Another rose from 7.2% at step 40K to 96.0% at the end, while a run at 92.8% at step 40K finished at 31.2%. Keeping the best anneal-tail checkpoint roughly doubled usable yield in the initial study.
+Accuracy at 1024 can change abruptly across training checkpoints while training loss remains smooth. One run moved 18% -> 92.5% -> 2.2% between steps 32K, 34K, and 36K. Another rose from 7.2% at step 40K to 96.0% at the end, while a run at 92.8% at step 40K finished at 31.2%. Selecting the best checkpoint during the late phase of learning-rate decay roughly doubled the reported success rate in the initial study.
 
 Three reruns showed that the 40K three-phase recipe was not inherently safe: all failed at 1024 (0.3%, 1.4%, 24.6%). Mixed sampling degraded more gently across its four runs (97.3%, 88.8%, 72.1%, 95.5%), although four runs are too few to establish why.
 
-These figures describe the historical plain recipe. The current reproducible path uses randomized detached late states and is documented in `looping/EXPERIMENTS_LOOPING.md`. For the 98.9% ceiling, run several plain trainings, probe every late checkpoint at 1024, and keep the best rather than assuming the final checkpoint is representative.
+These figures describe the original recipe, trained on iterations 1-16. The current recommendation trains on randomly sampled later iterations and is documented in [the looping notes](../looping/EXPERIMENTS_LOOPING.md). For the original recipe's historical best of 98.9%, several training runs and periodic 1024-iteration evaluation were needed; the final checkpoint was not reliably the best one.
 
 ## Stabilization Study (July 2026)
 
-See [stabilize/EXPERIMENTS_STABILIZE.md](../stabilize/EXPERIMENTS_STABILIZE.md). EMA and feedback noise failed; 128-iteration burn-in stabilized 6 of 7 runs near 90%; recurrent RMSNorm produced three healthy 50K runs at 91.3-92.4% on the full test set.
+See [stabilize/EXPERIMENTS_STABILIZE.md](../stabilize/EXPERIMENTS_STABILIZE.md). EMA and feedback noise failed. Starting supervised training after 128 gradient-free iterations kept 6 of 7 final runs above the study's 80% threshold at 1024, with scores near 90% at best. Recurrent RMSNorm produced three 50K runs whose selected checkpoints scored 91.3-92.4% on the full test set.
 
 ## Evolution-Strategies Fine-Tuning (July 2026)
 
-See [es/EXPERIMENTS_ES.md](../es/EXPERIMENTS_ES.md). ES rescued selected collapsed checkpoints to 94-96%, but a later cohort showed that healthy 128-iteration behavior is not sufficient. Pure ES did not bootstrap Sudoku from random initialization.
+See [es/EXPERIMENTS_ES.md](../es/EXPERIMENTS_ES.md). ES fine-tuning improved selected failing checkpoints to 94-96%, but later runs showed that high 128-iteration accuracy is not sufficient. ES did not learn Sudoku from random initialization.
 
 ## Test-Time Interventions (No Retraining)
 
@@ -255,11 +254,11 @@ Scripts: `eval_interventions.py`, `modal_eval_interventions.py`.
 | Pred_scale β=0.1 | 1.2% | 0.8% | 0.8% | 0.8% | 0.8% | 0.8% | 0.6% |
 | Pre_norm | 81.3% | 88.5% | 92.8% | 95.3% | 96.7% | 51.5% | 16.7% |
 
-### Recurrent-State RMS Cap (July 2026)
+### Limiting Recurrent-State RMS
 
-`eval_state_rms_cap.py` tested a different intervention. After every complete four-layer iteration, it measures each token's RMS over the 128 hidden features and rescales the token only when its RMS exceeds a fixed cap. It does not subtract the mean, change the token's direction, or add learned parameters. A balanced 1,000-puzzle sweep tested caps 8, 12, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 64, and 128; cap 12 was then confirmed on the standard 25,000-puzzle evaluation.
+`eval_state_rms_cap.py` tested a different intervention. After every complete four-layer iteration, it measures each cell state's RMS over the 128 hidden features and rescales the state only when its RMS exceeds a fixed limit. It does not subtract the mean, change the state's direction, or add learned parameters. A balanced 1,000-puzzle sweep tested RMS limits 8, 12, 16, 18, 20, 22, 24, 28, 32, 36, 40, 48, 64, and 128; the limit of 12 was then confirmed on the standard 25,000-puzzle evaluation.
 
-| Checkpoint | State cap | 16 | 128 | 1024 | 2048 |
+| Checkpoint | State RMS limit | 16 | 128 | 1024 | 2048 |
 |---|---:|---:|---:|---:|---:|
 | Stable BP | none | 82.19% | 95.40% | 98.94% | 98.95% |
 | Stable BP | 12 | 82.14% | 95.92% | 98.66% | 98.82% |
@@ -268,7 +267,7 @@ Scripts: `eval_interventions.py`, `modal_eval_interventions.py`.
 | Rescued after ES | none | 80.09% | 93.32% | 95.99% | 81.68% |
 | Rescued after ES | 12 | 79.86% | 91.85% | 93.50% | 93.59% |
 
-The collapsed checkpoint's rescue is large and horizon-flat: cap 12 changes 5.61% at 1024 iterations and 3.26% at 2048 into 91.45% and 91.31%. The same cap leaves the stable checkpoint essentially intact. Threshold choice matters: on the 1,000-puzzle sweep, cap 12 was best for the collapsed checkpoint, while cap 24 was best after ES at 97.5% and 97.4% for 1024 and 2048 iterations. This is not the earlier `Pre_norm` experiment. `Pre_norm` normalized a temporary copy only before the output head and left the recurrent state untouched; the RMS cap changes the state carried into the next iteration. A later radial-versus-tangential intervention showed that reducing state growth alone makes collapse worse, while reducing direction-changing motion repairs the same checkpoints. The cap succeeds by changing the subsequent trajectory, not because large state magnitude is itself the failure.
+The RMS limit of 12 changes the failing checkpoint's 5.61% at 1024 iterations and 3.26% at 2048 into 91.45% and 91.31%. It leaves the accurate original checkpoint essentially unchanged. Threshold choice matters: on the 1,000-puzzle sweep, the limit of 12 was best before ES, while 24 was best after ES at 97.5% and 97.4% for 1024 and 2048 iterations. This differs from the earlier `Pre_norm` experiment, which normalized only the output head's temporary input, leaving the carried hidden state unnormalized. A later intervention separated changes in state magnitude from changes in direction: reducing magnitude growth alone made accuracy worse, while reducing direction-changing motion improved the same checkpoints. The RMS limit changes subsequent computation; the experiment does not identify large magnitude alone as the cause of failure.
 
 ### Delayed Strong Damping (July 2026)
 
@@ -278,13 +277,13 @@ This does not contradict the tables above: those apply `alpha >= 0.5` from the f
 
 ### Intervention Analysis
 
-1. **Constant damping from iteration 1 delays collapse but doesn't prevent it.** For LR=3e-3: α=0.5 recovers baseline-equivalent 88.3% at 64 iters (vs 39.9%), effectively shifting the collapse point by ~1 octave. For d=192: α=0.5 peaks at 91.3% at 128 (vs 85.9% baseline) and holds 70.1% at 256 (vs 23.3%). But these constant policies still collapse at higher iter counts. The delayed strong-damping experiment above is a different policy and does prevent collapse on several checkpoints.
+1. **Constant damping from iteration 1 delays the accuracy drop but does not prevent it.** For LR=3e-3, alpha=0.5 recovers 88.3% at 64 iterations (vs 39.9%), roughly doubling the iteration count before the drop. For d=192, alpha=0.5 peaks at 91.3% at 128 (vs 85.9%) and holds 70.1% at 256 (vs 23.3%). These constant policies still lose accuracy at larger counts. The delayed strong-damping policy above preserved high accuracy through the tested counts on several checkpoints.
 
 2. **Prediction scaling is destructive for LR=3e-3 but interesting for d=192.** On LR=3e-3, even β=0.5 drops accuracy from 82% to 27% at 16 iters — the feedback loop is essential. But on d=192, β=0.5 trades peak accuracy (82.5% vs 94.3% at 64) for much gentler degradation (35.5% vs 3.5% at 1024). The model becomes worse but more stable.
 
-3. **Pre-output normalization actively introduces collapse.** Pre_norm makes all models worse — even the stable SOTA model collapses with pre_norm (96.7% at 256, then 51.5% at 512, 16.7% at 1024). On d=192: 0.0% at 1024 (vs 3.5%). LayerNorm before the output head destroys information the model uses for stable convergence.
+3. **Pre-output normalization reduces accuracy.** `Pre_norm` makes all tested models worse, including the accurate original model (96.7% at 256, then 51.5% at 512 and 16.7% at 1024). On d=192 it gives 0.0% at 1024 (vs 3.5%). This shows that inserting LayerNorm before the output head changes information needed for accurate predictions, not that the original hidden state had converged.
 
-4. **Damping on the stable model slows convergence.** With constant damping, α=0.9 reaches 98.7% at 1024 (vs 98.9% baseline), while α=0.5 peaks at 95.6% at 512 then drops to 94.1% at 1024. Delaying damping until iteration 128 reduces the damage but still trails ordinary inference, so stable checkpoints should remain undamped.
+4. **Damping can reduce the score of an already accurate model.** With constant damping, alpha=0.9 reaches 98.7% at 1024 (vs 98.9% baseline), while alpha=0.5 peaks at 95.6% at 512 then drops to 94.1% at 1024. Delaying damping until iteration 128 reduces the loss but still trails ordinary inference for this checkpoint.
 
 5. **Changing the late carried-state dynamics can fix collapse.** A per-token RMS cap rescues the collapsed checkpoint from 5.61% to 91.45% at 1024, while delayed damping reaches 95.66%. Component interventions show that the immediate failure is accumulated direction drift across correct-answer boundaries, not state size alone. Neither intervention is a universal checkpoint-independent rule.
 
@@ -313,15 +312,15 @@ Key findings:
 
 1. **BS=2048 is the observed sweet spot for iteration stability** — BS=4096 collapses at 48 iters, BS=1024 collapses at 256 iters, and BS=2048 remains healthy through 2048. The experiments did not isolate why.
 2. **Sampling strategy doesn't matter** — curriculum vs mixed gives near-identical results in all comparisons.
-3. **32-iter training (teacher forcing) hurts iteration scaling** — both 32-iter models collapse past 128-256 iters, while 16-iter BS=2048 models scale to 2048+.
-4. **Predictions can settle without the hidden state settling** — at 1024 iterations, 24,513 of 25,000 puzzles had identical predictions from iterations 1022 through 1026. The hidden-state norm continues growing, so this is an argmax-stable output, not a hidden-state fixed point.
+3. **32-iteration training did not match the best 16-iteration runs at large inference counts.** These runs use intermediate cross-entropy and model-generated feedback, not teacher forcing.
+4. **Predictions can stay correct while the hidden state keeps changing.** In the test spanning iterations 1022 through 1026, 24,513 of 25,000 puzzles had correct, identical predictions at all five iterations. The hidden-state norm continued growing; this is neither a hidden-state fixed point nor a guarantee about later predictions.
 5. **Useful answer trajectories emerge without a convergence loss** — successful models retain or improve answers over many iterations even though their hidden states keep moving.
-6. **Explicit fixed-point losses all degrade iteration scaling** — 4 variants tested, all collapse earlier than baseline. They optimize a finite-state property that the successful model does not exhibit.
+6. **The four prediction-preservation modifications reduced accuracy at large iteration counts.** They change losses on already-correct predictions; they do not impose a finite hidden-state equilibrium.
 7. **LR=2e-3 is the sharp observed optimum for iteration scaling** — at d_model=128: LR=3e-3 collapses at 64 iters, LR=2.5e-3 at 128, LR=2e-3 scales to 1024 at 98.9%, LR=1.5e-3 scales to 1024 at 98.1%, and LR=1e-3 stalls at worse long-horizon accuracy.
 8. **Wider models (d=192) collapse regardless of LR** — LR=2e-3 peaks at 64 iters (94.3%, better per-iteration than d=128's 92.5%) but collapses at 128. LR=1e-3 collapses at 256, LR=1.5e-3 at 64. The spectral radius rebounds past the collapse point (67→79 at iters 64→128), confirming the wider model's dynamics destabilize rather than converge.
 9. **3-phase curriculum works if you keep phase durations** — dropping Medium+ with original durations (40K total) is stable at 95.9%, but redistributing to maintain 50K steps collapses because the LR schedule decays slower.
-10. **Smaller model (d=96) peaks early then degrades** — 87.8% at 128 iters, slowly degrades to 73.2% at 2048. Not enough capacity for clean convergence.
+10. **The smaller model (d=96) peaks early then loses accuracy**: 87.8% at 128 iterations, falling to 73.2% at 2048. This does not by itself establish insufficient capacity as the cause.
 11. **Q-head (learned halt) failed** — loss competition degrades main task.
 12. **Test-time carried-state interventions can fix collapse.** On 25,000 puzzles, cap 12 rescues one collapsed checkpoint to 91.45% at 1024 and 91.31% at 2048. Delayed damping after iteration 128 improves the same checkpoint further, to 95.66% and 96.20%. Constant damping from iteration 1, prediction scaling, and pre-output LayerNorm still fail.
 13. **Jacobian spectral radius is much greater than 1 for every measured model, including stable ones** — estimates range from 14 to 88. A decreasing estimate correlates with stability in the original comparison, but does not establish fixed-point convergence. Later causal interventions identify loss of correct-answer margin from accumulated directional drift as the immediate collapse mechanism.
-14. **Historical released checkpoint: 98.9%** at 1024 test iterations with LR=2e-3 (`exp_baseline_lr2e3`), retaining 98.8% at 2048. The current recommended and highest-scoring training paths use detached late-state supervision and are documented in `looping/EXPERIMENTS_LOOPING.md`.
+14. **Historical released checkpoint: 98.9%** at 1024 test iterations with LR=2e-3 (`exp_baseline_lr2e3`), retaining 98.8% at 2048. The current recommendation trains on later iterations with a gradient-free initial segment; see [the looping notes](../looping/EXPERIMENTS_LOOPING.md).

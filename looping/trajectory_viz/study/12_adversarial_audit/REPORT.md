@@ -6,7 +6,7 @@ An attractive recurrent-state PCA path can support four increasingly strong clai
 
 ## Design and controls
 
-The audit used the four canonical checkpoints from `looping/eval_trajectory_geometry.py`: naturally stable plain backpropagation, collapsed plain backpropagation, standalone late-state cross-entropy, and staged late-state cross-entropy plus recheck and margin protection. Checkpoint SHA-256 hashes are recorded in `robustness_metrics.json`.
+The audit used the four checkpoints from `looping/eval_trajectory_geometry.py`, defined in [the protocol](../PROTOCOL.md#models): the accurate and failing original checkpoints, later-iteration training alone, and the combined recipe that adds a second training window and margin penalty at step 39K. Checkpoint SHA-256 hashes are recorded in `robustness_metrics.json`.
 
 The canonical balanced test sample was split before fitting. Discovery, validation, and final holdout each contain 20 whole puzzles, with four puzzles from each of the five rating buckets. Discovery fit each rank-32 PCA basis, validation selected a plane among the first three reported axes, and the final holdout was evaluated once. `split_manifest.json` records the split and puzzle hashes without exposing puzzle text.
 
@@ -27,7 +27,7 @@ The arc failure is informative. On normalized states, own-basis arc scores were 
 
 Loop evidence was absent. Final loop scores were at most 0.045, and temporal ordering never improved the aggregate loop score reliably. Helix-like time ordering was measurable in several projections, but the strongest own-basis final helix score was 0.257, below the preregistered 0.35 threshold. The relevant paths also failed one or more of radius consistency, net turns, axial monotonicity, and matched-rank projection percentile.
 
-As a descriptive check, all 20 final puzzles were solved at iteration 1024 by stable plain, late-state CE, and combined margin; collapsed plain solved none. The geometry verdict does not use this small-sample accuracy result.
+As a descriptive check, all 20 final puzzles were solved at iteration 1024 by stable plain, later-iteration training, and combined margin; collapsed plain solved none. The geometry verdict does not use this small-sample accuracy result.
 
 ## Limitations
 

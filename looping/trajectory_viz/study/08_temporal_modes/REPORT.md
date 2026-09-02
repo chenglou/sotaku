@@ -6,7 +6,7 @@ Sotaku's recurrent state may contain a reusable rotating or oscillating mode, ra
 
 ## Method
 
-The analysis used 60 balanced test puzzles: four puzzles from each of five rating buckets in each of the discovery, validation, and final splits. It evaluated the stable plain, collapsed plain, late-state cross-entropy, and combined-margin checkpoints. No final puzzle was used to fit a projection or DMD operator.
+The analysis used 60 balanced test puzzles: four puzzles from each of five rating buckets in each of the discovery, validation, and final splits. It evaluated the stable plain, collapsed plain, training on later iterations, and combined-margin checkpoints. No final puzzle was used to fit a projection or DMD operator.
 
 Two independent random 16-dimensional projections of the 10,368-dimensional board state were evaluated. The predefined variants were normalized states and normalized updates over iterations 0-128 and 768-1024. Validation selected early normalized updates by mean DMD R2 improvement over a model fitted after shuffling iteration order. Final controls used 32 independent time shuffles and 32 phase-randomized surrogates. Phase randomization preserved every projected channel's Fourier power exactly while removing its phase relationship to other channels.
 
@@ -14,11 +14,11 @@ Two independent random 16-dimensional projections of the 10,368-dimensional boar
 
 Time ordering is real, but the results do not support a substantial rotating or oscillating latent mode.
 
-On the selected early normalized updates, ordered DMD achieved final R2 of 0.80-0.85 for stable plain, 0.85-0.86 for collapsed plain, 0.90-0.91 for late-state cross-entropy, and 0.90-0.92 for combined margin across the two random projections. Shuffling time reduced R2 by 0.30-0.40 for the two plain checkpoints and by 0.49-0.95 for the late-trained checkpoints.
+On the selected early normalized updates, ordered DMD achieved final R2 of 0.80-0.85 for stable plain, 0.85-0.86 for collapsed plain, 0.90-0.91 for training on later iterations, and 0.90-0.92 for combined margin across the two random projections. Shuffling time reduced R2 by 0.30-0.40 for the two plain checkpoints and by 0.49-0.95 for the late-trained checkpoints.
 
 Phase randomization reduced R2 by only 0.008-0.021. Most predictability therefore comes from each channel's autocorrelation and power spectrum, not a precise phase relationship among channels.
 
-The DMD eigenvalues cluster near the positive real axis. The largest angle among active eigenvalues was 0.09 radians, and no checkpoint showed a large, stable complex pair characteristic of sustained rotation. Simple persistence also predicted the next update better than DMD in seven of eight checkpoint/projection comparisons. Late-state cross-entropy was the only exception, and only slightly: DMD improved over persistence by 0.009 and 0.018.
+The DMD eigenvalues cluster near the positive real axis. The largest angle among active eigenvalues was 0.09 radians, and no checkpoint showed a large, stable complex pair characteristic of sustained rotation. Simple persistence also predicted the next update better than DMD in seven of eight checkpoint/projection comparisons. The model trained on later iterations was the only exception, and only slightly: DMD improved over persistence by 0.009 and 0.018.
 
 Raw cross-checkpoint DMD R2 ranged from 0.57 to 0.91, but persistence beat almost every transferred operator. The transfer result supports shared smoothness, not a shared oscillatory law.
 
@@ -26,7 +26,7 @@ Raw cross-checkpoint DMD R2 ranged from 0.57 to 0.91, but persistence beat almos
 
 The early normalized state moves smoothly: consecutive projected velocity cosine is 0.90-0.94 on final puzzles. Normalized updates are less straight and differ by checkpoint, but no curvature pattern separates healthy from collapsed models consistently.
 
-Late random projections show period-two power for stable plain, late-state cross-entropy, and combined margin, while collapsed plain is dominated by a much slower component. This is exploratory rather than evidence of a full-state period-two mode. Each projection observes only 16 of 10,368 dimensions, late updates are small, DMD finds no matching active oscillatory eigenvalue, and the late-update variant did not survive validation selection. The likely explanation is an alternating low-energy residual exposed after projection and normalization.
+Late random projections show period-two power for stable plain, training on later iterations, and combined margin, while collapsed plain is dominated by a much slower component. This is exploratory rather than evidence of a full-state period-two mode. Each projection observes only 16 of 10,368 dimensions, late updates are small, DMD finds no matching active oscillatory eigenvalue, and the late-update variant did not survive validation selection. The likely explanation is an alternating low-energy residual exposed after projection and normalization.
 
 ## Controls
 

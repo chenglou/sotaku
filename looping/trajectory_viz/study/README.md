@@ -4,14 +4,14 @@ This study asked twelve independent questions about Sotaku's recurrent hidden st
 
 ## Bottom line
 
-The model's state contains real, compact Sudoku information, but it does not follow one universal geometric object. We found no shared helix, loop, arc, oscillation, raw fixed point, solvedness direction, or transferable collapse-warning direction.
+The model's state contains real, compact Sudoku information, but it does not follow one universal geometric object. We found no shared helix, loop, arc, oscillation, hidden-state fixed point, direction that reliably improves solving when used to modify the state, or transferable warning of later accuracy loss.
 
 The recurring picture is simpler:
 
 - Recurrent motion is smooth in both healthy and collapsed models.
 - The state progressively represents the current answer, candidate-set size, cell position, conflicts, answer margin, and solve progress.
 - Digit identity occupies a compact categorical subspace, but the digits do not have a privileged numeric or cyclic order. This is expected because Sudoku is unchanged by a global relabeling of the nine digits.
-- Healthy models keep changing in raw state space, but their normalized state direction settles and their answers remain stable.
+- The accurate models' complete states keep moving, but their directions change slowly at the measured later iterations and their answers remain correct.
 - The collapsed checkpoint also moves smoothly. Its normalized direction keeps drifting until some correct-answer margins cross the output boundary.
 - Most useful coordinates are checkpoint-local. A direction fitted in one checkpoint generally does not remain the same direction in another.
 
@@ -29,19 +29,19 @@ This supports interpreting Sotaku as a smooth, puzzle-dependent computation with
 | [06. Cell roles](06_cell_roles/REPORT.md) | Candidate-set size and row, column, and box roles emerge during recurrence after controlling for the input symbol. | [candidate geometry](06_cell_roles/artifacts/cell_roles_v1/candidate_size_geometry.png) |
 | [07. Difficulty](07_difficulty/REPORT.md) | The state orders model solve latency in healthy checkpoints, but does not robustly encode the dataset's human-oriented rating. | [held-out predictions](07_difficulty/artifacts/protocol_v2/heldout_predictions.png) |
 | [08. Temporal modes](08_temporal_modes/REPORT.md) | The dynamics are highly predictable and smooth, but persistence is usually better than a fitted linear dynamical model. There is no useful oscillatory or rotational mode. | [temporal statistics](08_temporal_modes/curvature_fourier_summary.png) |
-| [09. Settling](09_fixed_point/REPORT.md) | Healthy models do not approach a raw fixed point. They approach a stable direction in normalized state space; the collapsed model keeps turning. | [settling and accuracy](09_fixed_point/settling_and_accuracy.png) |
+| [09. State changes](09_fixed_point/REPORT.md) | The accurate models' hidden states keep moving, but their directions change slowly at the measured later iterations. The failing model keeps turning faster. | [state changes and accuracy](09_fixed_point/settling_and_accuracy.png) |
 | [10. Early warning](10_early_warning/REPORT.md) | Pooled geometry identifies the collapsed checkpoint family, not which unseen puzzle will later collapse. No transferable puzzle-level warning was established. | [confounded comparison](10_early_warning/model_comparison.png) |
-| [11. Causal axes](11_causal_axes/REPORT.md) | Moving along an oracle true-digit output direction causally changes answer margin, but does not reliably improve long-term solving. A learned solvedness direction fails the causal controls. | [dose response](11_causal_axes/dose_response.png) |
+| [11. Causal interventions](11_causal_axes/REPORT.md) | A state change chosen using the answer key raises the correct digit's score relative to alternatives, but does not reliably improve later solving. A learned direction that predicts current accuracy also fails to reliably improve it when used to change the state. | [dose response](11_causal_axes/dose_response.png) |
 | [12. Adversarial audit](12_adversarial_audit/REPORT.md) | Projection selection can manufacture convincing arcs, loops, and helices from synthetic null data. The shared-shape claims fail the final held-out audit. | [adversarial gallery](12_adversarial_audit/adversarial_gallery.png) |
 
 ## Practical use
 
-For future health diagnostics, prefer quantities that remained meaningful under controls: weakest correct-answer margin, normalized-state movement, relative acceleration, solved-answer retention, and output stability. Do not use an attractive PCA path, raw update size, smoothness alone, or proximity to a raw fixed point as evidence that a checkpoint is healthy.
+For future diagnostics, useful measurements are the weakest correct-answer margin, normalized-state movement, relative acceleration, the fraction of solved puzzles that remain solved, and prediction changes. An attractive PCA path, small raw updates, smoothness alone, or proximity to a hidden-state fixed point did not reliably distinguish accurate checkpoints in this study.
 
-The study does not identify a new training loss by itself. It does support the existing root-cause direction: train models to preserve correct decisions and to compute from genuinely late states, then use damping or ES only as optional polish rather than as the explanation for why the model works.
+The study does not identify a new training loss or universal root cause by itself. It motivates testing training that preserves correct predictions or directly supervises later iterations. Damping and ES fine-tuning remain separate interventions, not explanations of what the geometry study established.
 
 ## Scope
 
-The study used 60 held-out test puzzles per arm: 20 for discovery, 20 for validation, and 20 touched once for the final result, with four puzzles from each rating bucket in every split. The checkpoint set contains one plain stable model, one plain collapsed model, one late-state-CE model, and one combined margin model. Conclusions about collapse transfer therefore need independent collapsed training runs before they can be treated as general laws.
+The study used 60 test puzzles per analysis: 20 for discovery, 20 for validation, and 20 touched once for the final result, with four puzzles from each rating bucket in every split. The checkpoint set contains one accurate original model, one failing original model, one model trained on later iterations, and one combined model. [The protocol](PROTOCOL.md#models) maps these descriptions to the historical plot labels and defines the combined recipe. Conclusions about failure across models need independently trained failing checkpoints before they can be treated as general laws.
 
 Large activation tensors and projection-search caches are intentionally kept out of Git. Each arm includes the code, frozen choices, tests, reports, summary metrics, and plots needed to inspect the reported conclusion.

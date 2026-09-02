@@ -1,6 +1,6 @@
-# Sotaku Serious Viridian Probe
+# Full Sotaku Training Test On Viridian
 
-This is the real-data B200 runner. It uses `sapientinc/sudoku-extreme`, the current `iters.exp_baseline_lr2e3` model, the same checkpoint shape as the repo, and R2 for durable status/report/checkpoint objects.
+This historical B200 test uses `sapientinc/sudoku-extreme`, the `iters.exp_baseline_lr2e3` model, the repo's checkpoint format, and R2 for durable status, reports, and checkpoints.
 
 The full 50k-step training run completed through a guarded resume job:
 
@@ -97,7 +97,7 @@ checkpoint sha256: 4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df
 B200 gpu_seconds: 172
 ```
 
-That control means the Viridian eval harness is not the problem. The Viridian-trained checkpoint learned the 16-iteration task about as expected, improved at 128 iterations, but collapsed by 1024 iterations. The likely problem is the custom Viridian training wrapper, which reimplements the training loop instead of calling the blessed `iters.exp_baseline_lr2e3.train()` path that reproduces on Modal.
+That control suggested the evaluation code was not the problem. The Viridian-trained checkpoint learned the 16-iteration task about as expected, improved at 128 iterations, but lost most of its accuracy by 1024. The initial suspect was the custom Viridian training wrapper, which reimplements the training loop instead of calling the standard `iters.exp_baseline_lr2e3.train()` entrypoint. The follow-up below rejected that explanation.
 
 The pre-resume checkpoint already had the 1024-iteration collapse, so the guarded resume was not the cause:
 
@@ -113,7 +113,9 @@ sample: 500 puzzles per rating bucket, 2,500 total
 
 The replacement path is `repo/train_canonical.py` plus `presign_canonical_train_r2.py`. That runner calls `iters.exp_baseline_lr2e3.train(output_dir=...)` directly and only handles Viridian/R2 concerns outside the training loop: slot claiming, optional checkpoint download for resume, background upload of the canonical log/checkpoints/final model, status, and duplicate-attempt skipping. This removes the custom training-loop fork as a variable. If canonical Viridian training still fails after that, the remaining suspect is a runtime/platform difference, e.g. the torch/CUDA/compiler stack.
 
-**Resolution (2026-07-02, after the follow-up investigation):** the wrapper hypothesis above was wrong, and so was the runtime/platform suspicion. A line-by-line comparison plus adversarial review found the recreated loop mathematically identical in distribution to the canonical trainer, and the training data byte-identical (verified by digest). Fresh canonical-code runs then collapsed on Modal H200 with the original February image and settled once on Viridian B200 — both stacks appear in both outcome columns. A later clean-run study refuted the interruption hypothesis as well: four uninterrupted H200 runs finished at 5.4 / 92.3 / 31.2 / 1.2% at 1024 iterations, the same failure rate as interrupted-and-resumed runs. The final account: with everything controllable held fixed, a fresh run ends up stable at 1024 iterations only a fraction of the time (2 of 12 in July 2026, versus February's 4 of 4 — that split remains unexplained). The recovery path that works regardless of how a run ends: keep its best mid-training checkpoint and fine-tune that with the evolution-strategies runner (both under iters/, see EXPERIMENTS_ITERS.md "Reproducibility" and "Evolution-Strategies Fine-Tuning"). `viridian/train/` is the productized wrapper that replaced this probe's runner (single source of truth: it packages the live repo files at submit time).
+**Resolution (2026-07-02, with later follow-up):** the wrapper and platform hypotheses above did not explain the difference. A line-by-line comparison plus adversarial review found the recreated loop mathematically identical in distribution to the standard trainer, and the training data byte-identical (verified by digest). Fresh standard-code runs lost accuracy on Modal H200 with the original February image and retained high accuracy once on Viridian B200. Both platforms produced both outcomes. A later study of uninterrupted runs rejected interruptions as the explanation: four uninterrupted H200 runs finished at 5.4 / 92.3 / 31.2 / 1.2% at 1024 iterations, the same observed failure rate as interrupted-and-resumed runs. With the controlled settings held fixed, only 2 of 12 July runs retained high 1024-iteration accuracy, versus February's 4 of 4; that split remains unexplained. See [the reproduction study](../../iters/EXPERIMENTS_ITERS.md#reproducibility-july-2026).
+
+Saving intermediate checkpoints and fine-tuning a suitable one with evolution strategies improved several runs, but did not work regardless of the starting checkpoint. The [ES results](../../es/EXPERIMENTS_ES.md) document both successes and failures. `viridian/train/` replaced this test wrapper and packages the live repo files at submit time instead of maintaining a separate training-loop copy.
 
 ## Eval Harness
 

@@ -31,7 +31,7 @@ Cross-checkpoint transfer applies the complete source-checkpoint standardization
 
 ## Held-out results
 
-At iteration 16, expected unique-conflict probes reach final-holdout `R² = .860, .935, .865, .866` for stable plain, collapsed plain, late-state CE, and combined margin. Row, column, and box probes are similarly strong (`R² = .859–.945`). Every observed value exceeds the maximum shuffled-label and matched-rank random value in its corresponding 16-repeat control. The [numeric probe plot](numeric_probe_transfer.png) shows that this is an early and middle-state result; late healthy targets become nearly constant after the puzzles solve.
+At iteration 16, expected unique-conflict probes reach final-holdout `R² = .860, .935, .865, .866` for stable plain, collapsed plain, later-iteration training, and combined margin. Row, column, and box probes are similarly strong (`R² = .859–.945`). Every observed value exceeds the maximum shuffled-label and matched-rank random value in its corresponding 16-repeat control. The [numeric probe plot](numeric_probe_transfer.png) shows that this is an early and middle-state result; late healthy targets become nearly constant after the puzzles solve.
 
 The ordered hard-conflict probes are weaker but positive at iteration 16: unique-conflict count gives `R² = .268, .458, .403, .418`. Unconstrained hard-conflict classification gives balanced accuracy `.294, .300, .275, .264`, versus approximately `.20` for shuffled labels. Dynamic candidate classification gives `.449, .467, .431, .457`, versus approximately `.333` for shuffled labels. The [categorical plot](categorical_probe_transfer.png) omits late points with only one supported class; those cases cannot establish geometry.
 
@@ -41,14 +41,14 @@ This readability is mostly not independent of time and certainty in healthy chec
 |---|---:|---:|---:|---:|
 | stable plain | .980 | .0041 | .373 | -.0012 |
 | collapsed plain | .471 | .248 | .299 | .097 |
-| late-state CE | .987 | .0095 | .377 | .011 |
+| later-iteration training | .987 | .0095 | .377 | .011 |
 | combined margin | .983 | .0045 | .348 | .0061 |
 
 The healthy future gains are negligible. The collapsed checkpoint's `.097` future partial `R²` is larger than its shuffled-label maximum `.011` and random rank-one maximum `.040`, but shuffled iteration reaches `.107`; its one-sided 16-repeat value is `p = .118`. Shuffled iteration also exceeds the observed future gain in every healthy checkpoint. The [residual-probe plot](future_improvement_prediction.png) shows these controls together.
 
-Direct transfer provides no shared-axis replication. Off-diagonal current-conflict partial `R²` is positive only for late-state CE to collapsed plain (`.039`); off-diagonal future transfer is positive only for stable plain to collapsed plain (`.019`). Most transfers are negative, several catastrophically so. This result is visible in the [cross-checkpoint matrix](cross_checkpoint_transfer.png). The test is deliberately strict: separately trained representations may be rotated even when they encode the same abstract variable.
+Direct transfer provides no shared-axis replication. Off-diagonal current-conflict partial `R²` is positive only for later-iteration training to collapsed plain (`.039`); off-diagonal future transfer is positive only for stable plain to collapsed plain (`.019`). Most transfers are negative, several catastrophically so. This result is visible in the [cross-checkpoint matrix](cross_checkpoint_transfer.png). The test is deliberately strict: separately trained representations may be rotated even when they encode the same abstract variable.
 
-The behavioral trajectories themselves are coherent. Stable plain, late-state CE, and combined margin solve all 20 final puzzles by iteration 128 and remain solved at 1024. Collapsed plain solves 18/20 at 128 but only 2/20 at 1024; expected unique conflicts rise to `.846`. Row, column, and box components move together rather than showing a single privileged unit type. See [constraint dynamics](constraint_dynamics.png) and [component dynamics](constraint_components.png).
+The behavioral trajectories themselves are coherent. Stable plain, later-iteration training, and combined margin solve all 20 final puzzles by iteration 128 and remain solved at 1024. Collapsed plain solves 18/20 at 128 but only 2/20 at 1024; expected unique conflicts rise to `.846`. Row, column, and box components move together rather than showing a single privileged unit type. See [constraint dynamics](constraint_dynamics.png) and [component dynamics](constraint_components.png).
 
 ## Interpretation
 

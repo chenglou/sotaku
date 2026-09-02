@@ -4,7 +4,7 @@ This plan was fixed before the final split was evaluated.
 
 - Sample 60 canonical `sudoku-extreme` test puzzles with seed 20260811: four puzzles from each of five rating buckets in each of discovery, validation, and final splits.
 - Analyze the four checkpoints named by `study/PROTOCOL.md`.
-- Test two predefined semantic axes. `answer_evidence` is the normalized output-head direction for the true digit versus the mean other digit. `solvedness_progress` is a ridge direction fitted on discovery board states to the fraction of blank cells currently correct, after removing iteration means.
+- Test two predefined directions. `answer_evidence` uses the answer key: subtract the mean output-head weight of the eight incorrect digits from the correct digit's weight, then normalize that vector. `solvedness_progress` is a ridge-regression direction fitted on discovery board states to predict the fraction of blank cells currently correct, after removing iteration means. Fit each checkpoint separately; test whether the directions merely predict their quantities or also change them when used to modify the state.
 - Choose the ridge penalty from 0.01, 0.1, 1, 10, and 100 by mean validation partial correlation across all four checkpoints. Do not refit on validation or final puzzles.
 - Evaluate the selected axes once on the 20-puzzle final split. Compare the supervised axis with 64 within-iteration label shuffles and the answer-evidence axis with 64 random digit-conditioned axes.
 - Apply one pulse after iterations 16 and 512. Continue recurrence to iterations 128 and 1024, respectively. Use signed doses ±0.125, ±0.25, and ±0.5 times each puzzle's natural one-step update norm.

@@ -133,7 +133,7 @@ Packaged baseline digest:
 sha256:bf9f08c76c384b8a0082a3b3f58bf67300a54c0c9f20185b3bcd228173c6fe92
 ```
 
-This probe uses `iters.exp_baseline_lr2e3.SudokuTransformer`, the real encoding helpers, the real checkpoint shape, and the correct resume order: load model state before `torch.compile`, then create/load the optimizer. It uses a repo-packaged 128-puzzle CSV shard, so it does not test Hugging Face dataset download.
+This test uses `iters.exp_baseline_lr2e3.SudokuTransformer`, the actual encoding helpers, the repo's checkpoint format, and the correct resume order: load model state before `torch.compile`, then create/load the optimizer. It uses a repo-packaged 128-puzzle CSV shard, so it does not test Hugging Face dataset download.
 
 Settings:
 
@@ -190,7 +190,7 @@ fresh_report.jsonl                4,233 bytes
 fresh_status.json                   239 bytes
 ```
 
-Report shape:
+Report format:
 
 ```text
 line_count: 16
@@ -421,7 +421,7 @@ checkpoint sha256: 4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df
 B200 gpu_seconds: 172
 ```
 
-That control means the Viridian eval harness is not the problem. The Viridian-trained checkpoint learned the 16-iteration task about as expected, improved at 128 iterations, but collapsed by 1024 iterations. The likely problem is the custom Viridian training wrapper, which reimplements the training loop instead of calling the blessed `iters.exp_baseline_lr2e3.train()` path that reproduces on Modal.
+That control suggested the evaluation code was not the problem. The Viridian-trained checkpoint learned the 16-iteration task about as expected, improved at 128 iterations, but lost most of its accuracy by 1024. The initial suspect was the custom wrapper rather than the standard `iters.exp_baseline_lr2e3.train()` entrypoint. [The follow-up investigation](../sotaku_serious_probe/README.md#sudoku-extreme-eval-result) rejected that explanation; this entry records the earlier hypothesis.
 
 The pre-resume checkpoint already had the 1024-iteration collapse, so the guarded resume was not the cause:
 

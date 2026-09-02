@@ -1,6 +1,6 @@
 # Viridian Notes
 
-This folder keeps the current Viridian docs snapshot and the small probes that matter for using Viridian as a Sotaku training runner.
+This folder keeps the downloaded Viridian docs snapshot and records of the infrastructure tests for using Viridian to run Sotaku training.
 
 The general, project-independent version of the runner machinery lives in the private template repo [tips-for-running-viridian](https://github.com/chenglou/tips-for-running-viridian), extracted from `viridian/train/`. When you learn a new general Viridian lesson, add it there; keep this folder to what is Sotaku-specific.
 
@@ -22,13 +22,13 @@ Use R2 for durable outputs:
 r2:sotaku-viridian/viridian-runner-probes/
 ```
 
-The tested shape is:
+The tested workflow is:
 
 1. package a tiny repo into a Viridian baseline;
 2. run a GPU job that reads repo-packaged data, imports PyTorch, sees CUDA, writes a checkpoint and JSONL report, and uploads them to R2 with SHA-256 sidecars;
 3. run a second GPU job that downloads the checkpoint and sidecar, verifies the SHA-256, loads the checkpoint with `torch.load`, resumes training, and uploads its own checkpoint and report.
 
-That path is proven for both a tiny generic PyTorch training probe and a tiny real-Sotaku B200 probe.
+That workflow passed with both a small generic PyTorch training test and a short run of the actual Sotaku model on B200.
 
 The first longer B200 Sotaku pilot also proved the real Hugging Face path, but it exposed an artifact-layout problem: fixed R2 keys like `latest_checkpoint.pt`, `report.jsonl`, and `status.json` can be written by more than one eval attempt under one Viridian job. The highest preserved pilot checkpoint is archived at:
 

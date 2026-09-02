@@ -1,4 +1,4 @@
-# Viridian Pretraining Probe
+# Viridian Training Infrastructure Test
 
 This was the cheap infrastructure experiment for deciding whether Viridian can be used as a training runner.
 
@@ -12,7 +12,7 @@ The goal is not to train `sotaku` yet. The goal is to test the cluster propertie
 - Can a second job download a previous checkpoint and resume from it?
 - Does `vd artifact` include runtime-created files, or only the optimized repo snapshot?
 
-## Runner Shape
+## Job Configuration
 
 Use an eval-only runner job:
 
@@ -23,7 +23,7 @@ Use an eval-only runner job:
 
 This avoids the optimizer rollout path and directly runs the training command we provide. As of the latest runs, CPU and L4 runner jobs work, `eval.py` works directly, L4/H100 PyTorch sees CUDA, and a tiny CUDA matmul succeeds.
 
-## Run Shape
+## Test Setup
 
 Use zero agents and one generation. Lock the probe script so Viridian cannot improve the metric by editing the probe if this is later run with optimizer agents enabled.
 
@@ -33,7 +33,7 @@ Start with `l4` for the infrastructure test. A 10 minute GPU window costs about 
 600 seconds * $0.00022/sec = $0.132
 ```
 
-If that passes, repeat once on `h100` for a closer pretraining proxy:
+If that passes, repeat once on `h100` to test the intended training hardware:
 
 ```text
 600 seconds * $0.00110/sec = $0.660

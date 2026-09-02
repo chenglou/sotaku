@@ -6,7 +6,7 @@ Results and the resulting FP32 inference default are documented in [PRECISION_RE
 
 ## Full Benchmark
 
-Evaluate the exact exported late-state CE weights and the published v1 weights on the historical balanced 25K benchmark at 128, 1024, 2048, and 4096 iterations. Use eager CUDA bfloat16, batch size 256, ordinary undamped recurrence, and PyTorch 2.10.0+cu128 on H200. Verify equality against the original model forward before the full run. Save model hashes, complete model settings, runtime package/driver records, exact puzzle indices, and per-puzzle predictions.
+Evaluate the exact exported later-iteration training weights and the published v1 weights on the historical balanced 25K benchmark at 128, 1024, 2048, and 4096 iterations. Use eager CUDA bfloat16, batch size 256, ordinary undamped recurrence, and PyTorch 2.10.0+cu128 on H200. Verify equality against the original model forward before the full run. Save model hashes, complete model settings, runtime package/driver records, exact puzzle indices, and per-puzzle predictions.
 
 The frozen row-content checksum is `697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc`. The dataset revision and original sampling order are recorded in `benchmark_25k.json`. This benchmark has been reused during development; it is not a new holdout.
 
@@ -20,4 +20,4 @@ Separately record every iteration in eager BF16 and FP32 at batch size 256: firs
 
 ## Full-Set Confirmation
 
-The first completed compiled condition changed late-state CE's 4096-iteration result from 42.2% to 93.4% on the fixed 1K sample. Following that finding, evaluate both existing reference checkpoints on the full frozen 25K in BF16/compiled and FP32/eager, always at batch size 256. Keep these execution modes separate from the historical eager-BF16 score; no weights are selected or changed for this follow-up.
+The first completed compiled condition changed later-iteration training's 4096-iteration result from 42.2% to 93.4% on the fixed 1K sample. Following that finding, evaluate both existing reference checkpoints on the full frozen 25K in BF16/compiled and FP32/eager, always at batch size 256. Keep these execution modes separate from the historical eager-BF16 score; no weights are selected or changed for this follow-up.
