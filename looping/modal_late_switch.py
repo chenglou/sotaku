@@ -34,7 +34,8 @@ image = (
         remote_path="/root/project",
         ignore=[
             "venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/",
-            "runs_modal/", "*.pt", "*.log",
+            "runs_modal/", "*.pt", "*.log", ".venv/", ".claude/", ".codex/", "temp-side-convo.txt",
+            "release/validation/", "release/v2/*.zip",
         ],
     )
 )
@@ -51,7 +52,8 @@ image = (
         "/outputs": outputs_volume,
     },
 )
-def run_branch(mode: str, run_name: str):
+def run_branch(mode: str, run_name: str, source_checkpoint: str = SOURCE_CHECKPOINT,
+               source_step: int = SOURCE_STEP, seed: int = 20260724):
     import datetime
     import os
     import subprocess
@@ -64,8 +66,11 @@ def run_branch(mode: str, run_name: str):
     import torch
 
     outputs_volume.reload()
-    if not os.path.isfile(SOURCE_CHECKPOINT):
-        raise FileNotFoundError(SOURCE_CHECKPOINT)
+    if not os.path.isfile(source_checkpoint):
+        raise FileNotFoundError(source_checkpoint)
+    source = torch.load(source_checkpoint, map_location="cpu", weights_only=False)
+    if source.get("step") != source_step or source.get("config", {}).get("random_seed") != seed:
+        raise ValueError("Source checkpoint does not match the requested step and seed")
 
     timestamp = datetime.datetime.now(datetime.timezone.utc)
     smi = subprocess.run(
@@ -102,21 +107,27 @@ def run_branch(mode: str, run_name: str):
             output_dir="/outputs/looping",
             arm=arm,
             run_name=run_name,
-            random_seed=20_260_724,
+            random_seed=seed,
             full_50k=True,
-            branch_checkpoint_path=SOURCE_CHECKPOINT,
+            branch_checkpoint_path=source_checkpoint,
+            expected_branch_step=source_step,
         )
     finally:
         outputs_volume.commit()
 
 
 @app.local_entrypoint()
-def main(mode: str = "plain"):
+def main(mode: str = "plain", source_checkpoint: str = SOURCE_CHECKPOINT,
+         source_step: int = SOURCE_STEP, seed: int = 20260724, name: str = ""):
     mode = mode.replace("-", "_")
     if mode not in MODES:
         choices = ", ".join(MODES)
         raise ValueError(f"unknown mode {mode!r}; choose one of: {choices}")
-    run_name = f"loop_stay_late_switch_{mode}_from{SOURCE_STEP // 1000}k"
-    call = run_branch.spawn(mode, run_name)
+    if source_step < 0 or seed < 0:
+        raise ValueError("source_step and seed must be non-negative")
+    if not name and (source_checkpoint != SOURCE_CHECKPOINT or source_step != SOURCE_STEP or seed != 20260724):
+        raise ValueError("Pass a unique --name when changing the source checkpoint, step, or seed")
+    run_name = name or f"loop_stay_late_switch_{mode}_from{source_step // 1000}k"
+    call = run_branch.spawn(mode, run_name, source_checkpoint, source_step, seed)
     print(f"Spawned {run_name}: {call.object_id}")
     print(f"Poll looping/{run_name}.log on sudoku-outputs for progress.")

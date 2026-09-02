@@ -124,6 +124,7 @@ def train(
     screen=False,
     full_50k=False,
     branch_checkpoint_path=None,
+    expected_branch_step=None,
 ):
     if screen and full_50k:
         raise ValueError("screen and full_50k cannot both be enabled")
@@ -140,6 +141,8 @@ def train(
         train_settings["schedule"] = FULL_50K_SCHEDULE
     if branch_checkpoint_path is not None:
         train_settings["branch_checkpoint_path"] = branch_checkpoint_path
+    if expected_branch_step is not None:
+        train_settings["expected_branch_step"] = expected_branch_step
     return train_testbed(
         output_dir=output_dir,
         experiment_name=f"exp_loop_stay_{arm}",

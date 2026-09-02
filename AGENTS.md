@@ -30,6 +30,7 @@ The general, project-independent version of these rules lives in the public temp
 - When selecting by a validation metric, save the corresponding weights immediately. Recording only the best score is insufficient if periodic checkpoints do not include that step.
 - Load checkpoints before `torch.compile()` so parameter names still match the saved state.
 - Save config in checkpoints and verify it on load to avoid resuming the wrong experiment.
+- New inference exports include a `.pt.json` manifest. Keep it beside the tensor-only weights; the public evaluator checks both the checksum and model settings. Training-resume files include pickled RNG state and are for trusted local/volume artifacts, not arbitrary downloads.
 
 ## `torch.compile`
 

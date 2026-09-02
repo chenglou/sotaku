@@ -1,0 +1,94 @@
+{
+  "artifact_type": "sotaku-inference-weights",
+  "model": {
+    "architecture": "sotaku-loop-v1",
+    "d_ff": 512,
+    "d_model": 128,
+    "dropout": 0.1,
+    "feedback_scale": 1.0,
+    "grid_side": 9,
+    "input_categories": 10,
+    "layer_schedule": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "n_heads": 4,
+    "outer_state_norm": false,
+    "outer_state_norm_epsilon": 1e-06,
+    "outer_state_rms_cap": null,
+    "output_categories": 9,
+    "residual_scale": 1.0,
+    "rope_base": 10.0,
+    "training_iterations": 16,
+    "unique_layers": 4
+  },
+  "provenance": {
+    "dataset": "sapientinc/sudoku-extreme",
+    "dataset_revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b"
+  },
+  "schema_version": 1,
+  "training": {
+    "batch_size": 2048,
+    "branch_source_checkpoint": "loop_health_standalone_v1_late_state_ce_50k_trial0_checkpoint_step39000.pt",
+    "checkpoint_on_probe": true,
+    "d_ff": 512,
+    "d_model": 128,
+    "detached_burnin_dropout": false,
+    "eval_every": 5000,
+    "experiment": "exp_burnin_dropout",
+    "late_supervision_horizons": [
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "late_supervision_mix": 1.0,
+    "late_supervision_probability": 0.2,
+    "late_supervision_start_step": 0,
+    "lr": 0.002,
+    "lr_min_ratio": 0.01,
+    "n_layers": 4,
+    "outer_state_norm": "none",
+    "outer_state_norm_epsilon": 1e-06,
+    "phases": [
+      [
+        0,
+        10000,
+        21,
+        "Phase 1: Hard only (rating 21+)"
+      ],
+      [
+        10000,
+        20000,
+        6,
+        "Phase 2: Medium+ (rating 6+)"
+      ],
+      [
+        20000,
+        30000,
+        1,
+        "Phase 3: Easy+ (rating 1+)"
+      ],
+      [
+        30000,
+        50000,
+        0,
+        "Phase 4: All (rating 0+)"
+      ]
+    ],
+    "probe_every": 1000,
+    "random_seed": 20260730,
+    "record_sample_digest": true,
+    "run_name": "burnin_dropout_off_seed20260730",
+    "total_steps": 50000,
+    "warmup_steps": 1400
+  },
+  "weights": {
+    "bytes": 3213205,
+    "file": "model_burnin_dropout_off_seed20260730.pt",
+    "sha256": "768ff55f803285832c66fcbd2dae2a569a967638689cc60a595dc06fc0354b24"
+  }
+}

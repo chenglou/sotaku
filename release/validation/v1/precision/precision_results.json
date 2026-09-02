@@ -1,0 +1,1434 @@
+{
+  "bf16_compiled_bs256": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 6,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 19,
+        "variant_only_solved": 4,
+        "variant_solved": 985
+      },
+      "128": {
+        "baseline_only_solved": 18,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 68,
+        "variant_only_solved": 23,
+        "variant_solved": 955
+      },
+      "2048": {
+        "baseline_only_solved": 6,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 20,
+        "variant_only_solved": 5,
+        "variant_solved": 985
+      },
+      "4096": {
+        "baseline_only_solved": 6,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 154,
+        "variant_only_solved": 138,
+        "variant_solved": 984
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 196,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 30,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 985,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 185,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 180,
+            "total": 200
+          },
+          "51+": {
+            "solved": 191,
+            "total": 200
+          }
+        },
+        "solved": 955,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 98.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 196,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 985,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 98.4,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 195,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 1,
+        "solved": 984,
+        "total": 1000
+      }
+    }
+  },
+  "bf16_compiled_bs32": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 7,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 20,
+        "variant_only_solved": 4,
+        "variant_solved": 984
+      },
+      "128": {
+        "baseline_only_solved": 18,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 68,
+        "variant_only_solved": 14,
+        "variant_solved": 946
+      },
+      "2048": {
+        "baseline_only_solved": 6,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 20,
+        "variant_only_solved": 5,
+        "variant_solved": 985
+      },
+      "4096": {
+        "baseline_only_solved": 7,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 155,
+        "variant_only_solved": 139,
+        "variant_solved": 984
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.4,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 196,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 194,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 38,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 984,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 94.6,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 176,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 182,
+            "total": 200
+          },
+          "51+": {
+            "solved": 189,
+            "total": 200
+          }
+        },
+        "solved": 946,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 98.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 196,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 194,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 1,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 985,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 98.4,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 196,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 193,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 1,
+        "solved": 984,
+        "total": 1000
+      }
+    }
+  },
+  "bf16_eager_bs256": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 0,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 0,
+        "variant_only_solved": 0,
+        "variant_solved": 987
+      },
+      "128": {
+        "baseline_only_solved": 0,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 0,
+        "variant_only_solved": 0,
+        "variant_solved": 950
+      },
+      "2048": {
+        "baseline_only_solved": 0,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 0,
+        "variant_only_solved": 0,
+        "variant_solved": 986
+      },
+      "4096": {
+        "baseline_only_solved": 0,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 0,
+        "variant_only_solved": 0,
+        "variant_solved": 852
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.7,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 197,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 37,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 987,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 179,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 180,
+            "total": 200
+          },
+          "51+": {
+            "solved": 191,
+            "total": 200
+          }
+        },
+        "solved": 950,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 98.6,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 196,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 1,
+        "lost_since_previous_recorded_horizon": 2,
+        "solved": 986,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 85.2,
+        "buckets": {
+          "0": {
+            "solved": 176,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 175,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 168,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 174,
+            "total": 200
+          },
+          "51+": {
+            "solved": 159,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 134,
+        "solved": 852,
+        "total": 1000
+      }
+    }
+  },
+  "bf16_eager_bs32": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 4,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 16,
+        "variant_only_solved": 4,
+        "variant_solved": 987
+      },
+      "128": {
+        "baseline_only_solved": 13,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 62,
+        "variant_only_solved": 18,
+        "variant_solved": 955
+      },
+      "2048": {
+        "baseline_only_solved": 5,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 18,
+        "variant_only_solved": 4,
+        "variant_solved": 985
+      },
+      "4096": {
+        "baseline_only_solved": 88,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 231,
+        "variant_only_solved": 96,
+        "variant_solved": 860
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.7,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 197,
+            "total": 200
+          },
+          "51+": {
+            "solved": 195,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 32,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 987,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 184,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 184,
+            "total": 200
+          },
+          "51+": {
+            "solved": 188,
+            "total": 200
+          }
+        },
+        "solved": 955,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 98.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 194,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 197,
+            "total": 200
+          },
+          "51+": {
+            "solved": 195,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 2,
+        "solved": 985,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 86.0,
+        "buckets": {
+          "0": {
+            "solved": 180,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 173,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 167,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 167,
+            "total": 200
+          },
+          "51+": {
+            "solved": 173,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 125,
+        "solved": 860,
+        "total": 1000
+      }
+    }
+  },
+  "bf16_trajectory_bs256": {
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.7,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 197,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 37,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 987,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 179,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 180,
+            "total": 200
+          },
+          "51+": {
+            "solved": 191,
+            "total": 200
+          }
+        },
+        "solved": 950,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 98.6,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 200,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 195,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 196,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 1,
+        "lost_since_previous_recorded_horizon": 2,
+        "solved": 986,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 85.2,
+        "buckets": {
+          "0": {
+            "solved": 176,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 175,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 168,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 174,
+            "total": 200
+          },
+          "51+": {
+            "solved": 159,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 134,
+        "solved": 852,
+        "total": 1000
+      }
+    },
+    "solution_tracking": {
+      "ever_solved": 988,
+      "observation_interval": 1,
+      "puzzles_with_a_regression": 163,
+      "stayed_solved_after_first": 825
+    }
+  },
+  "fp32_compiled_bs256": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 5,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 18,
+        "variant_only_solved": 4,
+        "variant_solved": 986
+      },
+      "128": {
+        "baseline_only_solved": 22,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 72,
+        "variant_only_solved": 20,
+        "variant_solved": 948
+      },
+      "2048": {
+        "baseline_only_solved": 3,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 17,
+        "variant_only_solved": 5,
+        "variant_solved": 988
+      },
+      "4096": {
+        "baseline_only_solved": 2,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 150,
+        "variant_only_solved": 138,
+        "variant_solved": 988
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.6,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 196,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 194,
+            "total": 200
+          },
+          "51+": {
+            "solved": 197,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 38,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 986,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 94.8,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 179,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 177,
+            "total": 200
+          },
+          "51+": {
+            "solved": 193,
+            "total": 200
+          }
+        },
+        "solved": 948,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 98.8,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 196,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 2,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 988,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 98.8,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 196,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 195,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 988,
+        "total": 1000
+      }
+    }
+  },
+  "fp32_compiled_bs32": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 6,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 19,
+        "variant_only_solved": 8,
+        "variant_solved": 989
+      },
+      "128": {
+        "baseline_only_solved": 18,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 68,
+        "variant_only_solved": 24,
+        "variant_solved": 956
+      },
+      "2048": {
+        "baseline_only_solved": 5,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 19,
+        "variant_only_solved": 9,
+        "variant_solved": 990
+      },
+      "4096": {
+        "baseline_only_solved": 3,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 151,
+        "variant_only_solved": 142,
+        "variant_solved": 991
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 98.9,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 197,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 33,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 989,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.6,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 183,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 181,
+            "total": 200
+          },
+          "51+": {
+            "solved": 193,
+            "total": 200
+          }
+        },
+        "solved": 956,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 197,
+            "total": 200
+          },
+          "51+": {
+            "solved": 197,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 1,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 99.1,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 198,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 197,
+            "total": 200
+          },
+          "51+": {
+            "solved": 197,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 1,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 991,
+        "total": 1000
+      }
+    }
+  },
+  "fp32_eager_bs256": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 4,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 17,
+        "variant_only_solved": 7,
+        "variant_solved": 990
+      },
+      "128": {
+        "baseline_only_solved": 17,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 67,
+        "variant_only_solved": 22,
+        "variant_solved": 955
+      },
+      "2048": {
+        "baseline_only_solved": 4,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 18,
+        "variant_only_solved": 8,
+        "variant_solved": 990
+      },
+      "4096": {
+        "baseline_only_solved": 3,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 151,
+        "variant_only_solved": 141,
+        "variant_solved": 990
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 35,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 184,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 181,
+            "total": 200
+          },
+          "51+": {
+            "solved": 191,
+            "total": 200
+          }
+        },
+        "solved": 955,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      }
+    }
+  },
+  "fp32_eager_bs32": {
+    "paired_against_bf16_eager_bs256": {
+      "1024": {
+        "baseline_only_solved": 4,
+        "baseline_solved": 987,
+        "changed_blank_cell_boards": 17,
+        "variant_only_solved": 7,
+        "variant_solved": 990
+      },
+      "128": {
+        "baseline_only_solved": 17,
+        "baseline_solved": 950,
+        "changed_blank_cell_boards": 67,
+        "variant_only_solved": 22,
+        "variant_solved": 955
+      },
+      "2048": {
+        "baseline_only_solved": 4,
+        "baseline_solved": 986,
+        "changed_blank_cell_boards": 18,
+        "variant_only_solved": 8,
+        "variant_solved": 990
+      },
+      "4096": {
+        "baseline_only_solved": 3,
+        "baseline_solved": 852,
+        "changed_blank_cell_boards": 151,
+        "variant_only_solved": 141,
+        "variant_solved": 990
+      }
+    },
+    "scores": {
+      "1024": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 35,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 184,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 181,
+            "total": 200
+          },
+          "51+": {
+            "solved": 191,
+            "total": 200
+          }
+        },
+        "solved": 955,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      }
+    }
+  },
+  "fp32_trajectory_bs256": {
+    "scores": {
+      "1024": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 35,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "128": {
+        "accuracy_percent": 95.5,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 184,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 181,
+            "total": 200
+          },
+          "51+": {
+            "solved": 191,
+            "total": 200
+          }
+        },
+        "solved": 955,
+        "total": 1000
+      },
+      "2048": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      },
+      "4096": {
+        "accuracy_percent": 99.0,
+        "buckets": {
+          "0": {
+            "solved": 200,
+            "total": 200
+          },
+          "1-2": {
+            "solved": 199,
+            "total": 200
+          },
+          "11-50": {
+            "solved": 197,
+            "total": 200
+          },
+          "3-10": {
+            "solved": 196,
+            "total": 200
+          },
+          "51+": {
+            "solved": 198,
+            "total": 200
+          }
+        },
+        "gained_since_previous_recorded_horizon": 0,
+        "lost_since_previous_recorded_horizon": 0,
+        "solved": 990,
+        "total": 1000
+      }
+    },
+    "solution_tracking": {
+      "ever_solved": 990,
+      "observation_interval": 1,
+      "puzzles_with_a_regression": 0,
+      "stayed_solved_after_first": 990
+    }
+  }
+}

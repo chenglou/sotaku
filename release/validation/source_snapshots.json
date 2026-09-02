@@ -1,0 +1,64 @@
+{
+  "sources_continuation_evaluation.tar.gz": {
+    "sha256": "2974ecc9138ef15bd583727fd7c000d7ffe55ec7a73b6ee716195700ccc0c7cd",
+    "source_sha256": {
+      "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+      "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+      "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+      "iters/eval_more_iters.py": "48ec234b828d48cd8c5131771782569d4e01c024682057aa15909099df84eed2",
+      "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+      "modal_eval.py": "87ae940d161dcc5006fec819b5e70befe69917caa42bd840400dd4d2f5c21b77",
+      "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+      "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+      "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+      "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+    }
+  },
+  "sources_dropout.tar.gz": {
+    "sha256": "c1321f57ba85ac8a2ba78e360dfa605332b1e9b53d6ae2e3d398e0e549ea508b",
+    "source_sha256": {
+      "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+      "dataset_utils.py": "7804fe2a098482b7c8c5810ebfaac18e597e3a5fd53f9e18f39e1c291875a967",
+      "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+      "looping/exp_burnin_dropout.py": "0fac6a605b7c160559eb04bcbba781b48fa11112d65c063e5ff9f1436bae308d",
+      "looping/exp_health_methods.py": "93c30e8e322898646619ddd0118ad670e3ffea8023e2b37866a66791c17dd2f6",
+      "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+      "looping/modal_burnin_dropout.py": "8213be03439fccd8fd4af36fc8561b42053d152cda9b8ca43c137573033409e1",
+      "model_io.py": "26548f5a026fa410adc5f68a976569c8b4132f7ef507c7458b6f4fc2016df021",
+      "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+      "runtime_utils.py": "055b8b8acfa0cecf6b9e68235c861def0e33853900935903a74c8755ac5c2ecc",
+      "stabilize/exp_testbed_20k.py": "a15fabc2a29a03189f71ffb7b8744f4d427c164b33d1e3fcc304f13e5ec169f1"
+    }
+  },
+  "sources_full_confirmation.tar.gz": {
+    "sha256": "41c32d45f4e98fdcbd43b8d2a20e2386c9eabb2b19cc85d143cf9ee9f03eab7d",
+    "source_sha256": {
+      "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+      "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+      "inference.py": "f10cb7341ff84204c04d68891607a91f9f64c0002976444dadf40c8b33df92ad",
+      "iters/eval_more_iters.py": "24bd347016371d2e2cd456cf34c3beba221cbbb722dba63059b9bcfd1430a8b7",
+      "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+      "modal_eval.py": "a5b44908e20afdf887915ab85dcfabf17ea6dd9d5f12e9d2d90dfaf5dbc5ccd7",
+      "model_io.py": "26548f5a026fa410adc5f68a976569c8b4132f7ef507c7458b6f4fc2016df021",
+      "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+      "runtime_utils.py": "055b8b8acfa0cecf6b9e68235c861def0e33853900935903a74c8755ac5c2ecc",
+      "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+    }
+  },
+  "sources_precision.tar.gz": {
+    "sha256": "a9831060db8cb0c9d4ee5dfca1f1125e91789ac32bc05a10a0f348c50f6283d7",
+    "source_sha256": {
+      "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+      "dataset_utils.py": "7804fe2a098482b7c8c5810ebfaac18e597e3a5fd53f9e18f39e1c291875a967",
+      "inference.py": "f10cb7341ff84204c04d68891607a91f9f64c0002976444dadf40c8b33df92ad",
+      "iters/eval_more_iters.py": "65e9eb394d64675c2e88cab5cd6bfe397e84a8f30edcaecfb856197c74b5bf5a",
+      "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+      "model_io.py": "26548f5a026fa410adc5f68a976569c8b4132f7ef507c7458b6f4fc2016df021",
+      "release_tools/modal_checks.py": "66c9fffded0d42508d9d9e7b49a30abd5f3b4fc06132ad9900403b9d0aa76038",
+      "release_tools/validation.py": "513f00805a62475334fb96e3996b15314b0c27db4cb73535387f4ebc977cc604",
+      "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+      "runtime_utils.py": "faedc9a7aac3d390bf197673fe05620ade79707a09e389b2d717ac13b96784de",
+      "stabilize/exp_testbed_20k.py": "e5c71116b807945e2d05d7b31d3b4ca565acf0ebefd3384d41eed71344e57cd3"
+    }
+  }
+}

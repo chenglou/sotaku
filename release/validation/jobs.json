@@ -1,0 +1,116 @@
+{
+  "date": "2026-09-02",
+  "volume": "sudoku-outputs",
+  "jobs": [
+    {
+      "kind": "compiled_cuda_smoke",
+      "app": "ap-3GFGhN3h6ouHvAeWuwtIFB",
+      "directory": "release_validation/v2_20260902_smoke_v1"
+    },
+    {
+      "kind": "eager_cuda_smoke",
+      "app": "ap-ViEMlzF9R4Nr15rYg1hYcx",
+      "directory": "release_validation/v2_20260902_smoke_eager_v1"
+    },
+    {
+      "kind": "full_late_state_ce_bf16_eager",
+      "app": "ap-w7wQBhRZsh8Vjg9Rorxon2",
+      "directory": "release_validation/v2_20260902_full_late_ce_v1/full"
+    },
+    {
+      "kind": "full_v1_bf16_eager",
+      "app": "ap-UkNzxHV9jpHQZh3dTijlLC",
+      "directory": "release_validation/v2_20260902_full_v1_v1/full"
+    },
+    {
+      "kind": "precision_matrix_late_state_ce",
+      "app": "ap-ffO5gV4weHnom9jfW1fRgw",
+      "directory": "release_validation/v2_20260902_precision_late_ce_v1"
+    },
+    {
+      "kind": "precision_matrix_v1",
+      "app": "ap-rJCZZn16r9jmI41YWpNQ4t",
+      "directory": "release_validation/v2_20260902_precision_v1_v1"
+    },
+    {
+      "kind": "burnin_dropout_on",
+      "seed": 20260724,
+      "app": "ap-w590TJZvGNdDNL1UnbeuQj",
+      "directory": "release_validation/v2_20260902_dropout_on_s20260724_v1"
+    },
+    {
+      "kind": "burnin_dropout_off",
+      "seed": 20260724,
+      "app": "ap-xgm0yYVlZgHAV4VRFdgaov",
+      "directory": "release_validation/v2_20260902_dropout_off_s20260724_v1"
+    },
+    {
+      "kind": "burnin_dropout_on",
+      "seed": 20260730,
+      "app": "ap-MkbO5s6IapLjD5rAXDUK3M",
+      "directory": "release_validation/v2_20260902_dropout_on_s20260730_v1"
+    },
+    {
+      "kind": "burnin_dropout_off",
+      "seed": 20260730,
+      "app": "ap-le2BiZQUR59AMW8eiDDQDG",
+      "directory": "release_validation/v2_20260902_dropout_off_s20260730_v1"
+    },
+    {
+      "kind": "full_late_state_ce_bf16_compiled",
+      "app": "ap-xKppRhXAcFL5Vpq1UslW9m",
+      "directory": "evaluations/v2_20260902_full_late_ce_bf16_compiled_v1"
+    },
+    {
+      "kind": "full_late_state_ce_fp32_eager",
+      "app": "ap-54cJt714fHsWyig1yQShKY",
+      "directory": "evaluations/v2_20260902_full_late_ce_fp32_eager_v1"
+    },
+    {
+      "kind": "full_v1_bf16_compiled",
+      "app": "ap-CLOgHtPLc5W7XCnbdfcMxN",
+      "directory": "evaluations/v2_20260902_full_v1_bf16_compiled_v1"
+    },
+    {
+      "kind": "full_v1_fp32_eager",
+      "app": "ap-plUpXvmlG7olnkNlP6pAWv",
+      "directory": "evaluations/v2_20260902_full_v1_fp32_eager_v1"
+    },
+    {
+      "kind": "full_dropout_off_bf16",
+      "seed": 20260730,
+      "app": "ap-LoDEh3u6730wBYGwqAutVM",
+      "directory": "evaluations/v2_20260902_dropout_off_s20260730_to43k_bf16"
+    },
+    {
+      "kind": "full_dropout_off_fp32",
+      "seed": 20260730,
+      "app": "ap-1wNaw8HdajHwWYyGQgTvNJ",
+      "directory": "evaluations/v2_20260902_dropout_off_s20260730_to43k_fp32"
+    },
+    {
+      "kind": "full_dropout_on_bf16",
+      "seed": 20260724,
+      "app": "ap-B3wT43Kn3AoLlyp4XAZKfg",
+      "directory": "evaluations/v2_20260902_dropout_on_s20260724_to43k_bf16"
+    },
+    {
+      "kind": "full_dropout_on_fp32",
+      "seed": 20260724,
+      "app": "ap-P5O7fO08IHpU1WLJnmpQdv",
+      "directory": "evaluations/v2_20260902_dropout_on_s20260724_to43k_fp32"
+    },
+    {
+      "kind": "full_dropout_on_bf16",
+      "seed": 20260730,
+      "app": "ap-ZigocJms1qZREEXQCPBOOq",
+      "directory": "evaluations/v2_20260902_dropout_on_s20260730_to43k_bf16"
+    },
+    {
+      "kind": "full_dropout_on_fp32",
+      "seed": 20260730,
+      "app": "ap-mcjOSyC3U9B2rrPxRW4lu0",
+      "directory": "evaluations/v2_20260902_dropout_on_s20260730_to43k_fp32"
+    }
+  ]
+}

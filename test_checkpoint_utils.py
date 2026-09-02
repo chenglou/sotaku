@@ -4,10 +4,40 @@ from pathlib import Path
 
 import torch
 
-from checkpoint_utils import atomic_torch_save, load_branch_checkpoint
+from checkpoint_utils import atomic_torch_save, load_branch_checkpoint, load_checkpoint, validate_config
 
 
 class BranchCheckpointTest(unittest.TestCase):
+    def test_resume_rejects_a_removed_objective(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checkpoint.pt"
+            model = torch.nn.Linear(2, 1)
+            atomic_torch_save({
+                "model_state_dict": model.state_dict(),
+                "config": {"late_margin_floor_weight": 0.1, "late_margin_floor": 5},
+            }, path)
+            with self.assertRaisesRegex(ValueError, "Config mismatch.*late_margin_floor"):
+                load_checkpoint(path, model, {})
+
+    def test_legacy_defaults_must_be_explicit(self):
+        with self.assertRaises(ValueError):
+            validate_config({}, {"dropout": True})
+        validate_config({}, {"dropout": True}, legacy_defaults={"dropout": True})
+        with self.assertRaises(ValueError):
+            validate_config({}, {"dropout": False}, legacy_defaults={"dropout": True})
+        with self.assertRaises(ValueError):
+            validate_config({"unknown": None}, {})
+        validate_config({"horizons": (32, 64)}, {"horizons": [32, 64]})
+
+    def test_branch_checks_saved_step_before_loading_weights(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "checkpoint_step39000.pt"
+            model = torch.nn.Linear(2, 1)
+            atomic_torch_save({"step": 38000, "config": {},
+                               "model_state_dict": model.state_dict()}, path)
+            with self.assertRaisesRegex(ValueError, "Branch step mismatch"):
+                load_branch_checkpoint(path, model, {}, set(), expected_step=39000)
+
     def test_branch_allows_only_declared_config_changes(self):
         source_model = torch.nn.Linear(2, 1)
         with tempfile.TemporaryDirectory() as temp_dir:

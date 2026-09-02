@@ -1,0 +1,206 @@
+{
+  "benchmark": {
+    "dataset": "sapientinc/sudoku-extreme",
+    "per_bucket": 5000,
+    "purpose": "reused development benchmark, not an untouched holdout",
+    "revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b",
+    "rows_sha256": "697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc",
+    "sampling_order": "first encounter, then numeric bucket concatenation",
+    "schema_version": 1,
+    "seed": 42,
+    "split": "test"
+  },
+  "identity": {
+    "batch_size": 256,
+    "benchmark_rows_sha256": "697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc",
+    "chunk_iterations": 16,
+    "compiled": false,
+    "device_type": "cuda",
+    "implementation_sha256": {
+      "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+      "inference.py": "f10cb7341ff84204c04d68891607a91f9f64c0002976444dadf40c8b33df92ad",
+      "iters/eval_more_iters.py": "24bd347016371d2e2cd456cf34c3beba221cbbb722dba63059b9bcfd1430a8b7",
+      "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+      "model_io.py": "26548f5a026fa410adc5f68a976569c8b4132f7ef507c7458b6f4fc2016df021",
+      "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+    },
+    "iterations": [
+      128,
+      1024,
+      2048,
+      4096
+    ],
+    "matmul_precision": "highest",
+    "model": {
+      "architecture": "sotaku-loop-v1",
+      "d_ff": 512,
+      "d_model": 128,
+      "dropout": 0.1,
+      "feedback_scale": 1.0,
+      "grid_side": 9,
+      "input_categories": 10,
+      "layer_schedule": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "n_heads": 4,
+      "outer_state_norm": false,
+      "outer_state_norm_epsilon": 1e-06,
+      "outer_state_rms_cap": null,
+      "output_categories": 9,
+      "residual_scale": 1.0,
+      "rope_base": 10.0,
+      "training_iterations": 16,
+      "unique_layers": 4
+    },
+    "precision": "fp32",
+    "runtime": {
+      "cuda": "12.8",
+      "cudnn": 91002,
+      "driver_version": [
+        "580.95.05"
+      ],
+      "gpu": "NVIDIA H200",
+      "gpu_capability": [
+        9,
+        0
+      ],
+      "packages": {
+        "datasets": "4.4.1",
+        "huggingface_hub": "1.1.5",
+        "numpy": "2.2.6",
+        "pandas": "2.3.3",
+        "pyarrow": "22.0.0",
+        "torch": "2.10.0+cu128"
+      },
+      "sdpa_flash": true,
+      "sdpa_math": true,
+      "sdpa_memory_efficient": true,
+      "tf32_cudnn": true,
+      "tf32_matmul": false
+    },
+    "track_solutions_every_iteration": false,
+    "weights_sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+  },
+  "per_puzzle_file": "per_puzzle.npz",
+  "per_puzzle_sha256": "64aa64a621298d8692c9d606c32b2f325637e0a332b0c44c3b672bf30a908d43",
+  "scores": {
+    "1024": {
+      "accuracy_percent": 99.116,
+      "buckets": {
+        "0": {
+          "solved": 4997,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4982,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4936,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4918,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4946,
+          "total": 5000
+        }
+      },
+      "gained_since_previous_recorded_horizon": 734,
+      "lost_since_previous_recorded_horizon": 27,
+      "solved": 24779,
+      "total": 25000
+    },
+    "128": {
+      "accuracy_percent": 96.288,
+      "buckets": {
+        "0": {
+          "solved": 5000,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4981,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4665,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4612,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4814,
+          "total": 5000
+        }
+      },
+      "solved": 24072,
+      "total": 25000
+    },
+    "2048": {
+      "accuracy_percent": 99.048,
+      "buckets": {
+        "0": {
+          "solved": 4981,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4973,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4937,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4924,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4947,
+          "total": 5000
+        }
+      },
+      "gained_since_previous_recorded_horizon": 42,
+      "lost_since_previous_recorded_horizon": 59,
+      "solved": 24762,
+      "total": 25000
+    },
+    "4096": {
+      "accuracy_percent": 98.632,
+      "buckets": {
+        "0": {
+          "solved": 4957,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4950,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4922,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4912,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4917,
+          "total": 5000
+        }
+      },
+      "gained_since_previous_recorded_horizon": 25,
+      "lost_since_previous_recorded_horizon": 129,
+      "solved": 24658,
+      "total": 25000
+    }
+  },
+  "seconds_including_compilation": 992.623289051
+}

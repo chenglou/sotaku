@@ -1,169 +1,192 @@
-# Test existing model with more iterations at inference time.
-# No retraining needed — just override n_iterations during eval.
+"""Evaluate supported loop checkpoints with saved settings and per-puzzle records."""
 
-import torch
-import torch.nn.functional as F
-import numpy as np
 import argparse
-import importlib
+import json
+import os
 import time
+import uuid
+from pathlib import Path
+
+import numpy as np
+import torch
 from datasets import load_dataset
 
-torch.set_float32_matmul_precision('high')
+from checkpoint_utils import atomic_json_save, validate_config
+from dataset_utils import (
+    DATASET_NAME, DATASET_REVISION, RATING_BUCKETS, benchmark_manifest, validate_benchmark,
+)
+from inference import RecurrentRunner, validate_iterations
+from model_io import load_model
+from runtime_utils import file_sha256, runtime_manifest
+from stabilize.exp_testbed_20k import encode_puzzles, encode_solutions
 
-RATING_BUCKETS = [
-    (0, 0, "0"),
-    (1, 2, "1-2"),
-    (3, 10, "3-10"),
-    (11, 50, "11-50"),
-    (51, 1000, "51+"),
-]
+
+def evaluate(model_path, exp_module=None, iter_counts=(16, 32, 64, 128),
+             max_test=5000, device="cuda", output_dir=None, *, manifest_path=None,
+             benchmark_path=None, precision=None, batch_size=256, compiled=False,
+             matmul_precision=None, track_solutions=False, legacy_defaults=False,
+             dataset=None):
+    iterations = validate_iterations(iter_counts)
+    if type(batch_size) is not int or batch_size <= 0:
+        raise ValueError("batch_size must be a positive integer")
+    device = torch.device(device)
+    if device.type == "cuda" and not torch.cuda.is_available():
+        raise ValueError("CUDA is unavailable; pass --device cpu explicitly")
+    precision = precision or "fp32"
+    if precision not in ("fp32", "bf16") or (precision == "bf16" and device.type != "cuda"):
+        raise ValueError("Use fp32 on CPU, or fp32/bf16 on CUDA")
+    matmul_precision = matmul_precision or ("highest" if precision == "fp32" else "high")
+    if matmul_precision not in ("high", "highest"):
+        raise ValueError("matmul_precision must be high or highest")
+    model, model_manifest = load_model(
+        model_path, manifest_path=manifest_path, legacy_exp=exp_module,
+        legacy_defaults=legacy_defaults, device=device,
+    )
+    torch.set_float32_matmul_precision(matmul_precision)
+    if dataset is None:
+        dataset = load_dataset(DATASET_NAME, revision=DATASET_REVISION, split="test")
+    if benchmark_path:
+        benchmark = json.loads(Path(benchmark_path).read_text())
+    else:
+        benchmark = benchmark_manifest(dataset, per_bucket=max_test)
+    rows = validate_benchmark(dataset, benchmark)
+    if output_dir is None:
+        output_dir = Path("runs") / f"eval_{Path(model_path).stem}_{uuid.uuid4().hex[:10]}"
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    environment = runtime_manifest((
+        "model_io.py", "inference.py", "iters/eval_more_iters.py",
+        "stabilize/exp_testbed_20k.py", "dataset_utils.py", "iters/state_norm.py",
+    ))
+    identity = {
+        "weights_sha256": file_sha256(model_path), "model": model_manifest["model"],
+        "benchmark_rows_sha256": benchmark["rows_sha256"], "iterations": list(iterations),
+        "precision": precision, "matmul_precision": matmul_precision,
+        "batch_size": batch_size, "compiled": compiled, "chunk_iterations": 16,
+        "track_solutions_every_iteration": track_solutions, "device_type": device.type,
+        "implementation_sha256": environment["source_sha256"],
+        "runtime": {key: environment.get(key) for key in (
+            "python", "packages", "installed_packages", "inductor", "cuda", "gpu", "gpu_capability", "cudnn", "driver_version",
+            "tf32_matmul", "tf32_cudnn", "sdpa_flash", "sdpa_memory_efficient", "sdpa_math",
+            "bf16_reduced_precision_reduction",
+        )},
+    }
+    identity_path = output_dir / "identity.json"
+    if identity_path.exists():
+        validate_config(json.loads(identity_path.read_text()), identity)
+        if (output_dir / "result.json").exists():
+            result = json.loads((output_dir / "result.json").read_text())
+            validate_config(result["identity"], identity)
+            if file_sha256(output_dir / "per_puzzle.npz") != result["per_puzzle_sha256"]:
+                raise ValueError("Saved evaluation arrays do not match their checksum")
+            print(f"Reusing completed evaluation in {output_dir}")
+            return result
+    else:
+        atomic_json_save(identity, identity_path)
+    atomic_json_save(benchmark, output_dir / "benchmark.json")
+    atomic_json_save(environment, output_dir / "environment.json")
+    questions, answers = rows["question"], rows["answer"]
+    inputs = encode_puzzles(questions)
+    targets = encode_solutions(answers).long()
+    empty_masks = inputs[:, :, 0].bool()
+    predictions_by_horizon = {horizon: [] for horizon in iterations}
+    diagnostics_parts = {}
+    runner = RecurrentRunner(model, compiled=compiled, track_solutions=track_solutions)
+    start_time = time.monotonic()
+    log_path = output_dir / f"{Path(model_path).stem}_eval.log"
+    with log_path.open("a", buffering=1) as log_file:
+        def log(message):
+            print(message, flush=True)
+            log_file.write(message + "\n")
+
+        log_settings = {key: value for key, value in identity.items()
+                        if key not in ("runtime", "implementation_sha256")}
+        log(f"Evaluation: {json.dumps(log_settings, sort_keys=True)}")
+        log("Complete runtime and source hashes: environment.json and identity.json")
+        log(f"Total test puzzles: {len(rows)}; output: {output_dir}")
+        for start in range(0, len(rows), batch_size):
+            end = min(start + batch_size, len(rows))
+            autocast = torch.autocast(device.type, dtype=torch.bfloat16, enabled=precision == "bf16")
+            with autocast:
+                outputs, diagnostics = runner.run_batch(
+                    inputs[start:end].to(device), iterations,
+                    targets=targets[start:end].to(device), empty_mask=empty_masks[start:end].to(device),
+                )
+            for horizon, logits in outputs.items():
+                predictions_by_horizon[horizon].append(logits.argmax(-1).to(torch.uint8).cpu())
+            if diagnostics:
+                for key, values in diagnostics.items():
+                    diagnostics_parts.setdefault(key, []).append(values)
+            if end == len(rows) or (start // batch_size + 1) % 10 == 0:
+                log(f"Completed {end}/{len(rows)} puzzles through iteration {iterations[-1]}")
+        arrays = {"indices": np.asarray(benchmark["indices"], dtype=np.int64)}
+        summary, previous_solved = {}, None
+        for horizon in iterations:
+            predictions = torch.cat(predictions_by_horizon[horizon], dim=0)
+            solved = ((predictions == targets) | ~empty_masks).all(-1)
+            count = int(solved.sum())
+            bucket_results = {}
+            for _, _, name in RATING_BUCKETS:
+                selected = torch.tensor([value == name for value in benchmark["bucket_names"]])
+                bucket_results[name] = {"solved": int(solved[selected].sum()), "total": int(selected.sum())}
+            row = {"solved": count, "total": len(rows), "accuracy_percent": 100 * count / len(rows), "buckets": bucket_results}
+            if previous_solved is not None:
+                row["lost_since_previous_recorded_horizon"] = int((previous_solved & ~solved).sum())
+                row["gained_since_previous_recorded_horizon"] = int((~previous_solved & solved).sum())
+            previous_solved = solved
+            summary[str(horizon)] = row
+            arrays[f"predictions_{horizon}"] = predictions.numpy()
+            arrays[f"solved_{horizon}"] = solved.numpy()
+            log(f"{horizon:5d} | {count}/{len(rows)} | {100 * count / len(rows):.3f}%")
+        for key, parts in diagnostics_parts.items():
+            arrays[key] = torch.cat(parts).numpy()
+        temporary_arrays = output_dir / "per_puzzle.npz.tmp"
+        with temporary_arrays.open("wb") as handle:
+            np.savez_compressed(handle, **arrays)
+        os.replace(temporary_arrays, output_dir / "per_puzzle.npz")
+        result = {
+            "identity": identity, "scores": summary,
+            "seconds_including_compilation": time.monotonic() - start_time,
+            "per_puzzle_file": "per_puzzle.npz", "per_puzzle_sha256": file_sha256(output_dir / "per_puzzle.npz"),
+            "benchmark": {key: value for key, value in benchmark.items() if key not in ("indices", "bucket_names")},
+        }
+        if track_solutions:
+            result["solution_tracking"] = {
+                "ever_solved": int(arrays["ever_solved"].sum()),
+                "stayed_solved_after_first": int(arrays["stayed_solved_after_first"].sum()),
+                "puzzles_with_a_regression": int((arrays["regression_count"] > 0).sum()),
+                "observation_interval": 1,
+            }
+        atomic_json_save(result, output_dir / "result.json")
+        log(f"Saved per-puzzle records and result.json in {output_dir}")
+    return result
 
 
-def evaluate(model_path, exp_module='iters.exp_baseline_lr2e3', iter_counts=[16, 32, 64, 128],
-             max_test=5000, device='cuda', output_dir=None):
-    import os
-
-    log_file = None
-    if output_dir:
-        model_name = os.path.basename(model_path).replace(".pt", "")
-        log_path = os.path.join(output_dir, f"{model_name}_eval.log")
-        log_file = open(log_path, "w")
-
-    def log(msg):
-        print(msg)
-        if log_file:
-            log_file.write(msg + "\n")
-            log_file.flush()
-
-    mod = importlib.import_module(exp_module)
-
-    device = torch.device(device if torch.cuda.is_available() else 'cpu')
-
-    # Load model
-    model = mod.SudokuTransformer().to(device)
-    state = torch.load(model_path, map_location=device, weights_only=True)
-    if 'model_state_dict' in state:
-        state = state['model_state_dict']
-    model.load_state_dict(state)
-    model.eval()
-
-    # Load test data
-    log("Loading test data...")
-    test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
-
-    buckets = {}
-    for i in range(len(test_dataset)):
-        r = test_dataset[i]['rating']
-        for min_r, max_r, name in RATING_BUCKETS:
-            if min_r <= r <= max_r:
-                if name not in buckets:
-                    buckets[name] = []
-                buckets[name].append(i)
-                break
-
-    import random
-    random.seed(42)
-    for name in buckets:
-        if len(buckets[name]) > max_test:
-            buckets[name] = random.sample(buckets[name], max_test)
-
-    all_puzzles = []
-    all_solutions = []
-    bucket_names = []
-    for name in sorted(buckets.keys(), key=lambda n: [b[2] for b in RATING_BUCKETS].index(n)):
-        for idx in buckets[name]:
-            all_puzzles.append(test_dataset[idx]['question'])
-            all_solutions.append(test_dataset[idx]['answer'])
-            bucket_names.append(name)
-
-    x_all = mod.encode_puzzles(all_puzzles).to(device)
-    n_total = len(all_puzzles)
-    log(f"Total test puzzles: {n_total}\n")
-
-    # Build solution targets
-    solution_targets = []
-    for sol in all_solutions:
-        solution_targets.append([int(sol[j]) - 1 for j in range(81)])
-    solution_targets = torch.tensor(solution_targets)
-
-    empty_masks = torch.tensor([[p[j] == '.' for j in range(81)] for p in all_puzzles])
-
-    # Custom forward that allows overriding iteration count
-    def run_with_iters(model, x, n_iters):
-        batch_size = x.size(0)
-        dev = x.device
-        rope_cos = mod.ROPE_COS.to(dev)
-        rope_sin = mod.ROPE_SIN.to(dev)
-
-        h_prev = model.initial_encoder(x)
-        preds = torch.zeros(batch_size, 81, 9, device=dev)
-
-        for _ in range(n_iters):
-            h = h_prev + model.pred_proj(preds)
-            for layer in model.layers:
-                h = layer(h, rope_cos, rope_sin)
-            h_prev = h
-            logits = model.output_head(h)
-            preds = F.softmax(logits, dim=-1)
-        return logits
-
-    batch_size = 256
-    log(f"{'Iters':>5} | {'Total Solved':>12} | {'Acc':>6} | {'Time':>6} | " +
-        " | ".join(f"{b[2]:>5}" for b in RATING_BUCKETS))
-    log("-" * 80)
-
-    for n_iters in iter_counts:
-        all_preds = []
-        t_start = time.time()
-
-        use_autocast = device.type == 'cuda'
-        ctx = torch.autocast(device.type, dtype=torch.bfloat16) if use_autocast else torch.no_grad()
-        with torch.no_grad(), ctx:
-            for start in range(0, n_total, batch_size):
-                end = min(start + batch_size, n_total)
-                batch_x = x_all[start:end]
-                logits = run_with_iters(model, batch_x, n_iters)
-                all_preds.append(logits.argmax(dim=-1).cpu())
-
-        t_elapsed = time.time() - t_start
-        all_preds = torch.cat(all_preds, dim=0)
-
-        # Check puzzle-level accuracy
-        correct = (all_preds == solution_targets) & empty_masks
-        per_puzzle_correct = correct.sum(dim=1)
-        per_puzzle_total = empty_masks.sum(dim=1)
-        solved = (per_puzzle_correct == per_puzzle_total)
-
-        # Per-bucket results
-        bucket_results = {}
-        for name in [b[2] for b in RATING_BUCKETS]:
-            mask = torch.tensor([b == name for b in bucket_names])
-            bucket_solved = (solved & mask).sum().item()
-            bucket_total = mask.sum().item()
-            bucket_results[name] = (bucket_solved, bucket_total)
-
-        total_solved = solved.sum().item()
-        acc = 100 * total_solved / n_total
-
-        bucket_strs = []
-        for name in [b[2] for b in RATING_BUCKETS]:
-            s, t = bucket_results[name]
-            bucket_strs.append(f"{100*s/t:5.1f}%")
-
-        log(f"{n_iters:5d} | {total_solved:5d}/{n_total} | {acc:5.1f}% | {t_elapsed:5.1f}s | " +
-            " | ".join(bucket_strs))
-
-    if log_file:
-        log_file.close()
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("model_path")
+    parser.add_argument("--manifest")
+    parser.add_argument("--exp", help="Legacy plain model module, only with --legacy-defaults")
+    parser.add_argument("--legacy-defaults", action="store_true")
+    parser.add_argument("--iters", type=int, nargs="+", default=[128, 1024, 2048, 4096])
+    parser.add_argument("--max-test", type=int, default=5000, help="Puzzles per rating bucket")
+    parser.add_argument("--benchmark", help="Frozen benchmark JSON; overrides --max-test")
+    parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
+    parser.add_argument("--precision", choices=("fp32", "bf16"), default="fp32")
+    parser.add_argument("--matmul-precision", choices=("high", "highest"),
+                        help="Defaults to highest for FP32, high for BF16")
+    parser.add_argument("--batch-size", type=int, default=256)
+    parser.add_argument("--compiled", action="store_true")
+    parser.add_argument("--track-solutions", action="store_true")
+    parser.add_argument("--output-dir")
+    args = parser.parse_args()
+    evaluate(
+        args.model_path, args.exp, args.iters, args.max_test, args.device, args.output_dir,
+        manifest_path=args.manifest, benchmark_path=args.benchmark, precision=args.precision,
+        matmul_precision=args.matmul_precision, batch_size=args.batch_size,
+        compiled=args.compiled, track_solutions=args.track_solutions, legacy_defaults=args.legacy_defaults,
+    )
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("model_path", help="Path to model .pt file")
-    parser.add_argument("--exp", default="iters.exp_baseline_lr2e3")
-    parser.add_argument("--iters", type=int, nargs="+", default=[16, 32, 48, 64, 96, 128])
-    parser.add_argument("--max-test", type=int, default=5000)
-    parser.add_argument("--device", default="cuda")
-    args = parser.parse_args()
-    evaluate(args.model_path, args.exp, args.iters, args.max_test, args.device)
+    main()

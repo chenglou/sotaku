@@ -1,4 +1,4 @@
-# Looped Dynamics Experiments (July 2026)
+# Looped Dynamics Experiments
 
 This folder contains controlled follow-ups to two July 2026 results: the layer-loop schedule in [*Loop the Loopies!*](https://arxiv.org/abs/2607.16051) and the tied-residual parameterization in [*On the Residual Scaling of Looped Transformers*](https://arxiv.org/abs/2606.18524).
 
@@ -6,14 +6,20 @@ Current conclusions:
 
 - Residual scaling and 64-iteration training did not stabilize the unnormalized Sotaku loop.
 - Two-block RMSNorm schedules are reliable and parameter-efficient, but peak around 85%.
-- Randomized detached late-state cross-entropy is the recommended default. It changes neither the architecture nor the loss, and all tested 20K and 50K final runs remained healthy at 1024. A clean 50K final checkpoint scored 98.80% at 1024 and 92.98% at 2048 without inference adjustments.
+- Randomized detached late-state cross-entropy is the recommended default. It changes neither the architecture nor the loss, and all tested 20K and 50K final runs remained healthy at 1024. The recommended 50K final checkpoint scores 99.12% at 1024 and 98.63% at 4096 in FP32, without damping. Its historical BF16 scores were 98.80% at 1024 and 92.98% at 2048.
 - A second late supervised window is most useful after ordinary late-state training has produced a healthy model. Starting the extra objective from initialization did not improve the mean result.
 - Recovery and component interventions now locate the immediate failure at the correct-answer boundary: collapsed trajectories lose minimum answer margin. State magnitude, total hidden-state rotation, and gradient conflict do not distinguish healthy models reliably.
-- The highest-scoring research checkpoint combines late-state cross-entropy through step 39K with a second future cross-entropy window and calibrated minimum-margin loss through step 50K. Its final weights reached 99.00% at 1024, 98.46% at 2048, and 82.17% at 4096 without inference adjustments. This staged result has not yet been replicated; late-state CE alone remains the recommended public recipe.
+- The highest-scoring July BF16 research checkpoint combines late-state cross-entropy through step 39K with a second future cross-entropy window and calibrated minimum-margin loss through step 50K. Its final weights reached 99.00% at 1024, 98.46% at 2048, and 82.17% at 4096 without inference adjustments. This staged result has not yet been replicated; late-state CE alone remains the recommended public recipe.
 - Delayed damping remains an optional inference policy for checkpoints that deteriorate deeply. It keeps three independent late-state final checkpoints at 94.69-96.91% through iteration 4096, but is unnecessary when an undamped checkpoint already remains healthy at the target horizon.
 - Use 20K runs for routine comparisons, then validate promising changes at 50K. The 20K schedule preserved the useful late-state signal across three seeds, while 10K did not reliably preserve later rankings. A 20K result can still miss a positive or negative phase change after step 20K.
 
 All current runs use the first 2.7M puzzles from the training split. The full schedule has 50K optimizer steps, batch size 2048, a 1,400-step warmup, and actual rating pools 51+, 11+, 1+, and 0+ over phases of 10K, 10K, 10K, and 20K steps. Historical config and log labels say 21+ and 6+ for the first two phases, but the trainer selects whole buckets by their lower endpoint, producing 51+ and 11+. The training behavior is unchanged. The 20K schedule is useful for screening; 10K screens did not preserve the later ranking, and the current recipe has no clean reduced-puzzle-count ablation.
+
+## September Release Checks
+
+The release audit reproduced the recommended late-state CE checkpoint's full BF16 25K counts exactly at 128/1024/2048/4096. The same weights in FP32 score 96.288 / 99.116 / 99.048 / 98.632%. Compiled BF16 scores 96.372 / 98.952 / 97.600 / 92.512%. The historical profiles below are therefore execution-specific: do not attribute their deep-iteration deterioration entirely to learned dynamics. The [precision study](../release/PRECISION_PROTOCOL.md) holds weights and puzzles fixed; FP32 is now the public inference default, with no retraining or damping.
+
+A separate [burn-in dropout experiment](BURNIN_DROPOUT.md) continues two healthy seeds with dropout on versus off only while preparing detached states. It retains the original 50K schedule and supervised-window dropout, records the exact sampled batches, and does not change the public recommendation while results are pending. Release engineering fixes and fresh reference results are in [the audit](../V2_RELEASE_AUDIT.md).
 
 ## First-wave training matrix
 

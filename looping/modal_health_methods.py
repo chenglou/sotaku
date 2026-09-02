@@ -33,7 +33,8 @@ image = (
         remote_path="/root/project",
         ignore=[
             "venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/",
-            "runs_modal/", "*.pt", "*.log",
+            "runs_modal/", "*.pt", "*.log", ".venv/", ".claude/", ".codex/", "temp-side-convo.txt",
+            "release/validation/", "release/v2/*.zip",
         ],
     )
 )
@@ -104,15 +105,17 @@ def run_trial(arm: str, run_name: str, random_seed: int):
 
 
 @app.local_entrypoint()
-def main(arm: str = "vanilla", trial: int = 0):
+def main(arm: str = "late_state_ce", trial: int = 0, name: str = "", seed: int = -1):
     arm = arm.replace("-", "_")
     if arm not in ARM_NAMES:
         choices = ", ".join(ARM_NAMES)
         raise ValueError(f"unknown arm {arm!r}; choose one of: {choices}")
     if trial < 0:
         raise ValueError("trial must be non-negative")
-    run_name = f"loop_health_standalone_v1_{arm}_50k_trial{trial}"
-    random_seed = 20_260_730 + trial
+    run_name = name or f"loop_health_standalone_v1_{arm}_50k_trial{trial}"
+    random_seed = 20_260_730 + trial if seed == -1 else seed
+    if random_seed < 0:
+        raise ValueError("seed must be non-negative")
     call = run_trial.spawn(arm, run_name, random_seed)
     print(f"Spawned {run_name}: {call.object_id}")
     print(f"Poll looping/{run_name}.log on sudoku-outputs for progress.")

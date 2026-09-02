@@ -5,8 +5,8 @@ From-scratch experiments on iterative neural Sudoku solvers. See [post](https://
 ## Current Status
 
 - **Recommended default:** randomized detached late-state cross-entropy, with no architecture change or inference adjustment
-- **Benchmark:** `sapientinc/sudoku-extreme` via `load_dataset(..., split="test")`
-- **Recommended checkpoint result:** **98.80%** at 1024 and **92.98%** at 2048, without inference-time damping
+- **Benchmark:** [frozen 25K-puzzle sample](release/benchmark_25k.json) from the `sapientinc/sudoku-extreme` test split
+- **Recommended checkpoint result:** **99.12%** at 1024 and **98.63%** at 4096 with FP32 inference, without inference-time damping
 - **Published checkpoint:** the historical plain-backprop checkpoint remains available at **98.9%** at 1024; the recommended late-state checkpoint is not yet published
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** 2.7M-puzzle pool, BS=2048, LR=2e-3, 16 supervised iterations, 50K optimizer steps, cosine decay, reverse curriculum
@@ -25,7 +25,7 @@ Reported full evaluations use 25,000 test puzzles: 5,000 from each rating bucket
 
 ## Setup
 
-Reference training used Linux, Python 3.11, an NVIDIA H200, and PyTorch 2.10.0 with CUDA 12.8. Training requires a CUDA GPU and substantial memory at batch size 2048; gradient accumulation is not yet supported for late-state training. CPU inference is supported, but the reported scores use CUDA bfloat16 evaluation.
+Reference training used Linux, Python 3.11, an NVIDIA H200, and PyTorch 2.10.0 with CUDA 12.8. Training requires a CUDA GPU and substantial memory at batch size 2048; gradient accumulation is not yet supported for late-state training. Training uses BF16 autocast. Inference defaults to FP32 with TF32 matmul disabled because reduced precision can substantially degrade very long trajectories. CPU inference is supported; reported benchmark scores use CUDA.
 
 For the reference CUDA build, following the [PyTorch installation instructions](https://pytorch.org/get-started/previous-versions/#v2100):
 
@@ -33,27 +33,25 @@ For the reference CUDA build, following the [PyTorch installation instructions](
 python3.11 -m venv venv
 source venv/bin/activate
 pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cu128
-pip install -r requirements-modal.txt
+pip install -r requirements.txt
 ```
 
-For CPU-only inference, install the CPU build from the linked instructions instead. `requirements-modal.txt` contains the smaller core dependency set; `requirements.txt` is an older full environment snapshot. Neither file fully locks the reference environment.
+For CPU-only inference, install the CPU build from the linked instructions instead. `requirements.txt` pins the core packages; `requirements-modal.txt` also selects the CUDA 12.8 build. Optional tests and plotting dependencies are in `requirements-dev.txt`. The old Linux environment snapshot is preserved as `requirements-legacy.txt`. Evaluations record the complete installed environment, including transitive dependencies and the GPU driver.
 
 ## Train And Evaluate
 
-The 98.80% checkpoint used the 50K late-state-CE preset with seed `20260730`. The following command uses that preset and seed; independent retraining is not guaranteed to match its exact score.
+The recommended checkpoint used the 50K late-state-CE preset with seed `20260730`. Its unchanged weights score 99.12% at 1024 in FP32, versus the historical 98.80% in BF16. The following command uses that preset and seed; independent retraining is not guaranteed to match its exact score.
 
 ```sh
-python -c "from looping.exp_health_methods import train; train(arm='late_state_ce', random_seed=20260730, run_name='loop_late_state_ce_50k')"
+python train.py --preset reference --seed 20260730 --run-name late_ce_50k
 
-python -m iters.eval_more_iters model_loop_late_state_ce_50k.pt \
-  --exp stabilize.exp_testbed_20k --iters 128 1024 2048 4096
+python -m iters.eval_more_iters runs/training/model_late_ce_50k.pt \
+  --benchmark release/benchmark_25k.json --precision fp32 --iters 128 1024 2048 4096
 ```
 
-For a 20K development run instead:
+For a 20K development run, use `python train.py --run-name late_ce_20k`; `development` is the default preset. Reusing a run name resumes its saved optimizer and schedule. Use a new name for an independent run.
 
-```sh
-python -c "from looping.exp_stay_solved import train; train(arm='late_state_ce', random_seed=20260730, run_name='loop_late_state_ce_20k')"
-```
+New inference weights have an adjacent `.pt.json` manifest with the exact model settings and checksum. Keep both files together. The evaluator uses the same recurrence as training, including normalization or layer schedules, and saves per-puzzle results in a new directory under `runs/`. Unlabelled historical weights require an explicit `--legacy-defaults --exp stabilize.exp_testbed_20k` for a known plain model; the published v1 file is recognized by its checksum.
 
 ## Published Checkpoint
 
@@ -63,32 +61,42 @@ If you want the published 98.9% result without retraining:
 gh release download baseline-lr2e3-checkpoint --pattern model_baseline_lr2e3.pt
 
 python -m iters.eval_more_iters model_baseline_lr2e3.pt \
-  --exp iters.exp_baseline_lr2e3 --iters 1024
+  --benchmark release/benchmark_25k.json --precision bf16 --iters 1024
 ```
 
-Expected result: `24728/25000` solved, or `98.9%`, at `1024` test-time iterations.
+The fresh pinned-environment evaluation solves `24719/25000` at 1024 iterations (98.876%). The original published count was `24728/25000` (98.912%); both round to 98.9%. Use CUDA BF16, eager execution, and batch size 256 to reproduce the fresh evaluation.
+
+For one puzzle, without downloading the dataset:
+
+```sh
+python solve.py model_baseline_lr2e3.pt \
+  '53..7.... 6..195... .98....6. 8...6...3 4..8.3..1 7...2...6 .6....28. ...419..5 ....8..79'
+```
+
+The output is the model's proposed completion, with the given digits preserved.
 
 ## Modal (Optional)
 
 The core training code is provider-agnostic. This launcher uses the reference 50K preset and seed `20260730`:
 
 ```sh
-pip install modal
+pip install modal==1.2.6
 modal token new
 
 # Reference 50K late-state-CE training
-modal run --detach looping/modal_health_methods.py --arm late-state-ce --trial 0
+modal run --detach looping/modal_health_methods.py --arm late-state-ce --seed 20260730 --name late_ce_50k
 
 # Inspect outputs on the volume
 modal volume ls sudoku-outputs
-model=looping/model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt
+model=looping/model_late_ce_50k.pt
 modal volume get sudoku-outputs "$model" .
+modal volume get sudoku-outputs "$model.json" .
 
 # Evaluate the saved model
-modal run --detach modal_eval.py --exp stabilize.exp_testbed_20k --model "$model" --iters 128,1024,2048,4096
+modal run --detach modal_eval.py --model "$model" --precision fp32 --iters 128,1024,2048,4096
 ```
 
-For 20K development on Modal instead, use `modal run --detach looping/modal_stay_solved.py --arm late-state-ce --no-screen`. That launcher uses seed `20260724` for trial 0. Keep `--no-screen` explicit: omitting it selects the 10K screen. Modal installs dependencies from `requirements-modal.txt`, whose PyTorch version remains unpinned; the local installation above does not pin the remote image.
+For 20K development on Modal, use `modal run --detach looping/modal_stay_solved.py --arm late-state-ce --seed 20260730 --name late_ce_20k`. The launcher now defaults to 20K; the older 10K screen requires `--screen`. Launch each independent job in its own detached invocation. Evaluation outputs use unique directories under `evaluations/` on the volume.
 
 ## Visualizations
 
@@ -108,20 +116,24 @@ Outputs go to `viz/output/`.
 - [stabilize/exp_testbed_20k.py](stabilize/exp_testbed_20k.py): shared model and training implementation.
 - [looping/exp_health_methods.py](looping/exp_health_methods.py): 50K reference preset and matched training-method comparisons.
 - [looping/exp_stay_solved.py](looping/exp_stay_solved.py): 20K development preset and optional second-window experiments.
-- [iters/eval_more_iters.py](iters/eval_more_iters.py): iteration-scaling evaluation for the plain architecture used by the recommended and published checkpoints.
+- [train.py](train.py), [solve.py](solve.py): short entrypoints for the recommended training recipe and single-puzzle inference.
+- [model_io.py](model_io.py), [inference.py](inference.py): checksum-verified inference artifacts and the shared recurrent inference path.
+- [iters/eval_more_iters.py](iters/eval_more_iters.py): iteration-scaling evaluation, frozen benchmark indices, and per-puzzle records.
 - [checkpoint_utils.py](checkpoint_utils.py): checkpoint saving and resumption.
 - [looping/modal_health_methods.py](looping/modal_health_methods.py), [looping/modal_stay_solved.py](looping/modal_stay_solved.py), and [modal_eval.py](modal_eval.py): optional Modal wrappers.
 
 ## Results
 
-The recommended recipe and reference results below use the balanced 25K-puzzle test set. Recheck and margin results are kept in the [research notes](looping/EXPERIMENTS_LOOPING.md#staged-recheck-and-margin).
+The reference checkpoints were re-evaluated on 2026-09-02 using the frozen 25K-puzzle benchmark, eager CUDA execution, and batch size 256. FP32 and BF16 rows use identical weights. The BF16 late-state CE result reproduced its historical counts exactly. Recheck and margin results are kept in the [research notes](looping/EXPERIMENTS_LOOPING.md#staged-recheck-and-margin).
 
 | Model | 128 iterations | 1024 | 2048 | 4096 |
 |---|---:|---:|---:|---:|
-| **late-state CE only, final (recommended)** | 96.47% | **98.80%** | 92.98% | 43.70% |
-| historical released plain-backprop checkpoint | 95.3% | 98.9% | 98.8% | - |
-| recurrent RMSNorm, three selected checkpoints | 90.81-91.58% | 91.32-92.44% | 91.37-92.55% | - |
-| randomized late states + delayed damping, three finals | 93.61-94.36% | 94.74-96.84% | 94.71-96.88% | 94.69-96.91% |
+| **late-state CE only, final, FP32 (recommended)** | 96.29% | **99.12%** | 99.05% | 98.63% |
+| released plain-backprop checkpoint, FP32 | 95.70% | 98.89% | 99.03% | 99.02% |
+| same late-state CE checkpoint, BF16 | 96.47% | 98.80% | 92.98% | 43.70% |
+| same released plain-backprop checkpoint, BF16 | 95.26% | 98.88% | 98.84% | 84.89% |
+
+Precision and compilation can substantially change very long trajectories. Keep execution settings with the score; [numerical checks](release/PRECISION_PROTOCOL.md) evaluate these effects without changing the weights. FP32 is the default; use `--precision bf16` for the historical arithmetic. `--compiled` enables compiled 16-iteration chunks and is measured separately, not required for the recommended FP32 results. The observed full FP32 evaluation took about 16.5 minutes, versus 12.5 minutes for eager BF16 on H200; these individual runs are not a controlled throughput benchmark.
 
 The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row, column, or box constraint embedding, just 2D RoPE in attention. Full scaling tables, stability analysis, interventions, and ablations live in [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md) and [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
 
@@ -132,6 +144,8 @@ The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row
 - [Recurrent normalization](stabilize/EXPERIMENTS_STABILIZE.md): RMSNorm, caps, and other stabilization experiments.
 - [Evolution strategies](es/EXPERIMENTS_ES.md): checkpoint rescue, polish, and training from scratch.
 - [Recurrent-state geometry](looping/trajectory_viz/study/README.md): visualization study, controls, and limitations.
+- [Release verification](V2_RELEASE_AUDIT.md): artifact provenance and release-preparation status.
+- [Numerical sensitivity](release/PRECISION_RESULTS.md) and [burn-in dropout](looping/BURNIN_DROPOUT.md): fixed-checkpoint checks and matched continuation experiments.
 
 ## Historical / Archived Code
 

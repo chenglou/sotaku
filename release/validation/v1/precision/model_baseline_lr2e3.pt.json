@@ -1,0 +1,37 @@
+{
+  "artifact_type": "sotaku-inference-weights",
+  "model": {
+    "architecture": "sotaku-loop-v1",
+    "d_ff": 512,
+    "d_model": 128,
+    "dropout": 0.1,
+    "feedback_scale": 1.0,
+    "grid_side": 9,
+    "input_categories": 10,
+    "layer_schedule": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "n_heads": 4,
+    "outer_state_norm": false,
+    "outer_state_norm_epsilon": 1e-06,
+    "outer_state_rms_cap": null,
+    "output_categories": 9,
+    "residual_scale": 1.0,
+    "rope_base": 10.0,
+    "training_iterations": 16,
+    "unique_layers": 4
+  },
+  "provenance": {
+    "published_v1_sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e"
+  },
+  "schema_version": 1,
+  "training": null,
+  "weights": {
+    "bytes": 3210797,
+    "file": "model_baseline_lr2e3.pt",
+    "sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e"
+  }
+}

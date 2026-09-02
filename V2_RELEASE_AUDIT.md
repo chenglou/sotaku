@@ -1,137 +1,90 @@
-# V2 release audit
+# V2 Release Audit
 
-Audited 2026-09-02 at commit `42d5739`, branch `codex/viridian-diagnostics`.
+Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. This document includes the subsequent release-preparation work. No merge, tag, release publication, or GitHub default-branch change has been performed.
 
-Documentation follow-up: the README now leads with late-state CE, describes the actual curriculum pools, names the reference seed and launchers, distinguishes 20K development from 50K reference training, and explains benchmark reuse. The runtime evaluator/resume issues and unpinned Modal environment remain open.
+## Recommendation
 
-## Verdict
+Use late-state cross-entropy as the main v2 recipe and checkpoint, with ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary training loss; it adds no normalization, auxiliary loss, ES, or inference damping. Keep the published v1 checkpoint available, including its stronger result at 4096 in FP32. Recheck and margin remain research material.
 
-There is a credible v2 to release from the existing experiments. Following the release discussion, late-state cross-entropy is the main README model and recommended release checkpoint; recheck and margin remain research notes. Retain v1 as a reference. The late-state checkpoint uses the same 796,937-parameter architecture and ordinary inference: no recurrent RMSNorm, ES, or inference damping is required.
+The release engineering defects identified below have been addressed. Publication is still pending, and numerical-sensitivity and dropout experiments are being checked separately. Those experiments do not alter the prepared reference weights.
 
-The repository is not release-ready as currently presented. The public default branch is still v1, the new weights are not published, reproduction defaults need clarification, and the shared evaluator and resume validation have correctness gaps. These need a focused release-preparation pass, not new architecture research.
+## Verification Status
 
-This audit retrieved existing artifacts and performed local checks. It did not launch GPU jobs, retrain models, change training code, merge branches, create a tag, or publish a release.
+| Area | Result |
+|---|---|
+| Clean installation | Python 3.11.9, PyTorch 2.10.0; 136 unit tests passed; dependency consistency checked |
+| GPU training mechanics | Full four-layer model, 16 supervised iterations; compiled CUDA save/resume and dropout-off burn-in passed |
+| Inference equivalence | Exact eager logits versus the historical forward at 16, 128, and 1024 iterations for both reference models: eight CUDA BF16 puzzles and one CPU FP32 fixture |
+| Full benchmark | Historical BF16 late-state counts reproduced exactly; FP32 improves the same checkpoint to 99.116% at 1024 and 98.632% at 4096 |
+| Numerical sensitivity | Fixed-weight FP32/BF16, eager/compiled, batch-size, and solution-retention checks running; see [protocol](release/PRECISION_PROTOCOL.md) |
+| Dropout experiment | Two matched seed pairs continued from healthy step-39000 checkpoints; see [protocol](looping/BURNIN_DROPOUT.md) |
+| Public release | Assets prepared locally; public download flow cannot be verified until publication |
 
-## Findings
+The GPU smoke fixture uses five copies of an almost-filled board. It verifies optimization, saved optimizer state, resumption, gradients, and module modes, not Sudoku accuracy. Results are retained in [release/validation](release/validation).
 
-### P1: The public default branch and release still expose v1
+## Fresh Benchmark
 
-Live GitHub inspection found `master` at `1bbdc32`, with the research branch 80 commits ahead and no divergent commits. The only release is `baseline-lr2e3-checkpoint`, containing `model_baseline_lr2e3.pt`. There are no open pull requests and no GitHub Actions workflows.
-
-Prepare the release on the current research branch or a release-preparation branch, then integrate the reviewed commit into `master` and tag that commit as `v2.0.0`. Keeping the existing default branch name avoids unnecessary migration. Changing the default to a research branch is not required. Preserve the v1 release and attach the v2 weights, configuration, checksums, and evaluation records to the new release.
-
-The difference from `master` includes 500 files, much of it experimental code and analysis artifacts. This audit covers the recommended training, checkpoint, evaluation, and publication paths, not an exhaustive review of every historical experiment.
-
-### P2: The documented curriculum does not match the actual training pools
-
-The audited README described initial rating thresholds of 21+ and 6+. In [`stabilize/exp_testbed_20k.py`](stabilize/exp_testbed_20k.py), line 783 selects entire rating buckets by their lower endpoint. The actual first two pools are 51+ and 11+. The subsequent pools are 1+ and all ratings. The original baseline trainer uses the same bucket-selection behavior. The README and experiment summary now describe the actual pools; code and historical config labels are unchanged.
-
-This does not invalidate the recorded checkpoint scores, but it matters for reproduction. Document the actual historical pools and test their membership. Do not silently change the training data to literal 21+/6+ while describing that as the recipe that produced these weights; that would be a new experiment.
-
-### P2: The quickstart is not the exact reference run, and launch defaults disagree
-
-The simple checkpoint scoring 98.796% at 1024 used seed `20260730` through [`looping/exp_health_methods.py`](looping/exp_health_methods.py). The audited README's `exp_stay_solved.train(...)` command defaulted to `20260724`: the same training method, but not the score-producing seeded run. The historical control with that seed finished at 94.852% on the full 1024 benchmark. The updated README uses the reference preset and seed for its 50K commands and provides separate 20K development commands.
-
-The Python wrapper defaults to 20K steps, whereas [`looping/modal_stay_solved.py`](looping/modal_stay_solved.py), line 109, still defaults to the 10K screen. The README now keeps `--no-screen` explicit for its 20K Modal example. The launcher default itself has not changed.
-
-Expose explicit reference and development presets, seeds, run names, and checkpoint paths. Keep 20K for development and 50K for the released reference recipes. The combined launcher currently hardcodes one private-volume source checkpoint; accept an explicit source path and verify its saved step and configuration.
-
-### P2: Generic evaluation can silently execute the wrong recurrence
-
-[`iters/eval_more_iters.py`](iters/eval_more_iters.py), lines 44-48 and 92-109, instantiates the default architecture and implements its own loop. It does not restore non-weight model settings or call the model's `recurrent_step`. A normalized or capped checkpoint can load successfully, since normalization adds no parameters, and then be evaluated without its training-time constraint. Layer schedules and feedback settings can also be lost.
-
-The two proposed v2 checkpoints are plain four-layer models, so this bug does not invalidate their reported evaluations. The audit confirmed exact agreement between their normal forward and the evaluator's forward at 16 iterations. A separate RMSNorm check reproduced a large output discrepancy when using the generic evaluator.
-
-Use one shared recurrence for training and evaluation, with explicit architecture metadata. Alternatively, restrict the public evaluator to the supported plain model and reject incompatible configurations. Public tensor-only weights load successfully with `weights_only=True`; resumable training checkpoints contain NumPy RNG state and do not load through that same restricted loader. Clearly separate inference artifacts from trusted training-resume artifacts.
-
-### P2: Resume validation misses removed settings
-
-[`checkpoint_utils.py`](checkpoint_utils.py), lines 59-67, checks only keys present in the requested configuration. Removing a previously saved setting therefore escapes validation. The audit reproduced this with the combined checkpoint: removing `late_margin_floor_weight` and `late_margin_floor` was silently accepted.
-
-Validate the union of saved and requested settings, accounting explicitly for supported historical defaults. `load_branch_checkpoint` already uses the stricter comparison. Add a regression test for ordinary resume with a removed loss or model setting.
-
-### P2: The documented environment is not the training environment
-
-The saved runtime logs identify both proposed models as PyTorch `2.10.0+cu128`, CUDA 12.8, driver `580.95.05`. Their Modal image specifies Python 3.11. However, [`requirements.txt`](requirements.txt) pins PyTorch 2.9.1, and [`requirements-modal.txt`](requirements-modal.txt) leaves PyTorch and NumPy unpinned. The README now installs the reference PyTorch build explicitly before the smaller dependency set and warns that this does not pin the remote Modal image. The local audit environment is different again: Python 3.9.6 and PyTorch 2.8.0 on CPU.
-
-Record and pin a tested reference environment. Separate minimal inference dependencies from CUDA training and optional analysis/Modal dependencies. The current general setup includes Linux-specific NVIDIA/Triton packages without stating the platform requirement. Training also requires substantial memory at batch size 2048; late-state gradient accumulation is explicitly unsupported. A tiny checkpoint does not imply that the reference training run fits on a small GPU.
-
-### P2: Benchmark reuse limits the claims the release should make
-
-Training gradients use the training split. However, monitoring, checkpoint selection, and final reporting all draw from the same official test split, and the sampled sets are not disjoint. Reconstructing the index selection on the retained dataset revision found 73 of the control's 1,000 probe puzzles and 77 of the simple checkpoint's probe puzzles in the final 25K benchmark. Their 25K monitoring sets overlap the final benchmark by 2,035 and 2,034 puzzles, respectively. Repeated full-set comparisons also informed experiment decisions.
-
-Report the existing numbers as the repository's balanced development benchmark, not an untouched final holdout or an apples-to-apples comparison with methods using different training data. Save exact evaluation indices and reserve a disjoint validation/test arrangement for future experiments. A genuinely untouched claim needs a new, demonstrably unused evaluation set; changing a random seed alone is not sufficient.
-
-The combined model solves 22 more benchmark puzzles than v1 at 1024, an increase from 98.912% to 99.000%. That is a measured best score, not by itself evidence of a broadly superior method. Paired per-puzzle errors and independent seeds are needed to characterize the improvement. V1 remains stronger at 2048. The combined recipe has only one demonstrated seed; late-state CE has multiple healthy 50K runs, but no guaranteed success rate.
-
-## Audited checkpoints
-
-These results were recovered from the completed Modal evaluation logs, not newly recomputed on the full benchmark during this audit. All use ordinary, undamped inference.
+Same frozen 25K puzzles, PyTorch 2.10.0+cu128, H200, eager execution, batch size 256, ordinary undamped recurrence:
 
 | Checkpoint | 128 | 1024 | 2048 | 4096 |
 |---|---:|---:|---:|---:|
-| Simple late-state CE, final | 96.472% | 98.796% | 92.976% | 43.704% |
-| Combined CE/recheck/margin, final | 96.256% | 99.000% | 98.456% | 82.172% |
-| V1 published checkpoint | 95.3% | 98.912% | 98.8% | Not in the release table |
+| Late-state CE, final, FP32 | 96.288% | 99.116% | 99.048% | 98.632% |
+| Published v1, FP32 | 95.704% | 98.888% | 99.028% | 99.020% |
+| Same late-state CE weights, BF16 | 96.472% | 98.796% | 92.976% | 43.704% |
+| Same published v1 weights, BF16 | 95.256% | 98.876% | 98.844% | 84.888% |
 
-Use late-state CE as the default training recipe and main checkpoint. Keep the combined checkpoint's results and provenance as research material, not the README's main recommendation. Keep v1 available, including its stronger 2048 result.
+In BF16, late-state CE matches its historical counts exactly: 24,118 / 24,699 / 23,244 / 10,926 solved. V1's fresh BF16 1024 count is 24,719, versus the historical 24,728. The difference is not evidence that its weights changed; their checksum is identical. Do not attribute that nine-puzzle historical difference to a particular runtime setting without a controlled comparison.
 
-### Simple candidate
+Changing only arithmetic largely removes the selected late-state checkpoint's 4096 deterioration. FP32 is now the default for public evaluation, single-puzzle inference, and the Modal evaluator; BF16 remains an explicit option for historical reproduction. This does not prove that every older collapsed checkpoint had the same cause, or that further FP32 iterations can never fail. Training remains BF16 and its original dropout setting is unchanged.
 
-- Volume: `sudoku-outputs`
-- Weights: `looping/model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt`
-- SHA-256: `a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198`
-- Seed: `20260730`; final saved step: `49999`, meaning 50,000 optimizer updates.
-- Resume artifact: `looping/loop_health_standalone_v1_late_state_ce_50k_trial0_checkpoint_step49999.pt`
-- Result: `looping/result_loop_health_standalone_v1_late_state_ce_50k_trial0.json`
-- Evaluation log: `model_loop_health_standalone_v1_late_state_ce_50k_trial0_eval.log`
+Each evaluation retains exact row indices, predictions and correctness per puzzle, model settings and checksum, runtime packages and driver, and source-file hashes. The canonical row-content SHA-256 is `697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc`.
 
-### Combined research checkpoint
+## Engineering Fixes
 
-- Volume: `sudoku-outputs`
-- Weights: `looping/model_loop_stay_late_switch_margin_floor5_from39k.pt`
-- SHA-256: `b5aa3cda9a770153b977e6df32cb9fb80ba076cedb251d4ac26e2ad1e3c70b77`
-- Seed: `20260724`; final saved step: `49999`.
-- Source: `looping/loop_stay_control_50k_trial0_checkpoint_step39000.pt`, including optimizer and RNG state.
-- Resume artifact: `looping/loop_stay_late_switch_margin_floor5_from39k_checkpoint_step49999.pt`
-- Result: `looping/result_loop_stay_late_switch_margin_floor5_from39k.json`
-- Evaluation log: `model_loop_stay_late_switch_margin_floor5_from39k_eval.log`
+- **Resume validation:** compares added, changed, and removed configuration keys, with explicit historical defaults. Branches verify the source step and seed. The removed-margin-setting regression has a test.
+- **Inference correctness:** the evaluator calls the model's actual `recurrent_step` and restores non-weight settings from a checksummed manifest. The old independent loop could silently omit recurrent normalization, capping, or a layer schedule.
+- **Artifact safety:** public weights are tensor-only and use `weights_only=True`. Training checkpoints contain pickled optimizer/RNG state and require explicit trust when exporting. New exports record the selected step; final resumable checkpoints include the final probe history.
+- **Public entrypoints:** `train.py` exposes 20K development and 50K reference presets with explicit seed and run name. `solve.py` accepts one puzzle. The Modal development launcher now also defaults to 20K; 10K requires `--screen`. Late-switch runs accept and validate an explicit source checkpoint.
+- **Dataset identity:** training and evaluation pin revision `58942f96baeb572ca3127e2a9e9c70f330783d6b`. The 25K benchmark indices and row-content hash are frozen.
+- **Curriculum documentation:** the original code selects whole rating buckets. Its first pools are 51+ and 11+, not literal 21+ and 6+. Documentation now describes those actual pools, and a regression test preserves historical behavior.
+- **Environment:** the core requirements and CUDA build are pinned, the previous environment snapshot is retained separately, and evaluations record transitive package versions. A CPU GitHub Actions workflow exercises the public model and checkpoint tests without a Modal account.
 
-Both local and Modal caches retain dataset revision `58942f96baeb572ca3127e2a9e9c70f330783d6b`. The test split contains 422,786 puzzles; the published benchmark samples 5,000 from each of five difficulty buckets. The training pool is the first 2.7M of 3,831,994 training puzzles. Neither the dataset revision nor a code revision is embedded in the current weight exports; add both to the release manifest.
+The shared training math and default dropout behavior are preserved. Additional metadata and explicit burn-in-dropout controls do not silently change the reference recipe.
 
-Describe the training budget precisely: backpropagation spans 16 iterations at a time, but training executes longer trajectories. The simple recipe reaches iteration 528, and the combined recipe reaches 800. The simple method averages 55.68 forward iterations per optimizer batch under its intended sampling distribution, versus 16 for the original recipe. That ratio is not a measured wall-clock training-cost ratio because the additional iterations have no backward pass.
+## Reference Artifact
 
-## Release preparation
+The prepared tensor-only file is `release/v2/model_late_state_ce.pt`, with its adjacent [manifest](release/v2/model_late_state_ce.pt.json). Exporting verified every tensor against the final resumable checkpoint and preserved the original weight-file bytes.
 
-1. Make a short public inference path and explicit training presets that call the existing verified implementation. Keep historical experiments accessible without requiring users to navigate them.
-2. Correct curriculum documentation, seed/default inconsistencies, resume validation, and evaluation configuration handling. Preserve the historical recipe when exporting its checkpoints.
-3. Add release manifests containing weight checksums, architecture settings, training recipe and seed, source checkpoint identity, code/data revisions, evaluation indices, precision, and environment.
-4. Test installation in a clean supported environment and add CI for the public model, checkpoint loading, resume checks, and a small inference fixture. Core tests should not require a Modal account.
-5. Re-evaluate the exact exported bytes on the frozen 25K benchmark with a pinned GPU environment. Evaluate late-state CE and v1 on the same indices and record per-puzzle outcomes at 128/1024/2048/4096. Keep any new holdout results separate from these historical benchmark results; combined-model comparisons remain research.
-6. Update the README and release notes, integrate the reviewed commit into `master`, tag `v2.0.0`, and publish the assets. Verify the download-and-evaluate flow from the default branch before announcing.
+- Seed: `20260730`; last step `49999`, meaning 50,000 optimizer updates.
+- Source volume: `sudoku-outputs`.
+- Original weights: `looping/model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt`.
+- Weight SHA-256: `a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198`.
+- Resume source: `looping/loop_health_standalone_v1_late_state_ce_50k_trial0_checkpoint_step49999.pt`.
+- Result: `looping/result_loop_health_standalone_v1_late_state_ce_50k_trial0.json`.
 
-No new 50K training run is required to establish the identities or historical scores of the proposed release weights. Additional seeds are needed before promoting the combined training recipe as reliably superior.
+The historical checkpoint did not record its exact training commit. The manifest records that as unknown, rather than substituting the current commit. The retained configuration and historical implementation defaults establish its settings; new runs also record source-file hashes and their runtime.
 
-## Research priorities after the release
+Training uses the first 2.7M of 3,831,994 training puzzles, batch size 2048, AdamW at an initial LR of 2e-3, 1,400 warmup steps, and cosine decay. On 20% of batches, detached burn-in reaches 32/64/128/256/512 iterations before the supervised 16-iteration window; the other 80% use ordinary iterations 1-16. Maximum training depth is 528, not 16. The expected forward depth is 55.68 iterations per batch, but that is not a measured wall-clock cost ratio because burn-in has no backward pass.
 
-The useful next questions are concrete and testable; none needs to be bundled into v2.
+## Benchmark Limits
 
-- **Separate numerical sensitivity from learned instability.** Test fixed checkpoints across FP32/BF16, eager/compiled execution, and batch sizes on identical puzzles. The project already records different continuations after restoring a checkpoint. This matrix can establish how much of the variation is numerical before introducing another loss.
-- **Test the training/inference dropout mismatch.** Detached burn-in runs under `no_grad`, but the model remains in training mode, so dropout is active. Inference disables dropout. Compare the same late-state recipe with and without dropout during detached state preparation, preserving the supervised window and other settings. This is an untested hypothesis in the reviewed current-recipe experiment records, not an assumed improvement; dropout may provide useful regularization.
-- **Measure when correct solutions are lost.** In addition to final accuracy, record first-solve iteration, later regressions, and retention across seeds. A 99% snapshot does not establish that further iterations are safe. Use these measurements to decide whether additional late-state supervision is needed.
-- **Compare against the strongest existing method before adding complexity.** Prioritize matched-seed late-state CE versus the combined continuation, at equal stated training budgets. Keep RMSNorm, damping, and ES optional; the current evidence does not make them necessary parts of v2.
-- **Narrow the geometry claims.** The study did not establish a universal shape, but that is not proof that no shared structure exists. It uses one checkpoint per regime and 20 final puzzles. Its own constraints report notes that direct cross-checkpoint axes were not aligned first. Different hidden coordinate systems can make the same underlying feature fail raw-vector transfer. Prefer functional interventions and held-out alignment tests over stronger conclusions from attractive or dissimilar PCA plots.
+Training gradients use the training split. Monitoring, checkpoint selection, and final reporting reuse the official test split, and the samples overlap. The two audited seed cohorts had 73 and 77 probe puzzles in the final 25K benchmark; their larger monitoring sets overlapped by 2,035 and 2,034 puzzles. Full-set results also informed experiment decisions.
 
-The current model embeds the puzzle once; it does not explicitly re-inject the original input on every iteration. An older experiment removed that re-injection, so adding it back should be described as revisiting an existing design choice under the new training recipe, not as a previously unexplored idea.
+Call these results the repository's balanced development benchmark, not an untouched final holdout. Future generalization claims need demonstrably unused data. Late-state CE has multiple healthy 50K runs, but no guaranteed success rate. The 20K schedule is the development default for speed; it does not rule out later improvements or collapses. A smaller training dataset has not been tested with the current recipe.
 
-## Verification performed
+## Preserved Research
 
-- `python -m unittest discover -v`: 115 tests passed in the existing local environment.
-- Both new weight files load with `weights_only=True`, have 796,937 parameters, and match every tensor in their respective final resumable checkpoints.
-- Both resume artifacts contain optimizer state and Python, NumPy, CPU Torch, and CUDA RNG state.
-- The v1 and two v2 models produced finite outputs through 1024 iterations on a five-puzzle CPU smoke fixture, with one puzzle per difficulty bucket. This is a load/inference check, not a benchmark estimate.
-- The public evaluator's 16-step forward agrees exactly with the model forward for all three plain checkpoints. The normalization-bypass and removed-config resume defects were reproduced separately.
-- Live default branch, branch divergence, releases/assets, open pull requests, and CI workflow state were checked. A limited tracked-file scan found no common private-key or API-token patterns; this is not an exhaustive security audit.
-- `git diff --check` passed before this report. The user's existing untracked `temp-side-convo.txt` was left untouched.
+The combined late-state CE/recheck/margin checkpoint remains documented in [the looping notes](looping/EXPERIMENTS_LOOPING.md#staged-recheck-and-margin). Its historical full profile is 96.256 / 99.000 / 98.456 / 82.172%, without damping. Its weights are `looping/model_loop_stay_late_switch_margin_floor5_from39k.pt`, SHA-256 `b5aa3cda9a770153b977e6df32cb9fb80ba076cedb251d4ac26e2ad1e3c70b77`, from seed `20260724` through step `49999`. That selected run is not sufficient evidence of a reliably superior recipe.
 
-Still unverified: a clean dependency installation, fresh full-set GPU evaluation of the release exports, and the eventual public release download path. Artifact downloads and the local smoke-check script are retained under `/tmp/sotaku-v2-audit-20260902.4jekvM` for the release-preparation pass.
+The geometry study did not establish a universal shape. It also did not prove that none exists: it used one checkpoint per regime, 20 final puzzles, and unaligned hidden coordinates for some transfer tests. Prefer controlled interventions to stronger conclusions from PCA appearance. Re-introducing the original puzzle on every loop would revisit an older design choice; the current model embeds it only once.
+
+## Publication Steps
+
+The initial GitHub audit found `master` at `1bbdc32`, with the research branch 80 commits ahead and none behind. Only the `baseline-lr2e3-checkpoint` release was published. Keep `master` as the default; changing the default to a research branch is unnecessary.
+
+1. Review and commit the release preparation, including the final numerical report and retained evaluation records.
+2. Integrate the reviewed commit into `master`. The research delta includes about 500 files; this audit covers the supported training, inference, checkpoint, and release paths, not every archived experiment.
+3. Tag the integrated commit, publish the tensor-only weights, manifest, checksums, and evaluation records, and retain the v1 release.
+4. Test downloading and evaluating the published assets from the public default branch before announcing.
+
+No fresh 50K run is required to identify or verify the existing release candidate. The dropout continuations test a separate hypothesis and must not be presented as part of the original checkpoint's training.

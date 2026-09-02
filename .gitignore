@@ -8,3 +8,8 @@ logs/
 runs/
 viz/output/
 .DS_Store
+release/validation/**/*.npz
+release/validation/**/benchmark.json
+release/validation/**/precision_benchmark.json
+release/validation/sources_*.tar.gz
+release/v2/*.zip

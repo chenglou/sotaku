@@ -32,7 +32,8 @@ image = (
         remote_path="/root/project",
         ignore=[
             "venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/",
-            "runs_modal/", "*.pt", "*.log",
+            "runs_modal/", "*.pt", "*.log", ".venv/", ".claude/", ".codex/", "temp-side-convo.txt",
+            "release/validation/", "release/v2/*.zip",
         ],
     )
 )
@@ -104,10 +105,12 @@ def run_trial(
 
 @app.local_entrypoint()
 def main(
-    arm: str = "control",
+    arm: str = "late_state_ce",
     trial: int = 0,
-    screen: bool = True,
+    screen: bool = False,
     full_50k: bool = False,
+    seed: int = -1,
+    name: str = "",
 ):
     arm = arm.replace("-", "_")
     if arm not in ARM_NAMES:
@@ -120,8 +123,10 @@ def main(
         suffix = FULL_50K_SUFFIX
     else:
         suffix = SCREEN_SUFFIX if screen else ""
-    run_name = f"loop_stay_{arm}{suffix}_trial{trial}"
-    random_seed = 20_260_724 + trial
+    run_name = name or f"loop_stay_{arm}{suffix}_trial{trial}"
+    random_seed = 20_260_724 + trial if seed == -1 else seed
+    if random_seed < 0:
+        raise ValueError("seed must be non-negative")
     call = run_trial.spawn(
         arm,
         run_name,

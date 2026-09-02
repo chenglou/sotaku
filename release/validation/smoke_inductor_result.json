@@ -1,0 +1,12 @@
+{
+  "architecture": "full four-layer, 16 supervised iterations",
+  "compiled_cuda_training": true,
+  "dropout_off_updates": 2,
+  "fixture": "five copies of an almost-filled board; mechanics only, not a score experiment",
+  "passed": true,
+  "resume_from_step": 1,
+  "resume_to_step": 3,
+  "resumed_late_horizon_counts": {
+    "16": 4
+  }
+}

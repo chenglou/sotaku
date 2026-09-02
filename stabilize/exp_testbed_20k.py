@@ -14,12 +14,16 @@ import os
 import math
 import numpy as np
 import re
+import hashlib
+import struct
+from contextlib import contextmanager
 from checkpoint_utils import (
     atomic_torch_save,
     find_latest_checkpoint,
     load_branch_checkpoint,
     load_checkpoint,
 )
+from dataset_utils import DATASET_NAME, DATASET_REVISION, phase_bucket_keys
 from iters.state_norm import DEFAULT_EPSILON, cap_token_rms, rms_normalize
 
 torch.set_float32_matmul_precision('high')
@@ -545,6 +549,52 @@ def resolve_late_recheck(
     return gaps
 
 
+@contextmanager
+def detached_state_mode(model, dropout_enabled=True):
+    """Prepare a state without gradients, restoring every module's mode afterward."""
+    modes = [(module, module.training) for module in model.modules()]
+    try:
+        if not dropout_enabled:
+            model.eval()
+        with torch.no_grad():
+            yield
+    finally:
+        for module, training in modes:
+            module.training = training
+
+
+def build_detached_advance(model, dropout_enabled=True, compile_chunk=True):
+    def burnin_chunk(hidden_state, predictions):
+        rope_cos = ROPE_COS.to(hidden_state.device)
+        rope_sin = ROPE_SIN.to(hidden_state.device)
+        for _ in range(n_iterations):
+            hidden_state = model.recurrent_step(
+                hidden_state, predictions, rope_cos, rope_sin,
+            )
+            predictions = F.softmax(model.output_head(hidden_state), dim=-1)
+        return hidden_state, predictions
+
+    advance_chunk = torch.compile(burnin_chunk) if compile_chunk else burnin_chunk
+
+    def advance(initial_state, horizon):
+        if horizon < 0 or horizon % n_iterations:
+            raise ValueError(f"horizon must be a non-negative multiple of {n_iterations}")
+        with detached_state_mode(model, dropout_enabled):
+            hidden_state, predictions = (value.detach() for value in initial_state)
+            for _ in range(horizon // n_iterations):
+                hidden_state, predictions = advance_chunk(hidden_state, predictions)
+        return hidden_state.detach(), predictions.detach()
+
+    return advance
+
+
+def update_sample_digest(previous_digest, indices, step, late_horizon):
+    digest = hashlib.sha256(bytes.fromhex(previous_digest))
+    digest.update(indices.to(torch.int64).numpy().tobytes())
+    digest.update(struct.pack("<qq", step, late_horizon or 0))
+    return digest.hexdigest()
+
+
 def train(
     output_dir=".",
     *,
@@ -576,11 +626,21 @@ def train(
     late_margin_floor=1.0,
     late_auxiliary_only=False,
     branch_checkpoint_path=None,
+    expected_branch_step=None,
+    branch_config_changes=None,
+    detached_burnin_dropout=True,
+    stop_after_step=None,
+    record_sample_digest=False,
 ):
     if run_name is not None and not re.fullmatch(r"[A-Za-z0-9_.-]+", run_name):
         raise ValueError(f"unsafe run name: {run_name!r}")
     if branch_checkpoint_path is not None and run_name is None:
         raise ValueError("branch_checkpoint_path requires a run_name")
+    if expected_branch_step is not None and branch_checkpoint_path is None:
+        raise ValueError("expected_branch_step requires a branch checkpoint")
+    if not isinstance(detached_burnin_dropout, bool):
+        raise ValueError("detached_burnin_dropout must be a boolean")
+    os.makedirs(output_dir, exist_ok=True)
     if outer_state_norm_epsilon <= 0:
         raise ValueError("outer_state_norm_epsilon must be positive")
     if outer_state_norm and outer_state_rms_cap is not None:
@@ -651,6 +711,9 @@ def train(
     )
 
     run_schedule = resolve_schedule(schedule)
+    run_stop_step = run_schedule['total_steps'] - 1 if stop_after_step is None else stop_after_step
+    if not isinstance(run_stop_step, int) or not 0 <= run_stop_step < run_schedule['total_steps']:
+        raise ValueError("stop_after_step must lie inside the unchanged training schedule")
     run_warmup_steps = run_schedule['warmup_steps']
     run_total_steps = run_schedule['total_steps']
     run_eval_every = run_schedule['eval_every']
@@ -672,6 +735,9 @@ def train(
     run_config = dict(CONFIG)
     run_config['experiment'] = experiment_name
     run_config['batch_size'] = run_batch_size
+    run_config['detached_burnin_dropout'] = detached_burnin_dropout
+    run_config['record_sample_digest'] = record_sample_digest
+    legacy_defaults = {'detached_burnin_dropout': True, 'record_sample_digest': False}
     if microbatch_size < run_batch_size:
         run_config['microbatch_size'] = microbatch_size
     if nondefault_model_settings:
@@ -750,12 +816,12 @@ def train(
     )
 
     print("Loading sudoku-extreme train split...")
-    dataset = load_dataset("sapientinc/sudoku-extreme", split="train")
+    dataset = load_dataset(DATASET_NAME, revision=DATASET_REVISION, split="train")
     print(f"Total available: {len(dataset)}")
     train_size_local = min(train_size, len(dataset))
     print(f"Using first {train_size_local} for training")
 
-    test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
+    test_dataset = load_dataset(DATASET_NAME, revision=DATASET_REVISION, split="test")
     print(f"Test set: {len(test_dataset)}")
 
     print("\nEncoding training data by rating...")
@@ -780,7 +846,7 @@ def train(
 
     phase_buckets = {}
     for start, end, min_rating, name in run_phases:
-        buckets_for_phase = [k for k in train_data.keys() if k[0] >= min_rating]
+        buckets_for_phase = phase_bucket_keys(train_data.keys(), min_rating)
         total = sum(train_data[k]['size'] for k in buckets_for_phase)
         phase_buckets[min_rating] = buckets_for_phase
         print(f"  {name}: {total} puzzles")
@@ -826,7 +892,9 @@ def train(
     checkpoint_path, start_step = find_latest_checkpoint(output_dir, run_checkpoint_prefix)
     if checkpoint_path:
         print(f"Found checkpoint: {checkpoint_path}")
-        checkpoint_data = load_checkpoint(checkpoint_path, model, run_config)
+        checkpoint_data = load_checkpoint(
+            checkpoint_path, model, run_config, legacy_defaults=legacy_defaults,
+        )
         start_step = int(checkpoint_data['step']) + 1
         print(f"Loaded model weights through step {start_step - 1}")
     elif branch_checkpoint_path is not None:
@@ -846,12 +914,16 @@ def train(
             'late_auxiliary_only',
             'run_name',
         }
+        if branch_config_changes is not None:
+            allowed_config_changes = set(branch_config_changes)
         print(f"Branching from checkpoint: {branch_source}")
         checkpoint_data = load_branch_checkpoint(
             branch_source,
             model,
             run_config,
             allowed_config_changes,
+            legacy_defaults=legacy_defaults,
+            expected_step=expected_branch_step,
         )
         start_step = int(checkpoint_data['step']) + 1
         checkpoint_data = dict(checkpoint_data)
@@ -860,39 +932,32 @@ def train(
             'best_probe': {'step': -1, 'solved_1024': -1},
             'late_horizon_counts': {},
             'recheck_gap_counts': {},
+            'sample_digest': '0' * 64,
         })
         print(f"Loaded branch source through step {start_step - 1}")
+
+    if start_step > run_stop_step + 1:
+        raise ValueError("The saved checkpoint is past the requested stopping step")
+    from model_io import model_settings, write_model_manifest
+    from checkpoint_utils import atomic_json_save, validate_config
+    from runtime_utils import runtime_manifest
+    if checkpoint_data and 'model_settings' in checkpoint_data:
+        validate_config(checkpoint_data['model_settings'], model_settings(model))
+    if checkpoint_data and checkpoint_data.get('dataset_revision', DATASET_REVISION) != DATASET_REVISION:
+        raise ValueError("Dataset revision differs from the saved checkpoint")
+
+    training_runtime = runtime_manifest((
+        'stabilize/exp_testbed_20k.py', 'checkpoint_utils.py', 'dataset_utils.py',
+        'iters/state_norm.py', 'requirements-modal.txt',
+    ))
+    environment_name = f"environment_{run_name or experiment_name}.json"
+    atomic_json_save(training_runtime, os.path.join(output_dir, environment_name))
 
     model = torch.compile(model)
 
     original_model = getattr(model, '_orig_mod', model)
     if late_supervision_horizons:
-        def _burnin_chunk(hidden_state, predictions):
-            rope_cos = ROPE_COS.to(hidden_state.device)
-            rope_sin = ROPE_SIN.to(hidden_state.device)
-            for _ in range(n_iterations):
-                hidden_state = original_model.recurrent_step(
-                    hidden_state,
-                    predictions,
-                    rope_cos,
-                    rope_sin,
-                )
-                predictions = F.softmax(
-                    original_model.output_head(hidden_state),
-                    dim=-1,
-                )
-            return hidden_state, predictions
-
-        burnin_chunk = torch.compile(_burnin_chunk)
-
-        def detached_advance(initial_state, horizon):
-            hidden_state, predictions = initial_state
-            for _ in range(horizon // n_iterations):
-                hidden_state, predictions = burnin_chunk(
-                    hidden_state,
-                    predictions,
-                )
-            return hidden_state.detach(), predictions.detach()
+        detached_advance = build_detached_advance(original_model, detached_burnin_dropout)
 
         def detached_burnin(x_batch, horizon):
             initial_state = (
@@ -943,6 +1008,9 @@ def train(
     if microbatch_size < run_batch_size:
         print(f"Gradient accumulation microbatch size: {microbatch_size}")
     print(f"Total steps: {run_total_steps}")
+    print(f"Stopping after step {run_stop_step}; learning-rate schedule remains {run_total_steps} steps")
+    print(f"Detached burn-in dropout: {detached_burnin_dropout}; supervised dropout remains enabled")
+    print(f"Dataset revision: {DATASET_REVISION}")
     if outer_state_norm:
         outer_state_constraint = "RMSNorm without affine"
     elif outer_state_rms_cap is not None:
@@ -1005,6 +1073,7 @@ def train(
         if checkpoint_data
         else {}
     )
+    sample_digest = checkpoint_data.get('sample_digest', '0' * 64) if checkpoint_data else '0' * 64
 
     def log(msg):
         print(msg)
@@ -1024,6 +1093,7 @@ def train(
         counts = np.random.multinomial(bs, probs)
         x_parts = []
         t_parts = []
+        index_parts = []
         for b, count in zip(active_buckets, counts):
             if count == 0:
                 continue
@@ -1031,12 +1101,15 @@ def train(
             sel = bucket_idx[torch.randint(0, train_data[b]['size'], (count,))]
             x_parts.append(x_all[sel])
             t_parts.append(targets_all[sel])
+            if record_sample_digest:
+                index_parts.append(sel)
         x_batch = torch.cat(x_parts, dim=0)
         t_batch = torch.cat(t_parts, dim=0)
         perm = torch.randperm(bs)
         x_batch = x_batch[perm]
         t_batch = t_batch[perm]
-        return x_batch, t_batch
+        sampled_indices = torch.cat(index_parts)[perm] if record_sample_digest else None
+        return x_batch, t_batch, sampled_indices
 
     def compute_loss(
         x_batch,
@@ -1132,10 +1205,14 @@ def train(
             'model_state_dict': {k.replace('_orig_mod.', ''): v for k, v in model.state_dict().items()},
             'optimizer_state_dict': optimizer.state_dict(),
             'config': run_config,
+            'dataset_revision': DATASET_REVISION,
+            'model_settings': model_settings(original_model),
+            'training_runtime': training_runtime,
             'probe_history': probe_history,
             'best_probe': best_probe,
             'late_horizon_counts': late_horizon_counts,
             'recheck_gap_counts': recheck_gap_counts,
+            'sample_digest': sample_digest,
             'rng_state': {
                 'python': random.getstate(),
                 'numpy': np.random.get_state(),
@@ -1145,17 +1222,28 @@ def train(
         }, path)
         print(f"Checkpoint saved: {path}")
 
-    def save_model(path):
+    def save_model(path, saved_step):
         state_dict = {
             key.replace('_orig_mod.', ''): value
             for key, value in model.state_dict().items()
         }
         atomic_torch_save(state_dict, path)
+        write_model_manifest(
+            path, original_model,
+            training={'config': run_config, 'last_step': saved_step, 'optimizer_updates': saved_step + 1},
+            provenance={
+                'dataset': DATASET_NAME, 'dataset_revision': DATASET_REVISION,
+                'source_sha256': training_runtime['source_sha256'],
+                'environment_file': environment_name,
+            },
+        )
 
     current_phase_name = None
     current_buckets = None
 
-    for step in range(start_step, run_total_steps):
+    for step in range(start_step, run_stop_step + 1):
+        if step == start_step:
+            log(f"Starting optimizer step {step}; first-use compilation may take several minutes")
         current_lr = get_lr(step, run_warmup_steps, run_total_steps)
         for param_group in optimizer.param_groups:
             param_group['lr'] = current_lr
@@ -1171,7 +1259,7 @@ def train(
             log(f"{'='*60}\n")
 
         model.train()
-        x_batch, t_batch = sample_batch(current_buckets, run_batch_size)
+        x_batch, t_batch, sampled_indices = sample_batch(current_buckets, run_batch_size)
         x_batch = x_batch.to(device)
         t_batch = t_batch.to(device)
 
@@ -1195,6 +1283,8 @@ def train(
             if use_late_supervision
             else None
         )
+        if record_sample_digest:
+            sample_digest = update_sample_digest(sample_digest, sampled_indices, step, late_horizon)
         if late_horizon is not None:
             horizon_key = str(late_horizon)
             late_horizon_counts[horizon_key] = (
@@ -1387,8 +1477,10 @@ def train(
                 correct = (preds == t_batch) & (mask > 0)
                 train_acc = correct.sum().item() / mask.sum().item()
         optimizer.step()
+        if step == start_step:
+            log(f"First optimizer update completed at step {step}")
 
-        if step % 100 == 0 or step == run_total_steps - 1:
+        if step % 100 == 0 or step == run_stop_step:
             if late_loss is None:
                 late_text = ""
             elif late_auxiliary_only:
@@ -1408,7 +1500,7 @@ def train(
                     late_text += (
                         f" Margin: {margin_floor_loss.item():.4f}"
                     )
-            do_eval = step % run_eval_every == 0 or step == run_total_steps - 1
+            do_eval = step % run_eval_every == 0 or step == run_stop_step
             if do_eval:
                 results = evaluate_all()
                 total_r = results.pop('_total')
@@ -1433,7 +1525,7 @@ def train(
                 if solved_1024 > best_probe['solved_1024']:
                     best_probe.clear()
                     best_probe.update(probe_result)
-                    save_model(os.path.join(output_dir, best_model_name))
+                    save_model(os.path.join(output_dir, best_model_name), step)
                     log(f"Best 1024-iteration probe so far; saved {best_model_name}")
 
             if do_eval or (checkpoint_on_probe and do_probe):
@@ -1454,8 +1546,10 @@ def train(
         log(f"Late-state batch counts by horizon: {late_horizon_counts}")
     if recheck_gap_counts:
         log(f"Recheck batch counts by gap: {recheck_gap_counts}")
+    if record_sample_digest:
+        log(f"Puzzle-batch and horizon SHA-256: {sample_digest}")
     final_probe_result = {
-        'step': run_total_steps - 1,
+        'step': run_stop_step,
         'solved_128': final_probe_128,
         'solved_1024': final_probe_1024,
         'total': len(probe_puzzles),
@@ -1465,16 +1559,20 @@ def train(
     if final_probe_1024 > best_probe['solved_1024']:
         best_probe.clear()
         best_probe.update(final_probe_result)
-        save_model(os.path.join(output_dir, best_model_name))
+        save_model(os.path.join(output_dir, best_model_name), run_stop_step)
         log(f"Final probe is the best 1024-iteration probe; saved {best_model_name}")
 
     final_path = os.path.join(output_dir, final_model_name)
-    save_model(final_path)
+    save_model(final_path, run_stop_step)
+    do_save_checkpoint(run_stop_step)
     log(f"Final model saved: {final_path}")
     result = {
         'experiment': experiment_name,
         'run_name': run_name,
         'config': run_config,
+        'last_step': run_stop_step,
+        'completed_schedule': run_stop_step == run_total_steps - 1,
+        'dataset_revision': DATASET_REVISION,
         'final_training_iteration_count': training_iterations,
         'final_training_iteration_solved': total_r['solved'],
         'final_training_iteration_total': total_r['total'],
@@ -1485,6 +1583,7 @@ def train(
         'best_probe': best_probe,
         'late_horizon_counts': late_horizon_counts,
         'recheck_gap_counts': recheck_gap_counts,
+        'sample_digest': sample_digest,
         'final_training_iteration_per_bucket': results,
         'final_model_path': final_path,
     }

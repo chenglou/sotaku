@@ -1,0 +1,165 @@
+{
+  "best_probe": {
+    "solved_1024": 984,
+    "solved_128": 948,
+    "step": 40000,
+    "total": 1000
+  },
+  "completed_schedule": false,
+  "config": {
+    "batch_size": 2048,
+    "branch_source_checkpoint": "loop_health_standalone_v1_late_state_ce_50k_trial0_checkpoint_step39000.pt",
+    "checkpoint_on_probe": true,
+    "d_ff": 512,
+    "d_model": 128,
+    "detached_burnin_dropout": true,
+    "eval_every": 5000,
+    "experiment": "exp_burnin_dropout",
+    "late_supervision_horizons": [
+      32,
+      64,
+      128,
+      256,
+      512
+    ],
+    "late_supervision_mix": 1.0,
+    "late_supervision_probability": 0.2,
+    "late_supervision_start_step": 0,
+    "lr": 0.002,
+    "lr_min_ratio": 0.01,
+    "n_layers": 4,
+    "outer_state_norm": "none",
+    "outer_state_norm_epsilon": 1e-06,
+    "phases": [
+      [
+        0,
+        10000,
+        21,
+        "Phase 1: Hard only (rating 21+)"
+      ],
+      [
+        10000,
+        20000,
+        6,
+        "Phase 2: Medium+ (rating 6+)"
+      ],
+      [
+        20000,
+        30000,
+        1,
+        "Phase 3: Easy+ (rating 1+)"
+      ],
+      [
+        30000,
+        50000,
+        0,
+        "Phase 4: All (rating 0+)"
+      ]
+    ],
+    "probe_every": 1000,
+    "random_seed": 20260730,
+    "record_sample_digest": true,
+    "run_name": "burnin_dropout_on_seed20260730",
+    "total_steps": 50000,
+    "warmup_steps": 1400
+  },
+  "dataset_revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b",
+  "experiment": "exp_burnin_dropout",
+  "final_16_iteration_per_bucket": {
+    "0": {
+      "solved": 4998,
+      "total": 5000
+    },
+    "1-2": {
+      "solved": 4671,
+      "total": 5000
+    },
+    "11-50": {
+      "solved": 3351,
+      "total": 5000
+    },
+    "3-10": {
+      "solved": 3323,
+      "total": 5000
+    },
+    "51+": {
+      "solved": 3833,
+      "total": 5000
+    }
+  },
+  "final_16_iteration_solved": 20176,
+  "final_16_iteration_total": 25000,
+  "final_model_path": "/outputs/release_validation/v2_20260902_dropout_on_s20260730_v1/model_burnin_dropout_on_seed20260730.pt",
+  "final_probe_1024": 980,
+  "final_probe_128": 958,
+  "final_training_iteration_count": 16,
+  "final_training_iteration_per_bucket": {
+    "0": {
+      "solved": 4998,
+      "total": 5000
+    },
+    "1-2": {
+      "solved": 4671,
+      "total": 5000
+    },
+    "11-50": {
+      "solved": 3351,
+      "total": 5000
+    },
+    "3-10": {
+      "solved": 3323,
+      "total": 5000
+    },
+    "51+": {
+      "solved": 3833,
+      "total": 5000
+    }
+  },
+  "final_training_iteration_solved": 20176,
+  "final_training_iteration_total": 25000,
+  "last_step": 43000,
+  "late_horizon_counts": {
+    "128": 164,
+    "256": 151,
+    "32": 173,
+    "512": 157,
+    "64": 146
+  },
+  "probe_history": [
+    {
+      "solved_1024": 984,
+      "solved_128": 948,
+      "step": 40000,
+      "total": 1000
+    },
+    {
+      "solved_1024": 955,
+      "solved_128": 961,
+      "step": 41000,
+      "total": 1000
+    },
+    {
+      "solved_1024": 977,
+      "solved_128": 957,
+      "step": 42000,
+      "total": 1000
+    },
+    {
+      "solved_1024": 980,
+      "solved_128": 958,
+      "step": 43000,
+      "total": 1000
+    },
+    {
+      "final": true,
+      "solved_1024": 980,
+      "solved_128": 958,
+      "step": 43000,
+      "total": 1000
+    }
+  ],
+  "probe_total": 1000,
+  "recheck_gap_counts": {},
+  "run_name": "burnin_dropout_on_seed20260730",
+  "sample_digest": "d244b0ca101b5d4e6fbcc232632b39fc835f10445093b2e012ee16bd2e05e42c"
+}

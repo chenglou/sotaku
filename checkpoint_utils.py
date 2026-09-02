@@ -2,6 +2,7 @@ import os
 import re
 import glob
 import tempfile
+import json
 import torch
 
 
@@ -52,40 +53,69 @@ def find_latest_checkpoint(output_dir, checkpoint_prefix):
     return latest, checkpoint_steps[latest]
 
 
-def load_checkpoint(path, model, config):
-    """Load checkpoint and verify config matches. Returns checkpoint dict."""
-    checkpoint = torch.load(path, map_location='cpu', weights_only=False)
+def atomic_json_save(data, path):
+    """Publish a complete JSON file using a temporary sibling and rename."""
+    output_dir = os.path.dirname(path) or "."
+    os.makedirs(output_dir, exist_ok=True)
+    fd, temp_path = tempfile.mkstemp(prefix=".metadata.", suffix=".tmp", dir=output_dir)
+    try:
+        with os.fdopen(fd, "w") as handle:
+            json.dump(data, handle, indent=2, sort_keys=True, allow_nan=False)
+            handle.write("\n")
+        os.replace(temp_path, path)
+    finally:
+        if os.path.exists(temp_path):
+            os.remove(temp_path)
 
-    # Verify config matches
-    saved_config = checkpoint.get('config', {})
-    for key, value in config.items():
-        saved_value = saved_config.get(key)
-        if saved_value != value:
+
+def _comparable(value):
+    if isinstance(value, (list, tuple)):
+        return tuple(_comparable(item) for item in value)
+    if isinstance(value, dict):
+        return {key: _comparable(item) for key, item in value.items()}
+    return value
+
+
+def validate_config(saved, current, *, allowed_changes=(), legacy_defaults=None,
+                    label="Config mismatch!"):
+    """Reject changed, added, and removed settings unless explicitly permitted."""
+    missing = object()
+    defaults = legacy_defaults or {}
+    for key in sorted(set(saved) | set(current)):
+        if key in allowed_changes:
+            continue
+        default = defaults.get(key, missing)
+        saved_value = saved.get(key, default)
+        current_value = current.get(key, default)
+        if _comparable(saved_value) != _comparable(current_value):
+            saved_text = "<missing>" if saved_value is missing else repr(saved_value)
+            current_text = "<missing>" if current_value is missing else repr(current_value)
             raise ValueError(
-                f"Config mismatch! {key}: saved={saved_value}, current={value}. "
-                f"Use a fresh output_dir or delete old checkpoints."
+                f"{label} {key}: saved={saved_text}, current={current_text}. "
+                "Use the saved settings or a separately named experiment."
             )
 
+
+def load_checkpoint(path, model, config, *, legacy_defaults=None):
+    """Load a trusted training checkpoint, including pickled optimizer/RNG state."""
+    checkpoint = torch.load(path, map_location='cpu', weights_only=False)
+    validate_config(checkpoint.get('config', {}), config, legacy_defaults=legacy_defaults)
     model.load_state_dict(checkpoint['model_state_dict'])
     return checkpoint
 
 
-def load_branch_checkpoint(path, model, config, allowed_config_changes):
-    """Load a checkpoint for a new run while validating every unchanged setting."""
+def load_branch_checkpoint(path, model, config, allowed_config_changes, *,
+                           legacy_defaults=None, expected_step=None):
+    """Load a trusted checkpoint for a branch, permitting only declared changes."""
     checkpoint = torch.load(path, map_location='cpu', weights_only=False)
-    saved_config = checkpoint.get('config', {})
-    allowed_config_changes = set(allowed_config_changes)
-
-    for key in set(saved_config) | set(config):
-        if key in allowed_config_changes:
-            continue
-        saved_value = saved_config.get(key)
-        current_value = config.get(key)
-        if saved_value != current_value:
-            raise ValueError(
-                f"Branch config mismatch! {key}: saved={saved_value}, "
-                f"current={current_value}."
-            )
-
+    validate_config(
+        checkpoint.get('config', {}), config,
+        allowed_changes=set(allowed_config_changes), legacy_defaults=legacy_defaults,
+        label="Branch config mismatch!",
+    )
+    if expected_step is not None and checkpoint.get('step') != expected_step:
+        raise ValueError(
+            f"Branch step mismatch: expected {expected_step}, saved {checkpoint.get('step')}"
+        )
     model.load_state_dict(checkpoint['model_state_dict'])
     return checkpoint

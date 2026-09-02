@@ -1,0 +1,173 @@
+{
+  "benchmark": {
+    "dataset": "sapientinc/sudoku-extreme",
+    "per_bucket": null,
+    "purpose": "reused development benchmark, not an untouched holdout",
+    "revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b",
+    "rows_sha256": "a9fc44c2c39b39e862e91396c99cd0ad131cd70a94eb47e0d36950d768623f84",
+    "sampling_order": "first encounter, then numeric bucket concatenation",
+    "schema_version": 1,
+    "seed": null,
+    "split": "test"
+  },
+  "identity": {
+    "batch_size": 256,
+    "benchmark_rows_sha256": "a9fc44c2c39b39e862e91396c99cd0ad131cd70a94eb47e0d36950d768623f84",
+    "chunk_iterations": 16,
+    "compiled": false,
+    "device_type": "cuda",
+    "iterations": [
+      128,
+      1024,
+      2048,
+      4096
+    ],
+    "matmul_precision": "high",
+    "model": {
+      "architecture": "sotaku-loop-v1",
+      "d_ff": 512,
+      "d_model": 128,
+      "dropout": 0.1,
+      "feedback_scale": 1.0,
+      "grid_side": 9,
+      "input_categories": 10,
+      "layer_schedule": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "n_heads": 4,
+      "outer_state_norm": false,
+      "outer_state_norm_epsilon": 1e-06,
+      "outer_state_rms_cap": null,
+      "output_categories": 9,
+      "residual_scale": 1.0,
+      "rope_base": 10.0,
+      "training_iterations": 16,
+      "unique_layers": 4
+    },
+    "precision": "bf16",
+    "track_solutions_every_iteration": false,
+    "weights_sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e"
+  },
+  "per_puzzle_file": "per_puzzle.npz",
+  "per_puzzle_sha256": "03aead0b52c58c21de435b1e3653c8682e3e987476dc980cde876fcd2709f8c0",
+  "scores": {
+    "1024": {
+      "accuracy_percent": 98.7,
+      "buckets": {
+        "0": {
+          "solved": 200,
+          "total": 200
+        },
+        "1-2": {
+          "solved": 200,
+          "total": 200
+        },
+        "11-50": {
+          "solved": 195,
+          "total": 200
+        },
+        "3-10": {
+          "solved": 195,
+          "total": 200
+        },
+        "51+": {
+          "solved": 197,
+          "total": 200
+        }
+      },
+      "gained_since_previous_recorded_horizon": 37,
+      "lost_since_previous_recorded_horizon": 0,
+      "solved": 987,
+      "total": 1000
+    },
+    "128": {
+      "accuracy_percent": 95.0,
+      "buckets": {
+        "0": {
+          "solved": 200,
+          "total": 200
+        },
+        "1-2": {
+          "solved": 200,
+          "total": 200
+        },
+        "11-50": {
+          "solved": 179,
+          "total": 200
+        },
+        "3-10": {
+          "solved": 180,
+          "total": 200
+        },
+        "51+": {
+          "solved": 191,
+          "total": 200
+        }
+      },
+      "solved": 950,
+      "total": 1000
+    },
+    "2048": {
+      "accuracy_percent": 98.6,
+      "buckets": {
+        "0": {
+          "solved": 200,
+          "total": 200
+        },
+        "1-2": {
+          "solved": 200,
+          "total": 200
+        },
+        "11-50": {
+          "solved": 195,
+          "total": 200
+        },
+        "3-10": {
+          "solved": 195,
+          "total": 200
+        },
+        "51+": {
+          "solved": 196,
+          "total": 200
+        }
+      },
+      "gained_since_previous_recorded_horizon": 1,
+      "lost_since_previous_recorded_horizon": 2,
+      "solved": 986,
+      "total": 1000
+    },
+    "4096": {
+      "accuracy_percent": 85.2,
+      "buckets": {
+        "0": {
+          "solved": 176,
+          "total": 200
+        },
+        "1-2": {
+          "solved": 175,
+          "total": 200
+        },
+        "11-50": {
+          "solved": 168,
+          "total": 200
+        },
+        "3-10": {
+          "solved": 174,
+          "total": 200
+        },
+        "51+": {
+          "solved": 159,
+          "total": 200
+        }
+      },
+      "gained_since_previous_recorded_horizon": 0,
+      "lost_since_previous_recorded_horizon": 134,
+      "solved": 852,
+      "total": 1000
+    }
+  },
+  "seconds_including_compilation": 29.461455323000003
+}

@@ -1,0 +1,25 @@
+{
+  "device": "cpu",
+  "precision": "fp32",
+  "matmul_precision": "highest",
+  "torch": "2.10.0",
+  "python": "3.11.9",
+  "threads": 1,
+  "question": "53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79",
+  "reference_implementation": "iters.exp_baseline_lr2e3.SudokuTransformer.forward",
+  "current_implementation": "inference.RecurrentRunner.run_batch",
+  "models": {
+    "late_state_ce": {
+      "weights_sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198",
+      "iterations": [16, 128, 1024],
+      "all_logits_exactly_equal": true,
+      "maximum_logit_difference": 0.0
+    },
+    "v1": {
+      "weights_sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e",
+      "iterations": [16, 128, 1024],
+      "all_logits_exactly_equal": true,
+      "maximum_logit_difference": 0.0
+    }
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "benchmark": {
+    "dataset": "sapientinc/sudoku-extreme",
+    "per_bucket": 5000,
+    "purpose": "reused development benchmark, not an untouched holdout",
+    "revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b",
+    "rows_sha256": "697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc",
+    "sampling_order": "first encounter, then numeric bucket concatenation",
+    "schema_version": 1,
+    "seed": 42,
+    "split": "test"
+  },
+  "identity": {
+    "batch_size": 256,
+    "benchmark_rows_sha256": "697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc",
+    "chunk_iterations": 16,
+    "compiled": false,
+    "device_type": "cuda",
+    "iterations": [
+      128,
+      1024,
+      2048,
+      4096
+    ],
+    "matmul_precision": "high",
+    "model": {
+      "architecture": "sotaku-loop-v1",
+      "d_ff": 512,
+      "d_model": 128,
+      "dropout": 0.1,
+      "feedback_scale": 1.0,
+      "grid_side": 9,
+      "input_categories": 10,
+      "layer_schedule": [
+        0,
+        1,
+        2,
+        3
+      ],
+      "n_heads": 4,
+      "outer_state_norm": false,
+      "outer_state_norm_epsilon": 1e-06,
+      "outer_state_rms_cap": null,
+      "output_categories": 9,
+      "residual_scale": 1.0,
+      "rope_base": 10.0,
+      "training_iterations": 16,
+      "unique_layers": 4
+    },
+    "precision": "bf16",
+    "track_solutions_every_iteration": false,
+    "weights_sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+  },
+  "per_puzzle_file": "per_puzzle.npz",
+  "per_puzzle_sha256": "b0d5ff58e8b16c3ea083daf8a1593523e27106e724e468c79465e3542df98b57",
+  "scores": {
+    "1024": {
+      "accuracy_percent": 98.796,
+      "buckets": {
+        "0": {
+          "solved": 4982,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4968,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4923,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4899,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4927,
+          "total": 5000
+        }
+      },
+      "gained_since_previous_recorded_horizon": 674,
+      "lost_since_previous_recorded_horizon": 93,
+      "solved": 24699,
+      "total": 25000
+    },
+    "128": {
+      "accuracy_percent": 96.472,
+      "buckets": {
+        "0": {
+          "solved": 4999,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4979,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4668,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4635,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4837,
+          "total": 5000
+        }
+      },
+      "solved": 24118,
+      "total": 25000
+    },
+    "2048": {
+      "accuracy_percent": 92.976,
+      "buckets": {
+        "0": {
+          "solved": 4628,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 4608,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 4679,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 4674,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 4655,
+          "total": 5000
+        }
+      },
+      "gained_since_previous_recorded_horizon": 50,
+      "lost_since_previous_recorded_horizon": 1505,
+      "solved": 23244,
+      "total": 25000
+    },
+    "4096": {
+      "accuracy_percent": 43.704,
+      "buckets": {
+        "0": {
+          "solved": 2124,
+          "total": 5000
+        },
+        "1-2": {
+          "solved": 2069,
+          "total": 5000
+        },
+        "11-50": {
+          "solved": 2261,
+          "total": 5000
+        },
+        "3-10": {
+          "solved": 2268,
+          "total": 5000
+        },
+        "51+": {
+          "solved": 2204,
+          "total": 5000
+        }
+      },
+      "gained_since_previous_recorded_horizon": 20,
+      "lost_since_previous_recorded_horizon": 12338,
+      "solved": 10926,
+      "total": 25000
+    }
+  },
+  "seconds_including_compilation": 752.292664075
+}
