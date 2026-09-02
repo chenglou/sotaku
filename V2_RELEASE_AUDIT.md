@@ -1,10 +1,10 @@
 # V2 Release Audit
 
-Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. This document includes the subsequent release-preparation work. Local `master` has since been fast-forwarded to `ec3febe`, incorporating that work. The updated `master` has not been pushed; no v2 tag, release publication, or GitHub default-branch change has been performed.
+Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. This document includes the subsequent release preparation. The work was integrated into `master`, which remains the public default branch. Publication and public-download verification are the final steps below.
 
 ## Recommendation
 
-For v2, train on later iterations and use ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary cross-entropy loss; it adds no normalization, auxiliary loss, ES, or inference damping. Keep the published v1 checkpoint available, including its stronger result at 4096 in FP32. Additional supervised windows and margin penalties remain research material.
+For v2, train on later iterations and use ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary cross-entropy loss; it adds no normalization, auxiliary loss, ES, or inference damping. Additional supervised windows and margin penalties remain research material.
 
 The release engineering defects identified below have been addressed. Numerical-sensitivity checks and four matched dropout continuations are complete. The reference weights are unchanged; publication is still pending.
 
@@ -30,11 +30,9 @@ Same frozen 25K puzzles, PyTorch 2.10.0+cu128, H200, eager execution, batch size
 | Checkpoint | 128 | 1024 | 2048 | 4096 |
 |---|---:|---:|---:|---:|
 | Training on later iterations, final, FP32 | 96.288% | 99.116% | 99.048% | 98.632% |
-| Published v1, FP32 | 95.704% | 98.888% | 99.028% | 99.020% |
 | Same later-iteration training weights, BF16 | 96.472% | 98.796% | 92.976% | 43.704% |
-| Same published v1 weights, BF16 | 95.256% | 98.876% | 98.844% | 84.888% |
 
-In BF16, the later-iteration training checkpoint matches its historical counts exactly: 24,118 / 24,699 / 23,244 / 10,926 solved. V1's fresh BF16 1024 count is 24,719, versus the historical 24,728. The difference is not evidence that its weights changed; their checksum is identical. Do not attribute that nine-puzzle historical difference to a particular runtime setting without a controlled comparison.
+In BF16, the later-iteration training checkpoint matches its historical counts exactly: 24,118 / 24,699 / 23,244 / 10,926 solved. The [precision study](release/PRECISION_RESULTS.md) preserves the complete execution-setting comparisons.
 
 Changing only arithmetic largely removes the selected later-iteration training checkpoint's 4096 deterioration. FP32 is now the default for public evaluation, single-puzzle inference, and the Modal evaluator; BF16 remains an explicit option for historical reproduction. This does not prove that every older checkpoint with poor accuracy had the same cause, or that further FP32 iterations can never fail. Training remains BF16 and its original dropout setting is unchanged.
 
@@ -49,6 +47,7 @@ Each evaluation retains exact row indices, predictions and correctness per puzzl
 - **Dataset identity:** training and evaluation pin revision `58942f96baeb572ca3127e2a9e9c70f330783d6b`. The 25K benchmark indices and row-content hash are frozen.
 - **Curriculum documentation:** the original code selects whole rating buckets. Its first pools are 51+ and 11+, not literal 21+ and 6+. Documentation now describes those actual pools, and a regression test preserves historical behavior.
 - **Environment:** the core requirements and CUDA build are pinned, the previous environment snapshot is retained separately, and evaluations record transitive package versions. A CPU GitHub Actions workflow exercises the public model and checkpoint tests without a Modal account.
+- **Clean test discovery:** the exploratory `test_loss.py` script now reads its optional local dataset only when run directly. The 136-test suite also passes from a directory without that dataset.
 
 The shared training math and default dropout behavior are preserved. Additional metadata and explicit burn-in-dropout controls do not silently change the reference recipe.
 

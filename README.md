@@ -1,13 +1,13 @@
 # Sotaku
 
-From-scratch experiments on iterative neural Sudoku solvers. See [post](https://x.com/_chenglou/status/2032615500065419763)
+Sotaku v2 solves **99.12%** of a 25,000-puzzle Sudoku benchmark with an **800K-parameter looped transformer** trained from scratch. The recipe is simple: train on later iterations, then use ordinary FP32 inference.
 
 ## Current Status
 
 - **Recommended default:** training on later iterations, with the same architecture, cross-entropy loss, and ordinary inference
 - **Benchmark:** [frozen 25K-puzzle sample](release/benchmark_25k.json) from the `sapientinc/sudoku-extreme` test split
 - **Recommended checkpoint result:** **99.12%** at 1024 and **98.63%** at 4096 with FP32 inference, without inference-time damping
-- **Published checkpoint:** the original 16-iteration training checkpoint remains available at **98.9%** at 1024; the recommended checkpoint is not yet published
+- **Checkpoint:** [v2.0.0 weights, model manifest, and validation records](https://github.com/chenglou/sotaku/releases/tag/v2.0.0)
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** 2.7M-puzzle pool, BS=2048, LR=2e-3, 16 supervised iterations, 50K optimizer steps, cosine decay, reverse curriculum
 
@@ -40,7 +40,7 @@ For CPU-only inference, install the CPU build from the linked instructions inste
 
 ## Train And Evaluate
 
-The recommended checkpoint used the 50K preset for training on later iterations, with random seed `20260730`. Its unchanged weights score 99.12% at 1024 in FP32, versus the historical 98.80% in BF16. The following command uses that preset and seed; independent retraining is not guaranteed to match its exact score.
+The released checkpoint used the 50K preset for training on later iterations, with random seed `20260730`. The following command uses that preset and seed; independent retraining is not guaranteed to match its exact score.
 
 ```sh
 python train.py --preset reference --seed 20260730 --run-name late_ce_50k
@@ -51,25 +51,26 @@ python -m iters.eval_more_iters runs/training/model_late_ce_50k.pt \
 
 For a 20K development run, use `python train.py --run-name late_ce_20k`; `development` is the default preset. Reusing a run name resumes its saved optimizer and schedule. Use a new name for an independent run.
 
-New inference weights have an adjacent `.pt.json` manifest with the exact model settings and checksum. Keep both files together. The evaluator uses the same recurrence as training, including normalization or layer schedules, and saves per-puzzle results in a new directory under `runs/`. Unlabelled historical weights require an explicit `--legacy-defaults --exp stabilize.exp_testbed_20k` for a known plain model; the published v1 file is recognized by its checksum.
+Inference weights have an adjacent `.pt.json` manifest with the exact model settings and checksum. Keep both files together. The evaluator uses the same recurrence as training and saves per-puzzle results in a new directory under `runs/`.
 
 ## Published Checkpoint
 
-If you want the published 98.9% result without retraining:
+Download the v2 weights and their manifest without retraining:
 
 ```sh
-gh release download baseline-lr2e3-checkpoint --pattern model_baseline_lr2e3.pt
+gh release download v2.0.0 --repo chenglou/sotaku --pattern 'model_late_state_ce.pt*'
 
-python -m iters.eval_more_iters model_baseline_lr2e3.pt \
-  --benchmark release/benchmark_25k.json --precision bf16 --iters 1024
+python -m iters.eval_more_iters model_late_state_ce.pt \
+  --benchmark release/benchmark_25k.json --precision fp32 --device cuda \
+  --batch-size 256 --iters 128 1024 2048 4096
 ```
 
-The fresh pinned-environment evaluation solves `24719/25000` at 1024 iterations (98.876%). The original published count was `24728/25000` (98.912%); both round to 98.9%. Use CUDA BF16, eager execution, and batch size 256 to reproduce the fresh evaluation.
+The reference evaluation solves `24779/25000` puzzles at 1024 iterations (99.116%). It uses PyTorch 2.10.0+cu128 on H200, eager FP32 execution, and batch size 256. The release also includes checksums and per-puzzle validation records; see [the asset details](release/v2/README.md).
 
 For one puzzle, without downloading the dataset:
 
 ```sh
-python solve.py model_baseline_lr2e3.pt \
+python solve.py model_late_state_ce.pt \
   '53..7.... 6..195... .98....6. 8...6...3 4..8.3..1 7...2...6 .6....28. ...419..5 ....8..79'
 ```
 
@@ -104,9 +105,7 @@ Using the published checkpoint:
 
 ```sh
 pip install matplotlib
-python -m viz.visualize model_baseline_lr2e3.pt --exp iters.exp_baseline_lr2e3 --device cuda --n-iters 32
-
-python viz/plot_iteration_scaling.py
+python -m viz.visualize model_late_state_ce.pt --exp stabilize.exp_testbed_20k --device cuda --n-iters 32
 ```
 
 Outputs go to `viz/output/`.
@@ -124,27 +123,27 @@ Outputs go to `viz/output/`.
 
 ## Results
 
-The reference checkpoints were re-evaluated on 2026-09-02 using the frozen 25K-puzzle benchmark, eager CUDA execution, and batch size 256. FP32 and BF16 rows use identical weights. The BF16 result for training on later iterations reproduced its historical counts exactly. Results with a second supervised window and margin penalty are kept in the [research notes](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty).
+The v2 checkpoint was evaluated on 2026-09-02 using the frozen 25K-puzzle benchmark, eager FP32 execution on H200, and batch size 256. It uses no recheck, margin or consistency loss, added recurrent normalization, ES, or inference damping.
 
-| Model | 128 iterations | 1024 | 2048 | 4096 |
-|---|---:|---:|---:|---:|
-| **training on later iterations, final, FP32 (recommended)** | 96.29% | **99.12%** | 99.05% | 98.63% |
-| released 16-iteration training checkpoint, FP32 | 95.70% | 98.89% | 99.03% | 99.02% |
-| same later-iteration training checkpoint, BF16 | 96.47% | 98.80% | 92.98% | 43.70% |
-| same released 16-iteration training checkpoint, BF16 | 95.26% | 98.88% | 98.84% | 84.89% |
+| Inference iterations | Solved puzzles | Accuracy |
+|---:|---:|---:|
+| 128 | 24,072 / 25,000 | 96.29% |
+| 1024 | 24,779 / 25,000 | **99.12%** |
+| 2048 | 24,762 / 25,000 | 99.05% |
+| 4096 | 24,658 / 25,000 | 98.63% |
 
-Precision and compilation can substantially change very long trajectories. Keep execution settings with the score; [numerical checks](release/PRECISION_RESULTS.md) evaluated these effects without changing the weights. FP32 is the default; use `--precision bf16` for the historical arithmetic. `--compiled` enables compiled 16-iteration chunks and is measured separately, not required for the recommended FP32 results. The observed full FP32 evaluation took about 16.5 minutes, versus 12.5 minutes for eager BF16 on H200; these individual runs are not a controlled throughput benchmark.
+Precision and compilation can substantially change very long trajectories. FP32 with TF32 matmul disabled is the default; compilation is optional and not required for these results. The observed full evaluation took about 16.5 minutes on H200. [Numerical checks](release/PRECISION_RESULTS.md) document other execution settings, and [research notes](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty) preserve experiments with extra losses.
 
 The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row, column, or box constraint embedding, just 2D RoPE in attention. Full scaling tables, stability analysis, interventions, and ablations live in [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md) and [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
 
 ## Research Notes
 
 - [Training on later iterations](looping/EXPERIMENTS_LOOPING.md): repeated training runs, second supervised windows, margin penalties, damping, and fewer training iterations.
-- [Iteration scaling](iters/EXPERIMENTS_ITERS.md): the original checkpoint and behavior at large inference iteration counts.
+- [Iteration scaling](iters/EXPERIMENTS_ITERS.md): experiments on behavior at large inference iteration counts.
 - [Recurrent normalization](stabilize/EXPERIMENTS_STABILIZE.md): RMSNorm, state-magnitude limits, and other stabilization experiments.
 - [Evolution strategies](es/EXPERIMENTS_ES.md): fine-tuning existing checkpoints and training from scratch.
 - [Recurrent-state geometry](looping/trajectory_viz/study/README.md): visualization study, controls, and limitations.
-- [Release verification](V2_RELEASE_AUDIT.md): artifact provenance and release-preparation status.
+- [Release verification](V2_RELEASE_AUDIT.md): artifact provenance and release checks.
 - [Numerical sensitivity](release/PRECISION_RESULTS.md) and [burn-in dropout](looping/BURNIN_DROPOUT.md): fixed-checkpoint checks and matched continuation experiments.
 
 ## Historical / Archived Code
