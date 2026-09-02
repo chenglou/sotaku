@@ -9,11 +9,11 @@ Current conclusions:
 - Randomized detached late-state cross-entropy is the recommended default. It changes neither the architecture nor the loss, and all tested 20K and 50K final runs remained healthy at 1024. A clean 50K final checkpoint scored 98.80% at 1024 and 92.98% at 2048 without inference adjustments.
 - A second late supervised window is most useful after ordinary late-state training has produced a healthy model. Starting the extra objective from initialization did not improve the mean result.
 - Recovery and component interventions now locate the immediate failure at the correct-answer boundary: collapsed trajectories lose minimum answer margin. State magnitude, total hidden-state rotation, and gradient conflict do not distinguish healthy models reliably.
-- The current best checkpoint combines late-state cross-entropy through step 39K with a second future cross-entropy window and calibrated minimum-margin loss through step 50K. Its final weights reached 99.00% at 1024, 98.46% at 2048, and 82.17% at 4096 without inference adjustments. This staged result has not yet been replicated.
+- The highest-scoring research checkpoint combines late-state cross-entropy through step 39K with a second future cross-entropy window and calibrated minimum-margin loss through step 50K. Its final weights reached 99.00% at 1024, 98.46% at 2048, and 82.17% at 4096 without inference adjustments. This staged result has not yet been replicated; late-state CE alone remains the recommended public recipe.
 - Delayed damping remains an optional inference policy for checkpoints that deteriorate deeply. It keeps three independent late-state final checkpoints at 94.69-96.91% through iteration 4096, but is unnecessary when an undamped checkpoint already remains healthy at the target horizon.
 - Use 20K runs for routine comparisons, then validate promising changes at 50K. The 20K schedule preserved the useful late-state signal across three seeds, while 10K did not reliably preserve later rankings. A 20K result can still miss a positive or negative phase change after step 20K.
 
-All current runs use the first 2.7M puzzles from the training split. The full schedule has 50K optimizer steps, batch size 2048, a 1,400-step warmup, and rating thresholds 21+, 6+, 1+, and 0+ over phases of 10K, 10K, 10K, and 20K steps. The 20K schedule is useful for screening. The 10K screens did not preserve the later ranking, and the current recipe has no clean reduced-puzzle-count ablation.
+All current runs use the first 2.7M puzzles from the training split. The full schedule has 50K optimizer steps, batch size 2048, a 1,400-step warmup, and actual rating pools 51+, 11+, 1+, and 0+ over phases of 10K, 10K, 10K, and 20K steps. Historical config and log labels say 21+ and 6+ for the first two phases, but the trainer selects whole buckets by their lower endpoint, producing 51+ and 11+. The training behavior is unchanged. The 20K schedule is useful for screening; 10K screens did not preserve the later ranking, and the current recipe has no clean reduced-puzzle-count ablation.
 
 ## First-wave training matrix
 
@@ -326,6 +326,10 @@ The strongest checkpoint-health distinction is settling in normalized-state dire
 
 For future diagnostics, use weakest correct-answer margin, normalized-state movement, relative acceleration, solved-answer retention, and output stability. Apparent PCA shape, raw update magnitude, smoothness alone, and proximity to a raw fixed point are not reliable health measures. Because all final puzzle-level collapses in the early-warning arm came from one checkpoint, independent collapsed training runs are still required before claiming a general early-warning law.
 
+### Staged recheck and margin
+
+These experiments remain research alternatives, not part of the recommended late-state-CE recipe.
+
 `eval_margin_floor_calibration.py` measured the exact burn-in, first 16-step window, detached gap, and second 16-step window used by stay-solved training. On the healthy step-39K source, a raw logit margin floor of 1 activated on less than 2% of future solved-puzzle states. A floor of 5 remained selective, activating on roughly 1-13% depending on burn-in horizon and gap; a floor of 10 activated on more than 95% of the longest-gap windows. The `stay_margin_floor` follow-up therefore uses floor 5 and weight 0.1. It preserves ordinary recheck cross-entropy for unsolved states and adds a hinge loss only when the weakest blank cell of an anchor-solved puzzle falls below the calibrated margin.
 
 This was a stacked mechanism test, not a margin-only training result. The branch inherited randomized late-state cross-entropy through step 39K. From step 39K onward it continued the first late supervised window, added a second future cross-entropy window, and added the margin floor. The branch loaded the same ordinary step-39K checkpoint and optimizer state as the earlier late switch, then trained through 50K. Its final 1,000-puzzle probe was 99.4% at 1024; the selected step-46K checkpoint was 99.5%. Full evaluation favored the final checkpoint:
@@ -337,6 +341,16 @@ This was a stacked mechanism test, not a margin-only training result. The branch
 | earlier consistency-switch final checkpoint | 96.34% | 97.52% | 88.98% | 30.20% |
 
 Replacing the consistency term with the margin term improved exactly the failure mode it targeted: relative to the earlier consistency switch, the final checkpoint gained 9.48 points at 2048 and 51.97 points at 4096 while leaving 128 unchanged. The result does not isolate the margin term from the two late cross-entropy windows. It also did not create indefinite stability. The latest state directly seen by this training objective is iteration 800, so its 2048 behavior is extrapolation and its eventual 4096 decline is unsurprising.
+
+To reproduce the staged experiment, run these commands from the repository root as separate detached jobs:
+
+```sh
+# Produce the trial-0 source checkpoint.
+modal run --detach looping/modal_stay_solved.py --arm control --full-50k --trial 0
+
+# After the source job commits its step-39K checkpoint, enable recheck CE + margin.
+modal run --detach looping/modal_late_switch.py --mode margin-floor5
+```
 
 A matched standalone matrix now separates the training-time health mechanisms. All five trial-0 runs use seed 20260730, the same 50K schedule, and ordinary 16-iteration cross-entropy:
 
