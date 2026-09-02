@@ -1,12 +1,12 @@
 # V2 Release Audit
 
-Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. This document includes the subsequent release preparation. The work was integrated into `master`, which remains the public default branch. Publication and public-download verification are the final steps below.
+Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. The work was integrated into `master`, which remains the public default branch. [Sotaku v2.0.0](https://github.com/chenglou/sotaku/releases/tag/v2.0.0) is published, and its public downloads have been verified.
 
 ## Recommendation
 
-For v2, train on later iterations and use ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary cross-entropy loss; it adds no normalization, auxiliary loss, ES, or inference damping. Additional supervised windows and margin penalties remain research material.
+For v2, train on later iterations and use ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary cross-entropy loss; it adds no recurrent normalization, auxiliary loss, ES, or inference damping. Additional supervised windows and margin penalties remain research material.
 
-The release engineering defects identified below have been addressed. Numerical-sensitivity checks and four matched dropout continuations are complete. The reference weights are unchanged; publication is still pending.
+The release engineering defects identified below have been addressed. Numerical-sensitivity checks and four matched dropout continuations are complete. The published reference weights are unchanged.
 
 ## Verification Status
 
@@ -19,7 +19,7 @@ The release engineering defects identified below have been addressed. Numerical-
 | Numerical sensitivity | Completed both fixed-weight matrices and every-iteration solution-retention checks; see [results](release/PRECISION_RESULTS.md) |
 | Dropout experiment | Four matched 4K continuations and eight full evaluations completed; neither dropout-off seed meets the extension rule. Keep dropout on; see [results](looping/BURNIN_DROPOUT.md) |
 | Retained records | 34 evaluation conditions independently recomputed from saved predictions and pinned puzzle data, then verified again after extracting the release archive |
-| Public release | [Weights, manifest, and validation archive](release/v2/README.md) prepared locally; public download flow cannot be verified until publication |
+| Public release | Published as `v2.0.0`; all four assets downloaded without credentials and checksums verified; fresh public checkout passed 136 tests and the CPU example solve |
 
 The GPU smoke fixture uses five copies of an almost-filled board. It verifies optimization, saved optimizer state, resumption, gradients, and module modes, not Sudoku accuracy. Results are retained in [release/validation](release/validation).
 
@@ -53,7 +53,7 @@ The shared training math and default dropout behavior are preserved. Additional 
 
 ## Reference Artifact
 
-The prepared tensor-only file is `release/v2/model_late_state_ce.pt`, with its adjacent [manifest](release/v2/model_late_state_ce.pt.json). Exporting verified every tensor against the final resumable checkpoint and preserved the original weight-file bytes.
+The released tensor-only file is `model_late_state_ce.pt`, with its adjacent [manifest](release/v2/model_late_state_ce.pt.json). Exporting verified every tensor against the final resumable checkpoint and preserved the original weight-file bytes.
 
 - Seed: `20260730`; last step `49999`, meaning 50,000 optimizer updates.
 - Source volume: `sudoku-outputs`.
@@ -78,13 +78,13 @@ The combined experiment trained on later iterations, then added a second supervi
 
 The geometry study did not establish a universal shape. It also did not prove that none exists: it used one checkpoint per regime, 20 final puzzles, and unaligned hidden coordinates for some transfer tests. Prefer controlled interventions to stronger conclusions from PCA appearance. Re-introducing the original puzzle on every loop would revisit an older design choice; the current model embeds it only once.
 
-## Publication Steps
+## Publication
 
-The initial GitHub audit found `master` at `1bbdc32`, with the research branch 80 commits ahead and none behind. Only the `baseline-lr2e3-checkpoint` release was published. Keep `master` as the default; changing the default to a research branch is unnecessary.
+`master` was pushed and `v2.0.0` tagged at `b3420784b2f17ff0f76f58d7260a6003162103dc`. The release was published on 2026-09-02 at 22:39 UTC and marked latest. The [publication record](release/v2/publication.json) contains the asset URLs, checksums, tag commit, and verification results.
 
-1. Review the committed release preparation, final numerical report, and retained evaluation records.
-2. Local integration and documentation review are complete: `master` was fast-forwarded to `ec3febe`, followed by the terminology cleanup. Push the reviewed commits before tagging. The research changes include about 500 files; this audit covers the supported training, inference, checkpoint, and release paths, not every archived experiment.
-3. Tag the integrated commit, publish the tensor-only weights, manifest, checksums, and evaluation records, and retain the v1 release.
-4. Test downloading and evaluating the published assets from the public default branch before announcing.
+- All four assets downloaded without credentials and matched their local checksums and GitHub asset digests.
+- A fresh public checkout passed all 136 unit tests with Python 3.11.9 and PyTorch 2.10.0. The pinned Linux [GitHub Actions run](https://github.com/chenglou/sotaku/actions/runs/33691101782) also passed.
+- The downloaded weights and manifest loaded successfully. The documented example puzzle produced the correct solution using the default 1024 iterations and FP32 on CPU.
+- The verifier from the public checkout recomputed all 34 archived evaluation conditions against the pinned dataset, including the reference counts of 24,072 / 24,779 / 24,762 / 24,658 solved at 128 / 1024 / 2048 / 4096 iterations.
 
-No fresh 50K run is required to identify or verify the existing release candidate. The dropout continuations test a separate hypothesis and must not be presented as part of the original checkpoint's training.
+These publication checks revalidated saved predictions and ran CPU inference; they did not rerun the full GPU benchmark or train a new model. The audit covers supported training, inference, checkpoint, and release paths, not every archived experiment. The dropout continuations remain a separate experiment, not part of the released checkpoint's training.

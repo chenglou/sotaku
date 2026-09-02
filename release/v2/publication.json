@@ -1,0 +1,63 @@
+{
+  "tag": "v2.0.0",
+  "release_url": "https://github.com/chenglou/sotaku/releases/tag/v2.0.0",
+  "tag_commit": "b3420784b2f17ff0f76f58d7260a6003162103dc",
+  "published_at": "2026-09-02T22:39:12Z",
+  "default_branch": "master",
+  "latest_release_at_verification": true,
+  "verified_date": "2026-09-02",
+  "assets": {
+    "model_late_state_ce.pt": {
+      "sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198",
+      "bytes": 3214969,
+      "url": "https://github.com/chenglou/sotaku/releases/download/v2.0.0/model_late_state_ce.pt"
+    },
+    "model_late_state_ce.pt.json": {
+      "sha256": "baa2ab7fb0056a3131aa4e2ef392487ae91ea990d226e4293fbb25f3f8c6c072",
+      "bytes": 3101,
+      "url": "https://github.com/chenglou/sotaku/releases/download/v2.0.0/model_late_state_ce.pt.json"
+    },
+    "validation_records_20260902.zip": {
+      "sha256": "4d8d9661a429fee32ce25f9c10208f876e4c99c29046202d8b424e4885cfebcd",
+      "bytes": 54641811,
+      "url": "https://github.com/chenglou/sotaku/releases/download/v2.0.0/validation_records_20260902.zip"
+    },
+    "validation_records_20260902.checksums.json": {
+      "sha256": "7c86c494856631dbdaf8333916f70e35ce260877d975d57de490d0e05d630d31",
+      "bytes": 429,
+      "url": "https://github.com/chenglou/sotaku/releases/download/v2.0.0/validation_records_20260902.checksums.json"
+    }
+  },
+  "verification": {
+    "anonymous_downloads_match_sha256": true,
+    "github_asset_digests_match": true,
+    "fresh_public_checkout_commit": "b3420784b2f17ff0f76f58d7260a6003162103dc",
+    "python": "3.11.9",
+    "pytorch": "2.10.0",
+    "unit_tests_passed": 136,
+    "ci_url": "https://github.com/chenglou/sotaku/actions/runs/33691101782",
+    "ci_conclusion": "success",
+    "cpu_example": {
+      "iterations": 1024,
+      "precision": "fp32",
+      "puzzle": "53..7....6..195....98....6.8...6...34..8.3..17...2...6.6....28....419..5....8..79",
+      "expected_solution": "534678912672195348198342567859761423426853791713924856961537284287419635345286179",
+      "matches": true
+    },
+    "archived_evaluation_conditions_verified": 34,
+    "dataset_revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b",
+    "reference_evaluation": {
+      "result_sha256": "16c61a0018317d27b117cbb225854738844e06d949460642ef165d89a4acc240",
+      "rows_sha256": "697d79d8494d7904d7ecf5638f3f0e47b43c8f66c6b4381022d0457a469d61bc",
+      "solved": {
+        "128": 24072,
+        "1024": 24779,
+        "2048": 24762,
+        "4096": 24658
+      },
+      "total": 25000,
+      "weights_sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+    },
+    "scope": "Public-download integrity, clean-checkout tests, CPU example inference, and recomputation of archived predictions. No full GPU benchmark or training was rerun for publication."
+  }
+}

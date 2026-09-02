@@ -1,6 +1,6 @@
 # Release Validation Records
 
-These are the 2026-09-02 release checks. [Numerical results](../PRECISION_RESULTS.md) explain the fixed-weight comparisons; the [dropout protocol](../../looping/BURNIN_DROPOUT.md) describes the separate training experiment. None of these runs changes the prepared reference checkpoint.
+These are the 2026-09-02 release checks. [Numerical results](../PRECISION_RESULTS.md) explain the fixed-weight comparisons; the [dropout protocol](../../looping/BURNIN_DROPOUT.md) describes the separate training experiment. None of these runs changes the released reference checkpoint.
 
 - `late_state_ce/` and `v1/`: full 25K evaluations and precision comparisons on a fixed 1K sample. Each condition retains its identity, dataset indices, runtime, source hashes, score, and per-puzzle predictions.
 - `dropout/`: matched continuation results and final-checkpoint evaluations. Training summaries are named `training_result.json`; evaluator records are named `result.json`.
