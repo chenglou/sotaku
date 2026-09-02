@@ -133,7 +133,7 @@ The reference checkpoints were re-evaluated on 2026-09-02 using the frozen 25K-p
 | same late-state CE checkpoint, BF16 | 96.47% | 98.80% | 92.98% | 43.70% |
 | same released plain-backprop checkpoint, BF16 | 95.26% | 98.88% | 98.84% | 84.89% |
 
-Precision and compilation can substantially change very long trajectories. Keep execution settings with the score; [numerical checks](release/PRECISION_PROTOCOL.md) evaluate these effects without changing the weights. FP32 is the default; use `--precision bf16` for the historical arithmetic. `--compiled` enables compiled 16-iteration chunks and is measured separately, not required for the recommended FP32 results. The observed full FP32 evaluation took about 16.5 minutes, versus 12.5 minutes for eager BF16 on H200; these individual runs are not a controlled throughput benchmark.
+Precision and compilation can substantially change very long trajectories. Keep execution settings with the score; [numerical checks](release/PRECISION_RESULTS.md) evaluated these effects without changing the weights. FP32 is the default; use `--precision bf16` for the historical arithmetic. `--compiled` enables compiled 16-iteration chunks and is measured separately, not required for the recommended FP32 results. The observed full FP32 evaluation took about 16.5 minutes, versus 12.5 minutes for eager BF16 on H200; these individual runs are not a controlled throughput benchmark.
 
 The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row, column, or box constraint embedding, just 2D RoPE in attention. Full scaling tables, stability analysis, interventions, and ablations live in [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md) and [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
 

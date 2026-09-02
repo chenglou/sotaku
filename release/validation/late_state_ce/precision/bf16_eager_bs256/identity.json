@@ -1,0 +1,41 @@
+{
+  "batch_size": 256,
+  "benchmark_rows_sha256": "a9fc44c2c39b39e862e91396c99cd0ad131cd70a94eb47e0d36950d768623f84",
+  "chunk_iterations": 16,
+  "compiled": false,
+  "device_type": "cuda",
+  "iterations": [
+    128,
+    1024,
+    2048,
+    4096
+  ],
+  "matmul_precision": "high",
+  "model": {
+    "architecture": "sotaku-loop-v1",
+    "d_ff": 512,
+    "d_model": 128,
+    "dropout": 0.1,
+    "feedback_scale": 1.0,
+    "grid_side": 9,
+    "input_categories": 10,
+    "layer_schedule": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "n_heads": 4,
+    "outer_state_norm": false,
+    "outer_state_norm_epsilon": 1e-06,
+    "outer_state_rms_cap": null,
+    "output_categories": 9,
+    "residual_scale": 1.0,
+    "rope_base": 10.0,
+    "training_iterations": 16,
+    "unique_layers": 4
+  },
+  "precision": "bf16",
+  "track_solutions_every_iteration": false,
+  "weights_sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+}

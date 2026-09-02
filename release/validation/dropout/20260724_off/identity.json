@@ -1,0 +1,9 @@
+{
+  "detached_burnin_dropout": false,
+  "run_name": "burnin_dropout_off_seed20260724",
+  "seed": 20260724,
+  "source": "looping/loop_stay_control_50k_trial0_checkpoint_step39000.pt",
+  "source_sha256": "3e1e86dd40fe75fade2dec17c2d3916ad8959b5b12f1170c5dbbb5e3673e4a98",
+  "source_step": 39000,
+  "supervised_dropout": true
+}

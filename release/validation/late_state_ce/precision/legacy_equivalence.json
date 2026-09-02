@@ -1,0 +1,14 @@
+{
+  "1024": {
+    "equal": true,
+    "max_logit_difference": 0.0
+  },
+  "128": {
+    "equal": true,
+    "max_logit_difference": 0.0
+  },
+  "16": {
+    "equal": true,
+    "max_logit_difference": 0.0
+  }
+}

@@ -8,7 +8,8 @@ The unchanged final weights from seed `20260730`, trained for 50,000 optimizer u
 
 - `model_late_state_ce.pt`: tensor-only inference weights, SHA-256 `a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198`.
 - `model_late_state_ce.pt.json`: model settings, training configuration, source checksums, and reference evaluation.
-- The validation archive and its adjacent `.checksums.json`, generated after the checks finish, contain the evaluation records and source snapshots. Large assets are excluded from Git.
+- `validation_records_20260902.zip`: all 34 evaluated conditions, per-puzzle predictions, benchmark indices, training summaries, and source snapshots. Verify the extracted records without a GPU using the [record verification instructions](../validation/README.md).
+- `validation_records_20260902.checksums.json`: SHA-256 and byte counts for the weights, manifest, and validation archive. Large assets are excluded from Git.
 
 Publication is separate from preparation. No v2 tag, public release, merge, or default-branch change has been made by this audit. Keep the v1 release available.
 

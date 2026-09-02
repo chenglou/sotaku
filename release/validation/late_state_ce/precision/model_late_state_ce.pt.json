@@ -1,0 +1,101 @@
+{
+  "artifact_type": "sotaku-inference-weights",
+  "model": {
+    "architecture": "sotaku-loop-v1",
+    "d_ff": 512,
+    "d_model": 128,
+    "dropout": 0.1,
+    "feedback_scale": 1.0,
+    "grid_side": 9,
+    "input_categories": 10,
+    "layer_schedule": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "n_heads": 4,
+    "outer_state_norm": false,
+    "outer_state_norm_epsilon": 1e-06,
+    "outer_state_rms_cap": null,
+    "output_categories": 9,
+    "residual_scale": 1.0,
+    "rope_base": 10.0,
+    "training_iterations": 16,
+    "unique_layers": 4
+  },
+  "provenance": {
+    "dataset": "sapientinc/sudoku-extreme",
+    "dataset_revision": "58942f96baeb572ca3127e2a9e9c70f330783d6b",
+    "metadata_origin": "recovered training config and verified historical implementation defaults",
+    "source_checkpoint": "loop_health_standalone_v1_late_state_ce_50k_trial0_checkpoint_step49999.pt",
+    "source_checkpoint_sha256": "a52c83c1200aeb524889454d81602e5c17fceade7d306ae0005f946eb1c06426",
+    "source_weights": "model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt",
+    "source_weights_sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198",
+    "training_code_revision": null
+  },
+  "schema_version": 1,
+  "training": {
+    "config": {
+      "batch_size": 2048,
+      "checkpoint_on_probe": true,
+      "d_ff": 512,
+      "d_model": 128,
+      "eval_every": 5000,
+      "experiment": "exp_health_late_state_ce",
+      "late_supervision_horizons": [
+        32,
+        64,
+        128,
+        256,
+        512
+      ],
+      "late_supervision_mix": 1.0,
+      "late_supervision_probability": 0.2,
+      "late_supervision_start_step": 0,
+      "lr": 0.002,
+      "lr_min_ratio": 0.01,
+      "n_layers": 4,
+      "outer_state_norm": "none",
+      "outer_state_norm_epsilon": 1e-06,
+      "phases": [
+        [
+          0,
+          10000,
+          21,
+          "Phase 1: Hard only (rating 21+)"
+        ],
+        [
+          10000,
+          20000,
+          6,
+          "Phase 2: Medium+ (rating 6+)"
+        ],
+        [
+          20000,
+          30000,
+          1,
+          "Phase 3: Easy+ (rating 1+)"
+        ],
+        [
+          30000,
+          50000,
+          0,
+          "Phase 4: All (rating 0+)"
+        ]
+      ],
+      "probe_every": 1000,
+      "random_seed": 20260730,
+      "run_name": "loop_health_standalone_v1_late_state_ce_50k_trial0",
+      "total_steps": 50000,
+      "warmup_steps": 1400
+    },
+    "last_step": 49999,
+    "optimizer_updates": 50000
+  },
+  "weights": {
+    "bytes": 3214969,
+    "file": "model_late_state_ce.pt",
+    "sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+  }
+}

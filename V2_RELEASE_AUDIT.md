@@ -6,7 +6,7 @@ Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. This do
 
 Use late-state cross-entropy as the main v2 recipe and checkpoint, with ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary training loss; it adds no normalization, auxiliary loss, ES, or inference damping. Keep the published v1 checkpoint available, including its stronger result at 4096 in FP32. Recheck and margin remain research material.
 
-The release engineering defects identified below have been addressed. Publication is still pending, and numerical-sensitivity and dropout experiments are being checked separately. Those experiments do not alter the prepared reference weights.
+The release engineering defects identified below have been addressed. Numerical-sensitivity checks and four matched dropout continuations are complete. The reference weights are unchanged; publication is still pending.
 
 ## Verification Status
 
@@ -16,9 +16,10 @@ The release engineering defects identified below have been addressed. Publicatio
 | GPU training mechanics | Full four-layer model, 16 supervised iterations; compiled CUDA save/resume and dropout-off burn-in passed |
 | Inference equivalence | Exact eager logits versus the historical forward at 16, 128, and 1024 iterations for both reference models: eight CUDA BF16 puzzles and one CPU FP32 fixture |
 | Full benchmark | Historical BF16 late-state counts reproduced exactly; FP32 improves the same checkpoint to 99.116% at 1024 and 98.632% at 4096 |
-| Numerical sensitivity | Fixed-weight FP32/BF16, eager/compiled, batch-size, and solution-retention checks running; see [protocol](release/PRECISION_PROTOCOL.md) |
-| Dropout experiment | Two matched seed pairs continued from healthy step-39000 checkpoints; see [protocol](looping/BURNIN_DROPOUT.md) |
-| Public release | Assets prepared locally; public download flow cannot be verified until publication |
+| Numerical sensitivity | Completed both fixed-weight matrices and every-iteration solution-retention checks; see [results](release/PRECISION_RESULTS.md) |
+| Dropout experiment | Four matched 4K continuations and eight full evaluations completed; neither dropout-off seed meets the extension rule. Keep dropout on; see [results](looping/BURNIN_DROPOUT.md) |
+| Retained records | 34 evaluation conditions independently recomputed from saved predictions and pinned puzzle data, then verified again after extracting the release archive |
+| Public release | [Weights, manifest, and validation archive](release/v2/README.md) prepared locally; public download flow cannot be verified until publication |
 
 The GPU smoke fixture uses five copies of an almost-filled board. It verifies optimization, saved optimizer state, resumption, gradients, and module modes, not Sudoku accuracy. Results are retained in [release/validation](release/validation).
 
@@ -82,7 +83,7 @@ The geometry study did not establish a universal shape. It also did not prove th
 
 The initial GitHub audit found `master` at `1bbdc32`, with the research branch 80 commits ahead and none behind. Only the `baseline-lr2e3-checkpoint` release was published. Keep `master` as the default; changing the default to a research branch is unnecessary.
 
-1. Review and commit the release preparation, including the final numerical report and retained evaluation records.
+1. Review the committed release preparation, final numerical report, and retained evaluation records.
 2. Integrate the reviewed commit into `master`. The research delta includes about 500 files; this audit covers the supported training, inference, checkpoint, and release paths, not every archived experiment.
 3. Tag the integrated commit, publish the tensor-only weights, manifest, checksums, and evaluation records, and retain the v1 release.
 4. Test downloading and evaluating the published assets from the public default branch before announcing.

@@ -111,6 +111,18 @@
       "seed": 20260730,
       "app": "ap-mcjOSyC3U9B2rrPxRW4lu0",
       "directory": "evaluations/v2_20260902_dropout_on_s20260730_to43k_fp32"
+    },
+    {
+      "kind": "full_dropout_off_bf16",
+      "seed": 20260724,
+      "app": "ap-h1U6TaG6pEuPRp7JAAUGHm",
+      "directory": "evaluations/v2_20260902_dropout_off_s20260724_to43k_bf16"
+    },
+    {
+      "kind": "full_dropout_off_fp32",
+      "seed": 20260724,
+      "app": "ap-bqBu2Da1vgaE13XslqcDzP",
+      "directory": "evaluations/v2_20260902_dropout_off_s20260724_to43k_fp32"
     }
   ]
 }

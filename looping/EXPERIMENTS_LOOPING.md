@@ -17,9 +17,9 @@ All current runs use the first 2.7M puzzles from the training split. The full sc
 
 ## September Release Checks
 
-The release audit reproduced the recommended late-state CE checkpoint's full BF16 25K counts exactly at 128/1024/2048/4096. The same weights in FP32 score 96.288 / 99.116 / 99.048 / 98.632%. Compiled BF16 scores 96.372 / 98.952 / 97.600 / 92.512%. The historical profiles below are therefore execution-specific: do not attribute their deep-iteration deterioration entirely to learned dynamics. The [precision study](../release/PRECISION_PROTOCOL.md) holds weights and puzzles fixed; FP32 is now the public inference default, with no retraining or damping.
+The release audit reproduced the recommended late-state CE checkpoint's full BF16 25K counts exactly at 128/1024/2048/4096. The same weights in FP32 score 96.288 / 99.116 / 99.048 / 98.632%. Compiled BF16 scores 96.372 / 98.952 / 97.600 / 92.512%. The historical profiles below are therefore execution-specific: do not attribute their deep-iteration deterioration entirely to learned dynamics. The [precision study](../release/PRECISION_RESULTS.md) holds weights and puzzles fixed; FP32 is now the public inference default, with no retraining or damping.
 
-A separate [burn-in dropout experiment](BURNIN_DROPOUT.md) continues two healthy seeds with dropout on versus off only while preparing detached states. It retains the original 50K schedule and supervised-window dropout, records the exact sampled batches, and does not change the public recommendation while results are pending. Release engineering fixes and fresh reference results are in [the audit](../V2_RELEASE_AUDIT.md).
+A separate [burn-in dropout experiment](BURNIN_DROPOUT.md) completed four matched 4K continuations from two healthy seeds, retaining the original 50K schedule and supervised-window dropout. Turning off dropout only while preparing detached states worsened both BF16 probe floors and both full-set 2048 results. FP32 reduced the difference but did not make dropout-off consistently better. Keep dropout on; no 50K extensions were justified. Release engineering fixes and fresh reference results are in [the audit](../V2_RELEASE_AUDIT.md).
 
 ## First-wave training matrix
 

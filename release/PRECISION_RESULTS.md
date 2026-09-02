@@ -34,7 +34,7 @@ The sample is the first 200 puzzles per bucket from the frozen 25K, selected bef
 | Late-state CE | FP32 | eager | 256 | 95.5% | 99.0% | 98.7% | 97.9% |
 | Late-state CE | FP32 | eager | 32 | 95.5% | 99.0% | 98.7% | 97.9% |
 | Late-state CE | FP32 | compiled | 256 | 95.1% | 99.0% | 98.8% | 98.0% |
-| Late-state CE | FP32 | compiled | 32 | pending | pending | pending | pending |
+| Late-state CE | FP32 | compiled | 32 | 95.7% | 98.9% | 98.6% | 97.8% |
 | Published v1 | BF16 | eager | 256 | 95.0% | 98.7% | 98.6% | 85.2% |
 | Published v1 | BF16 | eager | 32 | 95.5% | 98.7% | 98.5% | 86.0% |
 | Published v1 | BF16 | compiled | 256 | 95.5% | 98.5% | 98.5% | 98.4% |
@@ -50,15 +50,17 @@ Observe every iteration through 4096 in eager execution at batch size 256. A reg
 
 | Weights | Precision | Ever solved | Never lost after first solve | At least one regression |
 |---|---|---:|---:|---:|
+| Late-state CE | BF16 | 991 | 243 | 748 |
+| Late-state CE | FP32 | 993 | 976 | 17 |
 | Published v1 | BF16 | 988 | 825 | 163 |
 | Published v1 | FP32 | 990 | 990 | 0 |
 
-Late-state CE's every-iteration measurements are still running. The full 25K tables above record endpoint gains and losses, not every intermediate event.
+All four observation passes reproduced their corresponding eager endpoint predictions exactly, including the unscored given cells. FP32 sharply reduces regressions in this 1K sample, but the late-state model still loses some correct solutions. The full 25K tables above record endpoint gains and losses, not every intermediate event.
 
 ## Interpretation And Records
 
 PyTorch documents that batching and arithmetic order can change floating-point results. Its Inductor 2.10 implementation also explains that fusion can retain FP32 intermediates where eager BF16 would round between operations. Those are plausible contributors, not an isolated explanation of which operation causes Sotaku's difference; changing precision can also change kernel selection. See [PyTorch numerical accuracy](https://docs.pytorch.org/docs/2.10/notes/numerical_accuracy.html) and [the versioned Inductor configuration](https://github.com/pytorch/pytorch/blob/v2.10.0/torch/_inductor/config.py).
 
-The recorded eager full runs took roughly 16.5 minutes in FP32 and 12-12.5 minutes in BF16. Cold compiled runs varied much more, about 13.5 and 35 minutes including compilation. These observations are not a controlled throughput comparison.
+The recorded eager full reference runs took roughly 16.5 minutes in FP32 and 12-12.5 minutes in BF16. Cold compiled full runs varied much more, about 13.5 and 35 minutes including compilation; some 1K compiled conditions were slower still. These observations are not a controlled throughput comparison. Compilation is optional, not part of the recommended inference settings.
 
-[Validation records](validation) retain model and dataset identities, exact indices, runtime packages and driver, source-file hashes, and per-puzzle predictions. Source archives preserve the precision-study and full-confirmation code versions. The original eager-BF16 full runs retain source hashes but not a separate complete source archive. Later metadata and CLI changes did not change their recurrence. `release_tools.verify_records` independently recomputes all downloaded scores from the pinned dataset and saved predictions. Large arrays, repeated index files, and source archives will be packaged in the release record zip when the remaining checks finish; they are excluded from Git.
+[Validation records](validation) retain model and dataset identities, exact indices, runtime packages and driver, source-file hashes, and per-puzzle predictions. Source archives preserve the precision-study and full-confirmation code versions. The original eager-BF16 full runs retain source hashes but not a separate complete source archive. Later metadata and CLI changes did not change their recurrence. `release_tools.verify_records` independently recomputes the endpoint scores from the pinned dataset and saved predictions. Large arrays, repeated index files, and source archives are included in the [prepared release archive](v2/README.md); they are excluded from Git.

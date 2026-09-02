@@ -1,0 +1,14 @@
+{
+  "model_late_state_ce.pt": {
+    "bytes": 3214969,
+    "sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+  },
+  "model_late_state_ce.pt.json": {
+    "bytes": 3101,
+    "sha256": "baa2ab7fb0056a3131aa4e2ef392487ae91ea990d226e4293fbb25f3f8c6c072"
+  },
+  "validation_records_20260902.zip": {
+    "bytes": 54641811,
+    "sha256": "4d8d9661a429fee32ce25f9c10208f876e4c99c29046202d8b424e4885cfebcd"
+  }
+}
