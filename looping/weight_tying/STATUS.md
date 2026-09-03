@@ -46,4 +46,6 @@ At 21:20 PDT, 13 runs were complete, including all nine early-training runs. The
 
 All 18 runs finished by 23:24 PDT, each at exactly 20K updates, without a numerical failure or worker restart. `pre_evaluation_audit.json` records every durable result hash and selected step. Full configs, source hashes, paired samples and horizons, matched-compute FLOPs, and earliest-best validation selection all passed. All recorded validation predictions were finite.
 
-No held-out evaluation has started. The separate CPU cohort-sealing job now verifies the selected model files and manifests on the Volume. After the lock is committed, evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.
+The separate CPU sealing job completed at 23:26 PDT after verifying every selected model and manifest. `cohort_lock.json` matches all pre-evaluation result hashes and selected steps. Its SHA256 is `1fdc572cdbc32ddbec6162bee0a83d7881d53a46d46e2f34be61c2b994c366f0`.
+
+All 36 full evaluations were submitted in separate detached invocations after the lock, from 23:27 to 23:41 PDT. `evaluation_jobs.json` records every app and function call. The first ten allocated workers have verified source hashes and FP32/TF32-off execution settings. The frozen development, validation, and new test arrays have been downloaded with matching hashes. Final-checkpoint performance remains primary; validation-selected weights are secondary. Independent checks of the saved predictions follow as the evaluations finish.
