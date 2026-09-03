@@ -4,6 +4,15 @@ permissions:
   contents: read
 jobs:
   cpu:
+    name: cpu-${{ matrix.suite }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: core
+            command: python -m unittest discover -v
+          - suite: research
+            command: python scripts/run_research_tests.py
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -13,4 +22,4 @@ jobs:
           cache: pip
       - run: python -m pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cpu
       - run: python -m pip install -r requirements-dev.txt
-      - run: python -m unittest discover -v
+      - run: ${{ matrix.command }}

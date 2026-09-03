@@ -105,10 +105,21 @@ Using the published checkpoint:
 
 ```sh
 pip install matplotlib
-python -m viz.visualize model_late_state_ce.pt --exp stabilize.exp_testbed_20k --device cuda --n-iters 32
+python -m viz.visualize model_late_state_ce.pt --device cuda --n-iters 32
 ```
 
 Outputs go to `viz/output/`.
+
+## Tests
+
+Install `requirements-dev.txt`, then run the core tests and the research tests:
+
+```sh
+python -m unittest discover -v
+python scripts/run_research_tests.py
+```
+
+CI runs both suites. Research study directories run in separate processes because some use different local modules with the same name.
 
 ## Key Files
 
@@ -155,4 +166,5 @@ Older Kaggle and pre-`sudoku-extreme` experiments are preserved for reference, b
 - `pos_embedding/EXPERIMENTS_POS.md` - 2D RoPE introduction and positional-encoding ablations
 - `muon/EXPERIMENTS_MUON.md` - Muon optimizer experiments
 - `rrn/RRN_EXPERIMENTS.md` - RRN experiments
-- root-level scripts such as `eval_extreme.py`, `eval_only.py`, and `eval_difficulties.py` - archival only
+
+Obsolete root-level CSV helpers, duplicate evaluators and failure analyzers, and the hard-coded iteration-scaling plot were removed after v2. Their original source remains in [the v2.0.0 tag](https://github.com/chenglou/sotaku/tree/v2.0.0). Use `solve.py`, `iters.eval_more_iters` (including `--track-solutions`), and `modal_eval.py` for the supported inference and evaluation workflows.

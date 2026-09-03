@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-per-cell-helix-dynamics")
 outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True)
@@ -14,21 +16,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/",
-            "__pycache__/",
-            "*.pyc",
-            ".git/",
-            "logs/",
-            "runs/",
-            "runs_modal/",
-            "*.pt",
-            "*.log",
-            "*.png",
-            "*.json",
-            "*.npz",
-            "*.html",
-        ],
+        ignore=PROJECT_IGNORE + ["*.png", "*.json", "*.npz", "*.html"],
     )
 )
 

@@ -1,7 +1,7 @@
 # Visualization of attention patterns, confidence evolution, and head specialization
 # for the iterative sudoku transformer.
 #
-# Usage: python viz/visualize.py model_baseline_lr2e3.pt --exp iters.exp_baseline_lr2e3
+# Usage: python -m viz.visualize model_late_state_ce.pt
 #
 # Generates figures in viz/output/
 
@@ -9,72 +9,51 @@ import torch
 import torch.nn.functional as F
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 from matplotlib.patches import Rectangle
 import os
-import sys
 import argparse
-import importlib
 from datasets import load_dataset
 import random
 
-random.seed(42)
-torch.manual_seed(42)
+from dataset_utils import DATASET_NAME, DATASET_REVISION
+from inference import RecurrentRunner
+from model_io import load_model
+from stabilize.exp_testbed_20k import ROPE_COS, ROPE_SIN, apply_rope, encode_puzzles
 
 
-def get_attention_weights(model, x, n_iters, exp_mod):
-    """Run forward pass capturing attention weights at every layer/head/iteration."""
-    device = x.device
-    rope_cos = exp_mod.ROPE_COS.to(device)
-    rope_sin = exp_mod.ROPE_SIN.to(device)
+@torch.inference_mode()
+def get_attention_weights(model, x, n_iters):
+    """Observe attention without replacing the model's actual recurrent computation."""
+    rope_cos, rope_sin = ROPE_COS.to(x.device), ROPE_SIN.to(x.device)
+    attention = []
+    hooks = []
 
-    batch_size = x.size(0)
-    h_prev = model.initial_encoder(x)
-    preds = torch.zeros(batch_size, 81, 9, device=device)
+    def capture(layer):
+        def hook(module, inputs, normalized):
+            batch, length, _ = normalized.shape
+            shape = (batch, length, layer.n_heads, layer.head_dim)
+            q = layer.q_proj(normalized).view(shape).transpose(1, 2)
+            k = layer.k_proj(normalized).view(shape).transpose(1, 2)
+            q = apply_rope(q, rope_cos, rope_sin)
+            k = apply_rope(k, rope_cos, rope_sin)
+            weights = F.softmax((q @ k.transpose(-2, -1)) * layer.head_dim ** -0.5, dim=-1)
+            attention.append(weights.cpu())
+        return hook
 
-    all_attention = []  # [iter][layer] -> (B, H, 81, 81)
-    all_logits = []     # [iter] -> (B, 81, 9)
-
-    for iter_idx in range(n_iters):
-        h = h_prev + model.pred_proj(preds)
-        iter_attn = []
-
+    try:
         for layer in model.layers:
-            # Manually compute attention weights instead of using SDPA
-            h_norm = layer.norm1(h)
-            B, L, D = h_norm.shape
-            n_heads = layer.n_heads
-            head_dim = layer.head_dim
+            hooks.append(layer.norm1.register_forward_hook(capture(layer)))
+        outputs, _ = RecurrentRunner(model).run_batch(x, range(1, n_iters + 1))
+    finally:
+        for hook in hooks:
+            hook.remove()
 
-            q = layer.q_proj(h_norm).view(B, L, n_heads, head_dim).transpose(1, 2)
-            k = layer.k_proj(h_norm).view(B, L, n_heads, head_dim).transpose(1, 2)
-            v = layer.v_proj(h_norm).view(B, L, n_heads, head_dim).transpose(1, 2)
-
-            q = exp_mod.apply_rope(q, rope_cos, rope_sin)
-            k = exp_mod.apply_rope(k, rope_cos, rope_sin)
-
-            # Compute attention weights explicitly
-            scale = head_dim ** -0.5
-            attn_weights = torch.matmul(q, k.transpose(-2, -1)) * scale
-            attn_weights = F.softmax(attn_weights, dim=-1)  # (B, H, 81, 81)
-            iter_attn.append(attn_weights.detach().cpu())
-
-            # Still compute the actual forward pass for correct h_prev
-            attn_out = torch.matmul(attn_weights.to(v.dtype), v)
-            attn_out = attn_out.transpose(1, 2).contiguous().view(B, L, D)
-            h = h + layer.out_proj(attn_out)
-
-            h2 = layer.norm2(h)
-            h2 = layer.linear2(F.relu(layer.linear1(h2)))
-            h = h + h2
-
-        h_prev = h
-        logits = model.output_head(h)
-        preds = F.softmax(logits, dim=-1)
-        all_logits.append(logits.detach().cpu())
-        all_attention.append(iter_attn)
-
-    return all_attention, all_logits
+    layers_per_iteration = len(model.layer_schedule)
+    if len(attention) != n_iters * layers_per_iteration:
+        raise RuntimeError("Attention capture did not match the model's layer schedule")
+    all_attention = [attention[i:i + layers_per_iteration]
+                     for i in range(0, len(attention), layers_per_iteration)]
+    return all_attention, [outputs[i].cpu() for i in range(1, n_iters + 1)]
 
 
 def cell_to_rc(cell_idx):
@@ -94,11 +73,7 @@ def plot_attention_for_cell(all_attention, query_cell, puzzle_str, solution_str,
     qr, qc = cell_to_rc(query_cell)
     iter_attn = all_attention[iteration]
 
-    fig, axes = plt.subplots(n_layers, n_heads, figsize=(3 * n_heads, 3 * n_layers))
-    if n_layers == 1:
-        axes = axes[np.newaxis, :]
-    if n_heads == 1:
-        axes = axes[:, np.newaxis]
+    fig, axes = plt.subplots(n_layers, n_heads, figsize=(3 * n_heads, 3 * n_layers), squeeze=False)
 
     for layer_idx in range(n_layers):
         attn = iter_attn[layer_idx][0]  # (H, 81, 81), first puzzle in batch
@@ -124,10 +99,10 @@ def plot_attention_for_cell(all_attention, query_cell, puzzle_str, solution_str,
             ax.set_yticks([])
 
     cell_char = solution_str[query_cell] if solution_str else '?'
-    fig.suptitle(f'Attention from cell ({qr},{qc}) [answer={cell_char}], iter {iteration}',
+    fig.suptitle(f'Attention from cell ({qr},{qc}) [answer={cell_char}], iter {iteration + 1}',
                  fontsize=12)
     plt.tight_layout()
-    path = os.path.join(output_dir, f'P{puzzle_idx}_attn_cell{query_cell}_iter{iteration}.png')
+    path = os.path.join(output_dir, f'P{puzzle_idx}_attn_cell{query_cell}_iter{iteration + 1}.png')
     plt.savefig(path, dpi=150, bbox_inches='tight')
     plt.close()
     print(f'  Saved: {path}')
@@ -204,7 +179,7 @@ def plot_confidence_evolution(all_logits, puzzle_str, solution_str, output_dir, 
         # Count correct
         n_correct = sum(1 for i in range(81) if empty_mask[i] and predictions[i] == target[i])
         n_empty = sum(empty_mask)
-        ax.set_title(f'Iter {iter_idx} ({n_correct}/{n_empty})', fontsize=9)
+        ax.set_title(f'Iter {iter_idx + 1} ({n_correct}/{n_empty})', fontsize=9)
         ax.set_xticks([])
         ax.set_yticks([])
 
@@ -236,7 +211,7 @@ def plot_entropy_evolution(all_logits, puzzle_str, output_dir, puzzle_idx):
         entropies.append(avg_entropy)
 
     fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(range(n_iters), entropies, 'b-o', markersize=3)
+    ax.plot(range(1, n_iters + 1), entropies, 'b-o', markersize=3)
     ax.set_xlabel('Iteration')
     ax.set_ylabel('Average entropy (empty cells)')
     ax.set_title(f'Entropy evolution (max possible = {np.log(9):.2f})')
@@ -297,7 +272,7 @@ def plot_head_specialization(all_attention, puzzles, n_layers, n_heads, output_d
             ax.axvline(0, color='cyan', linewidth=0.5, alpha=0.5)
             plt.colorbar(im, ax=ax, shrink=0.8)
 
-        fig.suptitle(f'Layer {layer_idx}: Average attention by relative position (iter {last_iter})',
+        fig.suptitle(f'Layer {layer_idx}: Average attention by relative position (iter {last_iter + 1})',
                      fontsize=11)
         plt.tight_layout()
         path = os.path.join(output_dir, f'head_specialization_layer{layer_idx}.png')
@@ -335,7 +310,7 @@ def plot_attention_across_iterations(all_attention, query_cell, puzzle_str, solu
             draw_sudoku_grid(ax)
             ax.add_patch(Rectangle((qc - 0.5, qr - 0.5), 1, 1,
                                    fill=False, edgecolor='cyan', linewidth=2))
-            ax.set_title(f'Iter {iter_idx}', fontsize=9)
+            ax.set_title(f'Iter {iter_idx + 1}', fontsize=9)
             ax.set_xticks([])
             ax.set_yticks([])
 
@@ -353,35 +328,37 @@ def plot_attention_across_iterations(all_attention, query_cell, puzzle_str, solu
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('model_path', help='Path to model .pt file')
-    parser.add_argument('--exp', default='iters.exp_baseline_lr2e3')
+    parser.add_argument('--manifest', help='Checkpoint manifest (defaults to <model_path>.json)')
+    parser.add_argument('--exp', help='Experiment module for a legacy checkpoint')
+    parser.add_argument('--legacy-defaults', action='store_true', help='Explicitly allow legacy model defaults')
     parser.add_argument('--n-iters', type=int, default=16, help='Number of iterations to run')
     parser.add_argument('--n-puzzles', type=int, default=20, help='Puzzles for head specialization')
     parser.add_argument('--device', default='cpu')
+    parser.add_argument('--output-dir', default=os.path.join(os.path.dirname(__file__), 'output'))
     args = parser.parse_args()
+    if args.n_iters < 1 or args.n_puzzles < 1:
+        parser.error('--n-iters and --n-puzzles must be positive')
 
-    output_dir = os.path.join(os.path.dirname(__file__), 'output')
+    output_dir = args.output_dir
     os.makedirs(output_dir, exist_ok=True)
 
     # Load model
-    exp_mod = importlib.import_module(args.exp)
     device = torch.device(args.device)
-    model = exp_mod.SudokuTransformer().to(device)
-    state = torch.load(args.model_path, map_location=device, weights_only=True)
-    if 'model_state_dict' in state:
-        state = state['model_state_dict']
-    model.load_state_dict(state)
-    model.eval()
+    model, _ = load_model(args.model_path, manifest_path=args.manifest,
+                         legacy_exp=args.exp, legacy_defaults=args.legacy_defaults, device=device)
+    torch.set_float32_matmul_precision('highest')
+    rng = random.Random(42)
 
-    n_layers = exp_mod.n_layers
-    n_heads = exp_mod.n_heads
-    print(f'Model: d_model={exp_mod.d_model}, n_heads={n_heads}, n_layers={n_layers}')
+    n_layers = len(model.layer_schedule)
+    n_heads = model.layers[0].n_heads
+    print(f'Model: n_heads={n_heads}, layer_schedule={model.layer_schedule}, FP32')
     print(f'Iterations: {args.n_iters}')
 
     # Load test data - pick representative puzzles
     print('Loading test data...')
-    test_dataset = load_dataset("sapientinc/sudoku-extreme", split="test")
+    test_dataset = load_dataset(DATASET_NAME, revision=DATASET_REVISION, split="test")
 
-    # Pick one easy, one medium, one hard puzzle (that the model solves)
+    # Pick one puzzle from each difficulty group.
     easy = [i for i in range(min(1000, len(test_dataset))) if test_dataset[i]['rating'] == 0]
     medium = [i for i in range(min(5000, len(test_dataset))) if 3 <= test_dataset[i]['rating'] <= 10]
     hard = [i for i in range(min(10000, len(test_dataset))) if test_dataset[i]['rating'] >= 51]
@@ -394,16 +371,14 @@ def main():
     if hard:
         selected.append(('hard', hard[0]))
 
-    # Find puzzles the model gets WRONG at 16 iterations
-    print('Scanning for failed puzzles...')
-    scan_size = 200
-    scan_indices = random.sample(range(min(10000, len(test_dataset))), scan_size)
+    print(f'Scanning for failed puzzles at {args.n_iters} iterations...')
+    scan_size = min(200, len(test_dataset))
+    scan_indices = rng.sample(range(min(10000, len(test_dataset))), scan_size)
     scan_puzzles = [test_dataset[i]['question'] for i in scan_indices]
     scan_solutions = [test_dataset[i]['answer'] for i in scan_indices]
-    scan_x = exp_mod.encode_puzzles(scan_puzzles).to(device)
-
-    with torch.no_grad():
-        logits = model(scan_x)
+    scan_x = encode_puzzles(scan_puzzles).to(device)
+    outputs, _ = RecurrentRunner(model).run_batch(scan_x, [args.n_iters])
+    logits = outputs[args.n_iters]
 
     # Check which puzzles are wrong
     final_preds = logits.argmax(dim=-1).cpu()  # (scan_size, 81)
@@ -451,10 +426,8 @@ def main():
         n_iters = max(args.n_iters * 4, 64) if is_fail else args.n_iters
         print(f'\n--- Puzzle {puzzle_idx} ({difficulty}, rating={rating}, {n_empty} empty cells, {n_iters} iters) ---')
 
-        x = exp_mod.encode_puzzles([puzzle_str]).to(device)
-
-        with torch.no_grad():
-            all_attention, all_logits = get_attention_weights(model, x, n_iters, exp_mod)
+        x = encode_puzzles([puzzle_str]).to(device)
+        all_attention, all_logits = get_attention_weights(model, x, n_iters)
 
         # 1. Confidence evolution across iterations
         print('  Plotting confidence evolution...')
@@ -468,7 +441,7 @@ def main():
         empty_cells = [i for i in range(81) if puzzle_str[i] == '.']
         # Pick a cell near the center for interesting patterns
         center_cells = [i for i in empty_cells if 2 <= i // 9 <= 6 and 2 <= i % 9 <= 6]
-        query_cell = center_cells[0] if center_cells else empty_cells[0]
+        query_cell = center_cells[0] if center_cells else empty_cells[0] if empty_cells else 40
         print(f'  Plotting attention for cell {query_cell} ({cell_to_rc(query_cell)})...')
 
         # Attention at last iteration
@@ -482,14 +455,14 @@ def main():
 
     # === Head specialization (averaged across many puzzles) ===
     print(f'\n--- Head specialization (averaging over {args.n_puzzles} puzzles) ---')
-    spec_indices = random.sample(range(min(5000, len(test_dataset))), args.n_puzzles)
+    spec_count = min(args.n_puzzles, 5000, len(test_dataset))
+    spec_indices = rng.sample(range(min(5000, len(test_dataset))), spec_count)
     spec_puzzles = [test_dataset[i]['question'] for i in spec_indices]
 
     all_puzzle_attentions = []
     for i, puzzle_str in enumerate(spec_puzzles):
-        x = exp_mod.encode_puzzles([puzzle_str]).to(device)
-        with torch.no_grad():
-            attn, _ = get_attention_weights(model, x, args.n_iters, exp_mod)
+        x = encode_puzzles([puzzle_str]).to(device)
+        attn, _ = get_attention_weights(model, x, args.n_iters)
         all_puzzle_attentions.append(attn)
         if (i + 1) % 5 == 0:
             print(f'  Processed {i + 1}/{args.n_puzzles} puzzles')

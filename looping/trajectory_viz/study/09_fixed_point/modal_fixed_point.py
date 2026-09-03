@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-trajectory-study-fixed-point")
 outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True)
@@ -13,7 +15,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=["venv/", ".git/", "*.pt", "*.log"],
+        ignore=PROJECT_IGNORE,
     )
 )
 

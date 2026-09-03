@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-health-methods")
 
@@ -31,11 +33,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/",
-            "runs_modal/", "*.pt", "*.log", ".venv/", ".claude/", ".codex/", "temp-side-convo.txt",
-            "release/validation/", "release/v2/*.zip",
-        ],
+        ignore=PROJECT_IGNORE,
     )
 )
 

@@ -8,6 +8,8 @@ Usage:
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 app = modal.App("sudoku-eval")
 
 hf_cache_volume = modal.Volume.from_name("sudoku-hf-cache", create_if_missing=True)
@@ -16,7 +18,7 @@ outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", ".venv/", "__pycache__/", "*.pyc", ".git/", ".claude/", ".codex/", "logs/", "runs/", "runs_modal/", "*.pt", "*.log", "temp-side-convo.txt", "release/validation/", "release/v2/*.zip"])
+    .add_local_dir(".", remote_path="/root/project", ignore=PROJECT_IGNORE)
 )
 
 

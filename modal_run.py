@@ -9,6 +9,8 @@ Outputs (checkpoints, logs) are saved to a Modal volume.
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 app = modal.App("sudoku-solver")
 
 # Volume for HuggingFace cache (persists across runs, avoids re-downloading)
@@ -20,7 +22,7 @@ outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/", "runs_modal/", "*.pt", "*.log"])
+    .add_local_dir(".", remote_path="/root/project", ignore=PROJECT_IGNORE)
 )
 
 
@@ -50,6 +52,9 @@ def run_training(
 
     sys.path.insert(0, "/root/project")
 
+    # Refresh before reading checkpoints or writing new logs in a reused worker.
+    outputs_volume.reload()
+
     # Record the runtime environment durably on the volume: the February-vs-July 2026
     # reproducibility question (iters/EXPERIMENTS_ITERS.md) was unanswerable because no
     # run recorded its driver, and Modal's app logs are garbage-collected within months.
@@ -63,15 +68,11 @@ def run_training(
     print(env_line)
     # One file per run: concurrent training containers each commit the shared volume
     # with last-writer-wins semantics, so appending to one shared file loses lines.
-    import os
     os.makedirs("/outputs/env_runs", exist_ok=True)
     stamp = datetime.datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     with open(f"/outputs/env_runs/{stamp}_{exp_name.rsplit('.', 1)[-1]}.log", "w") as env_log:
         env_log.write(env_line + "\n")
 
-    # A reused container (e.g. a retry after worker loss) needs an explicit refresh
-    # before find_latest_checkpoint() inspects the volume.
-    outputs_volume.reload()
     try:
         # Dynamically import the experiment module
         exp_module = importlib.import_module(exp_name)

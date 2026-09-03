@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-trajectory-study-08-temporal-modes")
 outputs = modal.Volume.from_name("sudoku-outputs", create_if_missing=True)
@@ -13,7 +15,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=["venv/", ".git/", "*.pt", "__pycache__/"],
+        ignore=PROJECT_IGNORE,
     )
 )
 

@@ -1,6 +1,14 @@
+import unittest
+
 import torch
 
 from looping.trajectory_viz.global_pca.analyze_global_pca import fit_pca, project_global
+
+
+def load_tests(loader, standard_tests, pattern):
+    return unittest.TestSuite(unittest.FunctionTestCase(test) for test in (
+        test_fit_pca_recovers_plane, test_global_projection_preserves_shape,
+    ))
 
 
 def test_fit_pca_recovers_plane():

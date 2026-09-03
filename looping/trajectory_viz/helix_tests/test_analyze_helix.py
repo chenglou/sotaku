@@ -1,3 +1,5 @@
+import unittest
+
 import torch
 
 from looping.trajectory_viz.helix_tests.analyze_helix import (
@@ -6,6 +8,13 @@ from looping.trajectory_viz.helix_tests.analyze_helix import (
     ridge_fit,
     ridge_predict,
 )
+
+
+def load_tests(loader, standard_tests, pattern):
+    return unittest.TestSuite(unittest.FunctionTestCase(test) for test in (
+        test_ridge_recovers_linear_target, test_cyclic_probe_recovers_embedded_digits,
+        test_first_harmonic_distinguishes_ring_from_one_hot,
+    ))
 
 
 def test_ridge_recovers_linear_target():

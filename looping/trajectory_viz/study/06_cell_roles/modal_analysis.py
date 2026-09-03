@@ -4,6 +4,8 @@ import re
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-study-cell-roles")
 outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True)
@@ -16,15 +18,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/",
-            "__pycache__/",
-            "*.pyc",
-            ".git/",
-            "*.pt",
-            "*.log",
-            "looping/trajectory_viz/study/06_cell_roles/artifacts/",
-        ],
+        ignore=PROJECT_IGNORE + ["looping/trajectory_viz/study/06_cell_roles/artifacts/"],
     )
 )
 

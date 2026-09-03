@@ -11,6 +11,8 @@ after the detached entrypoint exits.  Aggregate artifacts are committed to the
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-trajectory-study-margin")
 outputs_volume = modal.Volume.from_name(
@@ -29,14 +31,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/",
-            "__pycache__/",
-            "*.pyc",
-            ".git/",
-            "*.pt",
-            "*.log",
-        ],
+        ignore=PROJECT_IGNORE,
     )
 )
 

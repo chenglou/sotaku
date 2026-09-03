@@ -22,6 +22,7 @@ The general, project-independent version of these rules lives in the public temp
 - Read an active worker's not-yet-committed log with `modal container exec <container-id> cat <path>`. After the worker exits, verify the result file on the Volume; no active container alone does not distinguish success from failure.
 - `modal app logs` only works while the app is still active. For detached or finished runs, poll the log file from the volume with `modal volume get`.
 - Keep experiment code Modal-agnostic: accept an `output_dir` argument and let the Modal wrapper point it at the mounted volume path.
+- Use `modal_config.PROJECT_IGNORE` for whole-project image uploads; append experiment-specific exclusions when needed. Modal's `*.pt` matches root files only; use `**/*.pt` to also exclude nested checkpoints.
 - Do not pipe `modal run --detach` into `tail`, `head`, or similar tools; those commands hang waiting for EOF.
 
 ## Checkpoints

@@ -7,6 +7,8 @@ Usage:
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 app = modal.App("sudoku-viz")
 
 hf_cache_volume = modal.Volume.from_name("sudoku-hf-cache", create_if_missing=True)
@@ -16,7 +18,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
     .pip_install("matplotlib")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "*.pt", "*.log"])
+    .add_local_dir(".", remote_path="/root/project", ignore=PROJECT_IGNORE)
 )
 
 
@@ -37,23 +39,26 @@ def run_viz():
     os.environ["HF_DATASETS_CACHE"] = "/hf_cache/datasets"
     sys.path.insert(0, "/root/project")
 
-    from viz.plot_collapse_diagnostics import analyze_models
+    outputs_volume.reload()
+    try:
+        from viz.plot_collapse_diagnostics import analyze_models
 
-    # Compare stable SOTA vs collapsing models
-    configs = [
-        ('LR=2e-3 (stable)', '/outputs/model_baseline_lr2e3.pt', 'iters.exp_baseline_lr2e3'),
-        ('LR=3e-3 (collapse@64)', '/outputs/model_baseline_lr3e3.pt', 'iters.exp_baseline_lr3e3'),
-        ('LR=1e-3 (collapse@128)', '/outputs/model_baseline_lr1e3.pt', 'iters.exp_baseline_lr1e3'),
-    ]
+        # Compare stable SOTA vs collapsing models
+        configs = [
+            ('LR=2e-3 (stable)', '/outputs/model_baseline_lr2e3.pt', 'iters.exp_baseline_lr2e3'),
+            ('LR=3e-3 (collapse@64)', '/outputs/model_baseline_lr3e3.pt', 'iters.exp_baseline_lr3e3'),
+            ('LR=1e-3 (collapse@128)', '/outputs/model_baseline_lr1e3.pt', 'iters.exp_baseline_lr1e3'),
+        ]
 
-    output_dir = "/outputs/viz_diagnostics"
-    analyze_models(configs, n_iters=256, n_puzzles=500, device='cuda', output_dir=output_dir)
-
-    outputs_volume.commit()
+        output_dir = "/outputs/viz_diagnostics"
+        analyze_models(configs, n_iters=256, n_puzzles=500, device='cuda', output_dir=output_dir)
+    finally:
+        outputs_volume.commit()
     print(f"\nPlots saved to volume at viz_diagnostics/")
     print("Download with: modal volume get sudoku-outputs viz_diagnostics/ viz/output/")
 
 
 @app.local_entrypoint()
 def main():
-    run_viz.remote()
+    call = run_viz.spawn()
+    print(f"Spawned function call: {call.object_id}")

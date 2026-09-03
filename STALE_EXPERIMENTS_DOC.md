@@ -521,7 +521,7 @@ Traditional curriculum learning works well when easier tasks teach foundational 
 
 **Hypothesis:** The baseline only passes predictions (9-dim softmax) between iterations - the hidden state h is recomputed from scratch each time. What if we pass the full hidden state (128-dim) forward, giving the model a "scratchpad" for working memory?
 
-**Background:** Analysis of failures (`analyze_failures.py`) showed that on failed puzzles:
+**Background:** Analysis of failures ([archived analyze_failures.py](https://github.com/chenglou/sotaku/blob/v2.0.0/analyze_failures.py)) showed that on failed puzzles:
 - Model peaks at iteration 4, then gets *worse* (oscillates without converging)
 - 99.4% of failures still changing at final iteration (not converged)
 - Successful puzzles show steady improvement across iterations
@@ -641,7 +641,7 @@ With recurrence, this working memory persists across iterations instead of being
 
 ## Benchmark: Sudoku-Extreme
 
-**File:** `eval_extreme.py`
+**File:** [archived eval_extreme.py](https://github.com/chenglou/sotaku/blob/v2.0.0/eval_extreme.py)
 
 **Dataset:** [sapientinc/sudoku-extreme](https://huggingface.co/datasets/sapientinc/sudoku-extreme) - 423k test puzzles rated by backtrack count (higher = harder).
 

@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-trajectory-entropy-study")
 outputs_volume = modal.Volume.from_name(
@@ -20,20 +22,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/",
-            "__pycache__/",
-            "*.pyc",
-            ".git/",
-            "*.pt",
-            "*.log",
-            "*.png",
-            "*.html",
-            "*.npz",
-            "*.csv",
-            "looping/trajectory_viz/study/**",
-            "!looping/trajectory_viz/study/01_entropy/**",
-        ],
+        ignore=PROJECT_IGNORE + ["*.png", "*.html", "*.npz", "*.csv", "looping/trajectory_viz/study/**", "!looping/trajectory_viz/study/01_entropy/**"],
     )
 )
 

@@ -7,6 +7,8 @@ Examples:
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 from es.es_sampling import DEFAULT_SAMPLING_MODE
 
 
@@ -21,10 +23,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/",
-            "runs_modal/", "*.pt", "*.log",
-        ],
+        ignore=PROJECT_IGNORE,
     )
 )
 

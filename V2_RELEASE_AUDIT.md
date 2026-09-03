@@ -47,7 +47,7 @@ Each evaluation retains exact row indices, predictions and correctness per puzzl
 - **Dataset identity:** training and evaluation pin revision `58942f96baeb572ca3127e2a9e9c70f330783d6b`. The 25K benchmark indices and row-content hash are frozen.
 - **Curriculum documentation:** the original code selects whole rating buckets. Its first pools are 51+ and 11+, not literal 21+ and 6+. Documentation now describes those actual pools, and a regression test preserves historical behavior.
 - **Environment:** the core requirements and CUDA build are pinned, the previous environment snapshot is retained separately, and evaluations record transitive package versions. A CPU GitHub Actions workflow exercises the public model and checkpoint tests without a Modal account.
-- **Clean test discovery:** the exploratory `test_loss.py` script now reads its optional local dataset only when run directly. The 136-test suite also passes from a directory without that dataset.
+- **Clean test discovery:** the exploratory `test_loss.py` script was guarded before the v2 release, then removed in the script cleanup. At release, the 136-test suite also passed from a directory without that dataset.
 
 The shared training math and default dropout behavior are preserved. Additional metadata and explicit burn-in-dropout controls do not silently change the reference recipe.
 

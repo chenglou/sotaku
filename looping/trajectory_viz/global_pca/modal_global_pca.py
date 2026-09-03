@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-trajectory-global-pca")
 outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True)
@@ -10,7 +12,7 @@ image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
     .pip_install("matplotlib==3.10.5")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", ".git/", "*.pt", "*.log"])
+    .add_local_dir(".", remote_path="/root/project", ignore=PROJECT_IGNORE)
 )
 
 

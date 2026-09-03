@@ -4,6 +4,8 @@ import re
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-late-supervision-full-eval")
 
@@ -16,10 +18,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "runs/",
-            "runs_modal/", "*.pt", "*.log",
-        ],
+        ignore=PROJECT_IGNORE,
     )
 )
 

@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-trajectory-helix-tests")
 outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True)
@@ -14,17 +16,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/",
-            "__pycache__/",
-            "*.pyc",
-            ".git/",
-            "*.pt",
-            "*.log",
-            "looping/trajectory_viz/helix_tests/visual/*.png",
-            "looping/trajectory_viz/helix_tests/visual/*.npz",
-            "looping/trajectory_viz/helix_tests/visual/*.json",
-        ],
+        ignore=PROJECT_IGNORE + ["looping/trajectory_viz/helix_tests/visual/*.png", "looping/trajectory_viz/helix_tests/visual/*.npz", "looping/trajectory_viz/helix_tests/visual/*.json"],
     )
 )
 

@@ -7,6 +7,8 @@ Usage:
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 app = modal.App("sudoku-interventions")
 
 hf_cache_volume = modal.Volume.from_name("sudoku-hf-cache", create_if_missing=True)
@@ -15,7 +17,7 @@ outputs_volume = modal.Volume.from_name("sudoku-outputs", create_if_missing=True
 image = (
     modal.Image.debian_slim(python_version="3.11")
     .pip_install_from_requirements("requirements-modal.txt")
-    .add_local_dir(".", remote_path="/root/project", ignore=["venv/", "__pycache__/", "*.pyc", ".git/", "logs/", "*.pt", "*.log"])
+    .add_local_dir(".", remote_path="/root/project", ignore=PROJECT_IGNORE)
 )
 
 
@@ -36,21 +38,23 @@ def run_interventions():
     os.environ["HF_DATASETS_CACHE"] = "/hf_cache/datasets"
     sys.path.insert(0, "/root/project")
 
-    from iters.eval_interventions import evaluate_all
+    outputs_volume.reload()
+    try:
+        from iters.eval_interventions import evaluate_all
 
-    models = [
-        ('/outputs/model_baseline_lr3e3.pt', 'iters.exp_baseline_lr3e3'),
-        ('/outputs/model_wider_6h_lr2e3.pt', 'iters.exp_wider_6h_lr2e3'),
-    ]
+        models = [
+            ('/outputs/model_baseline_lr3e3.pt', 'iters.exp_baseline_lr3e3'),
+            ('/outputs/model_wider_6h_lr2e3.pt', 'iters.exp_wider_6h_lr2e3'),
+        ]
 
-    for model_path, exp in models:
-        model_name = os.path.basename(model_path).replace('.pt', '')
-        print(f"\n{'#'*80}")
-        print(f"# MODEL: {model_name}")
-        print(f"{'#'*80}")
-        evaluate_all(model_path, exp, device='cuda', output_dir='/outputs')
-
-    outputs_volume.commit()
+        for model_path, exp in models:
+            model_name = os.path.basename(model_path).replace('.pt', '')
+            print(f"\n{'#'*80}")
+            print(f"# MODEL: {model_name}")
+            print(f"{'#'*80}")
+            evaluate_all(model_path, exp, device='cuda', output_dir='/outputs')
+    finally:
+        outputs_volume.commit()
     print("\nDone. Download logs with:")
     print("  modal volume get sudoku-outputs model_baseline_lr3e3_interventions.log .")
     print("  modal volume get sudoku-outputs model_wider_6h_lr2e3_interventions.log .")
@@ -58,4 +62,5 @@ def run_interventions():
 
 @app.local_entrypoint()
 def main():
-    run_interventions.remote()
+    call = run_interventions.spawn()
+    print(f"Spawned function call: {call.object_id}")

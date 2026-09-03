@@ -2,6 +2,8 @@
 
 import modal
 
+from modal_config import PROJECT_IGNORE
+
 
 app = modal.App("sudoku-number-helix-statistics")
 outputs_volume = modal.Volume.from_name(
@@ -20,14 +22,7 @@ image = (
     .add_local_dir(
         ".",
         remote_path="/root/project",
-        ignore=[
-            "venv/",
-            "__pycache__/",
-            "*.pyc",
-            ".git/",
-            "*.pt",
-            "*.log",
-        ],
+        ignore=PROJECT_IGNORE,
     )
 )
 
