@@ -10,10 +10,10 @@ import torch
 from torch.nn import functional as F
 
 from checkpoint_utils import atomic_json_save, validate_config
-from looping.weight_tying.common import atomic_npz, protocol, protocol_sha256, run_config, run_name
+from looping.weight_tying.common import SOURCE_PATHS, atomic_npz, protocol, protocol_sha256, run_config, run_name
 from looping.weight_tying.data import load_manifest
 from looping.weight_tying.model import StudyTransformer
-from runtime_utils import file_sha256
+from runtime_utils import file_sha256, runtime_manifest
 
 
 @torch.inference_mode()
@@ -147,15 +147,18 @@ def evaluate_run(root, architecture, regime, seed, selection="final"):
     directory.mkdir(parents=True, exist_ok=True)
     metadata = load_manifest(root / "data", verify=("holdout.npz", "development.npz"))
     model, export = load_export(root / "runs" / name / f"{selection}.pt", device="cuda")
+    torch.set_float32_matmul_precision("highest")
     identity = {"protocol_sha256": protocol_sha256(), "cohort_lock_sha256": file_sha256(root / "cohort_lock.json"),
                 "weights_sha256": export["weights_sha256"], "selection": selection,
                 "run_name": name, "iterations": protocol()["evaluation"]["iterations"],
-                "precision": "fp32", "compiled": False, "repeat_stack": model.period > 1}
+                "precision": "fp32", "compiled": False, "tf32_matmul": False,
+                "repeat_stack": model.period > 1, "model": export["config"]["model"]}
     complete = directory / "result.json"
     if complete.exists():
         result = json.loads(complete.read_text())
         validate_config(result["identity"], identity)
         return result
+    atomic_json_save(runtime_manifest(SOURCE_PATHS), directory / "environment.json")
     scores = {}
     started = time.perf_counter()
     for dataset_name in ("development", "holdout"):

@@ -178,6 +178,31 @@ class StudyTests(unittest.TestCase):
             self.assertEqual(metadata["updates"], 4)
             self.assertEqual(loaded.period, 16)
 
+    def test_late_training_detaches_only_the_input_encoder(self):
+        model = StudyTransformer(width=16, feedforward_width=32, period=16)
+        inputs, targets = fixture(2)
+        loss, _ = model(inputs, targets)
+        loss.backward()
+        check_training_gradients(model, detached_input=False)
+        model.zero_grad(set_to_none=True)
+        with torch.no_grad():
+            initial = model.advance(*model.initial_state(inputs))
+        loss, _ = model(inputs, targets, initial_state=initial)
+        loss.backward()
+        check_training_gradients(model, detached_input=True)
+        model.output_head.weight.grad = None
+        with self.assertRaisesRegex(ValueError, "output_head.weight"):
+            check_training_gradients(model, detached_input=True)
+
+
+def check_training_gradients(model, *, detached_input):
+    for name, parameter in model.named_parameters():
+        if detached_input and name.startswith("initial_encoder."):
+            if parameter.grad is not None:
+                raise ValueError(f"Unexpected gradient through detached input encoder: {name}")
+        elif parameter.grad is None or not torch.isfinite(parameter.grad).all().item():
+            raise ValueError(f"Missing or nonfinite gradient: {name}")
+
 
 def gpu_smoke(output_dir):
     """Exercise actual 2048-puzzle memory use and both compiled training paths."""
@@ -212,9 +237,7 @@ def gpu_smoke(output_dir):
             if not torch.isfinite(loss).item():
                 raise ValueError(f"Nonfinite CUDA smoke loss: {architecture}/{horizon}")
             loss.backward()
-            if any(parameter.grad is None or not torch.isfinite(parameter.grad).all().item()
-                   for parameter in model.parameters()):
-                raise ValueError(f"Missing or nonfinite gradient: {architecture}/{horizon}")
+            check_training_gradients(model, detached_input=bool(horizon))
             optimizer.step()
             torch.cuda.synchronize()
             print(f"GPU SMOKE {architecture} horizon={horizon} loss={loss.item():.6f}", flush=True)

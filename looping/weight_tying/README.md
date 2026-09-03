@@ -35,3 +35,25 @@ Three seeds provide an initial comparison, not a precise success probability. Us
 
 - [Universal Transformers](https://arxiv.org/abs/1807.03819) describes recurrent weight sharing as an inductive bias.
 - [QQWing](https://github.com/stephenostermiller/qqwing) supplies puzzle generation and uniqueness checks; [CLI documentation](https://qqwing.com/instructions.html) defines its difficulty labels.
+
+## Running The Study
+
+All commands run from the repository root after `source venv/bin/activate`. Use a separate detached invocation for every worker. Data preparation and the full-batch CUDA preflight must finish before training; training checks the preflight's source hashes before starting.
+
+```sh
+modal run --detach looping/weight_tying/modal_run.py --action prepare
+modal run --detach looping/weight_tying/modal_run.py --action smoke
+
+# Repeat this separate invocation for each architecture, regime, and seed in protocol.json.
+modal run --detach looping/weight_tying/modal_run.py --action train --architecture tied --regime late --seed 20260902
+
+# Only after all 18 training results exist and their selected weights are fixed:
+modal run --detach looping/weight_tying/modal_run.py --action seal
+
+# Then evaluate each run's final and best-validation exports separately.
+modal run --detach looping/weight_tying/modal_run.py --action evaluate --architecture tied --regime late --seed 20260902 --selection final
+```
+
+Outputs are under `weight_tying_v1_20260902/` on `sudoku-outputs`. The training log records UTC timestamps and optimizer-only time separately from total training time. Every checkpoint saves optimizer, sampler and dropout RNG states, config, source hashes, and data identity. A mismatched retry is rejected instead of silently continuing another experiment.
+
+Create a local destination before recursively downloading completed results with `modal volume get`. Final reports use `python -m looping.weight_tying.analyze LOCAL_STUDY_DIRECTORY --output NEW_REPORT_DIRECTORY`; `--partial` produces an explicitly incomplete progress report. The analysis verifies saved prediction checksums and independently recomputes scores. Failed runs remain in reliability denominators; paired score averages include only completed pairs and show how many pairs are missing.

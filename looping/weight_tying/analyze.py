@@ -1,0 +1,210 @@
+"""Summarize every seed without treating puzzles as independent training runs."""
+
+import argparse
+import json
+from pathlib import Path
+
+import numpy as np
+
+from checkpoint_utils import atomic_json_save, validate_config
+from looping.weight_tying.common import protocol, protocol_sha256, run_name
+from runtime_utils import file_sha256
+
+
+def training_summary(result):
+    metric = "16" if result["config"]["regime"] == "early" else "1024"
+    floor_start = protocol()["training"]["late_floor_start"]
+    late = [row["scores"][metric]["accuracy"] for row in result["history"] if row["updates"] >= floor_start]
+    return {"status": result["status"], "updates": result["updates"], "parameters": result["parameters"],
+            "primary_iteration": int(metric), "best_validation": result["best_validation"],
+            "late_validation_mean": float(np.mean(late)) if late else None,
+            "late_validation_minimum": min(late) if late else None,
+            "timings_seconds": result["timings_seconds"], "estimated_model_flops": result["estimated_model_flops"],
+            "processed_puzzles": result["processed_puzzles"], "sample_digest": result["sample_digest"]}
+
+
+def read_evaluation(root, name, selection, entry):
+    path = root / "evaluations" / name / selection / "result.json"
+    if not path.exists():
+        return None
+    result = json.loads(path.read_text())
+    identity = result["identity"]
+    if identity["protocol_sha256"] != protocol_sha256() or identity["run_name"] != name:
+        raise ValueError(f"Evaluation identity mismatch: {path}")
+    if identity["weights_sha256"] != entry["exports"][selection]["weights_sha256"]:
+        raise ValueError(f"Evaluation is not for the selected model: {path}")
+    if identity["selection"] != selection or identity["cohort_lock_sha256"] != file_sha256(root / "cohort_lock.json"):
+        raise ValueError(f"Evaluation selection or cohort lock mismatch: {path}")
+    for dataset, expected in result["prediction_sha256"].items():
+        predictions_path = path.parent / f"{dataset}_predictions.npz"
+        data_path = root / "data" / f"{dataset}.npz"
+        if file_sha256(predictions_path) != expected:
+            raise ValueError(f"Prediction checksum mismatch: {path}/{dataset}")
+        if file_sha256(data_path) != result["dataset_sha256"][dataset]:
+            raise ValueError(f"Evaluation data checksum mismatch: {path}/{dataset}")
+        with np.load(data_path, allow_pickle=False) as data, np.load(predictions_path, allow_pickle=False) as predictions:
+            verify_scores(data, predictions, result["scores"][dataset], identity["iterations"])
+    return result
+
+
+def verify_scores(data, predictions, scores, iterations):
+    """Recompute exact-board accuracy from saved predictions, not saved scores."""
+    previous_solved = None
+    np.testing.assert_array_equal(data["labels"], predictions["labels"])
+    for horizon in iterations:
+        predicted = predictions[f"predictions_{horizon}"]
+        finite = predictions[f"finite_{horizon}"]
+        if predicted.shape != data["targets"].shape or finite.shape != (len(predicted),) or finite.dtype != bool:
+            raise ValueError("Invalid prediction or finite-mask shape/type")
+        if np.any(predicted > 8) or np.any(predicted < 0):
+            raise ValueError("Predicted digit is outside the class range")
+        solved = ((predicted == data["targets"]) | (data["digits"] != 0)).all(-1) & finite
+        np.testing.assert_array_equal(solved, predictions[f"solved_{horizon}"])
+        expected = {"solved": int(solved.sum()), "total": len(solved), "accuracy": float(solved.mean()),
+                    "nonfinite": int((~finite).sum()),
+                    "difficulty": {str(label): {"solved": int(solved[data["labels"] == label].sum()),
+                                                 "total": int((data["labels"] == label).sum())}
+                                   for label in np.unique(data["labels"])}}
+        if previous_solved is not None:
+            expected["lost_since_previous"] = int((previous_solved & ~solved).sum())
+            expected["gained_since_previous"] = int((~previous_solved & solved).sum())
+        validate_config(scores[str(horizon)], expected)
+        previous_solved = solved
+
+
+def reliability_summary(results, architecture, regime):
+    settings = protocol()
+    members = [results.get(run_name(architecture, regime, seed)) for seed in settings["seeds"]]
+    summary = {"planned": len(members), "completed": 0, "numerical_failures": 0, "pending_training": 0,
+               "datasets": {name: {"evaluated": 0, "healthy": 0, "pending_evaluation": 0}
+                            for name in ("development", "holdout")}}
+    for result in members:
+        if result is None or result["status"] not in ("complete", "numerical_failure"):
+            summary["pending_training"] += 1
+            continue
+        if result["status"] == "numerical_failure":
+            summary["numerical_failures"] += 1
+            continue
+        summary["completed"] += 1
+        for dataset, counts in summary["datasets"].items():
+            scores = result.get("evaluations", {}).get("final", {}).get(dataset)
+            if scores is None:
+                counts["pending_evaluation"] += 1
+                continue
+            counts["evaluated"] += 1
+            accuracy_1024 = scores["1024"]["accuracy"]
+            drop = accuracy_1024 - scores["4096"]["accuracy"]
+            if (accuracy_1024 >= settings["evaluation"]["healthy_1024_accuracy"]
+                    and drop <= settings["evaluation"]["maximum_1024_to_4096_drop"] + 1e-12):
+                counts["healthy"] += 1
+    return summary
+
+
+def summarize(root, output, *, partial=False):
+    root, output = Path(root), Path(output)
+    output.mkdir(parents=True, exist_ok=False)
+    settings = protocol()
+    lock_path = root / "cohort_lock.json"
+    lock = json.loads(lock_path.read_text()) if lock_path.exists() else None
+    if not partial and lock is None:
+        raise ValueError("Final analysis requires a sealed cohort")
+    results, missing, histories = {}, [], {}
+    for architecture in settings["architectures"]:
+        for regime in settings["regimes"]:
+            for seed in settings["seeds"]:
+                name = run_name(architecture, regime, seed)
+                path = root / "runs" / name / "result.json"
+                if not path.exists():
+                    missing.append(name)
+                    continue
+                result = json.loads(path.read_text())
+                if result["config"]["protocol_sha256"] != protocol_sha256() or result["config"]["smoke"]:
+                    raise ValueError(f"Wrong protocol or fixture in analysis: {name}")
+                if lock and file_sha256(path) != lock["identity"]["runs"][name]["result_sha256"]:
+                    raise ValueError(f"Training result changed after cohort lock: {name}")
+                histories[name] = result["history"]
+                summary = training_summary(result)
+                summary["evaluations"] = {}
+                if lock and result["status"] == "complete":
+                    entry = lock["identity"]["runs"][name]
+                    for selection in ("final", "best_validation"):
+                        evaluation = read_evaluation(root, name, selection, entry)
+                        if evaluation is None:
+                            missing.append(f"{name}/{selection} evaluation")
+                        else:
+                            summary["evaluations"][selection] = evaluation["scores"]
+                results[name] = summary
+    if missing and not partial:
+        raise ValueError("Incomplete final analysis: " + ", ".join(missing))
+    comparisons = {}
+    for regime in settings["regimes"]:
+        primary_iteration = "16" if regime == "early" else "1024"
+        for comparison in ("untied_compute", "untied_parameters"):
+            seed_differences = []
+            for seed in settings["seeds"]:
+                left = results.get(run_name("tied", regime, seed), {})
+                right = results.get(run_name(comparison, regime, seed), {})
+                left_scores = left.get("evaluations", {}).get("final", {}).get("holdout")
+                right_scores = right.get("evaluations", {}).get("final", {}).get("holdout")
+                if left_scores is None or right_scores is None:
+                    continue
+                differences = {str(horizon): 100 * (left_scores[str(horizon)]["accuracy"]
+                                                    - right_scores[str(horizon)]["accuracy"])
+                               for horizon in settings["evaluation"]["iterations"]}
+                seed_differences.append({"seed": seed, "tied_minus_untied_percentage_points": differences})
+            primary_differences = [row["tied_minus_untied_percentage_points"][primary_iteration] for row in seed_differences]
+            comparisons[f"{regime}/{comparison}"] = {
+                "primary_iteration": int(primary_iteration), "paired_seeds": seed_differences,
+                "mean_primary_difference_percentage_points": float(np.mean(primary_differences)) if primary_differences else None,
+                "seed_count": len(primary_differences),
+                "missing_or_failed_pairs": len(settings["seeds"]) - len(primary_differences),
+                "interpretation": "Positive differences favor tied weights. Averages include only pairs with both final evaluations; consult reliability counts for failures. Three seeds do not establish a precise reliability probability.",
+            }
+    reliability = {f"{architecture}/{regime}": reliability_summary(results, architecture, regime)
+                   for architecture in settings["architectures"] for regime in settings["regimes"]}
+    report = {"protocol_sha256": protocol_sha256(), "partial": partial, "missing": missing,
+              "runs": results, "comparisons": comparisons, "reliability": reliability}
+    atomic_json_save(report, output / "report.json")
+    lines = ["# Weight-Tying Results", "", "Partial report; no final conclusions." if partial else "All preregistered runs are included.", "",
+             "## Per-Seed Results", "", "| Run | Status | Holdout @16 | @1024 | @4096 | Training Hours | Late Validation Floor |",
+             "|---|---|---:|---:|---:|---:|---:|"]
+    for name, summary in results.items():
+        scores = summary["evaluations"].get("final", {}).get("holdout", {})
+        values = [f"{100 * scores[str(horizon)]['accuracy']:.2f}%" if str(horizon) in scores else "pending"
+                  for horizon in (16, 1024, 4096)]
+        floor = summary["late_validation_minimum"]
+        floor_text = f"{100 * floor:.2f}%" if floor is not None else "not reached"
+        lines.append(f"| {name} | {summary['status']} | {' | '.join(values)} | "
+                     f"{summary['timings_seconds']['training'] / 3600:.2f} | {floor_text} |")
+    lines.extend(["", "## Reliability", "",
+                  "Healthy means at least 90% at 1024 iterations and no more than a 5-point drop by 4096. Numerical failures remain in the denominator. Pending runs are not failures.", "",
+                  "| Architecture / Regime | Completed | Numerical Failures | Pending Training | Healthy Development | Healthy Holdout |",
+                  "|---|---:|---:|---:|---:|---:|"])
+    for name, counts in reliability.items():
+        health = [f"{counts['datasets'][dataset]['healthy']}/{counts['planned']} ({counts['datasets'][dataset]['evaluated']} evaluated)"
+                  for dataset in ("development", "holdout")]
+        lines.append(f"| {name} | {counts['completed']} | {counts['numerical_failures']} | {counts['pending_training']} | {' | '.join(health)} |")
+    lines.extend(["", "## Paired Comparisons", "",
+                  "These are differences between three paired training seeds, not confidence intervals obtained by treating puzzles as independent training runs.", ""])
+    for name, comparison in comparisons.items():
+        value = comparison["mean_primary_difference_percentage_points"]
+        rendered = "pending" if value is None else f"{value:+.2f} percentage points"
+        lines.append(f"- {name}, iteration {comparison['primary_iteration']}: {rendered}; {comparison['seed_count']} completed pairs, {comparison['missing_or_failed_pairs']} missing or failed pairs.")
+    lines.extend(["", "Early-trained untied stacks beyond iteration 16 are explicit stack-repetition diagnostics. Late-trained stacks already repeat during training. Neither result represents a fully untied network with thousands of independently trained stages.", "",
+                  "Training time includes forward/backward passes, data transfer, optimizer work, and synchronization. Optimizer time is a subset, not an additional category. Preparation, compilation, evaluation, and checkpoint time are recorded separately in the JSON."])
+    (output / "report.md").write_text("\n".join(lines) + "\n")
+    return report
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("root", type=Path)
+    parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--partial", action="store_true")
+    arguments = parser.parse_args()
+    report = summarize(arguments.root, arguments.output, partial=arguments.partial)
+    print(json.dumps({"runs": len(report["runs"]), "missing": report["missing"]}))
+
+
+if __name__ == "__main__":
+    main()
