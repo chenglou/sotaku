@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 
 import modal
+from grpclib.exceptions import StreamTerminatedError
 
 from checkpoint_utils import atomic_json_save
 from looping.weight_tying.common import protocol_sha256, run_name
@@ -61,7 +62,7 @@ def wait_for_results(registry_path, output_path, timeout):
                 result = modal.FunctionCall.from_id(job["call_id"]).get(timeout=1)
             except TimeoutError:
                 continue
-            except modal.exception.ConnectionError as error:
+            except (modal.exception.ConnectionError, StreamTerminatedError) as error:
                 connection_failures[name] = connection_failures.get(name, 0) + 1
                 if connection_failures[name] == 1 or connection_failures[name] % 10 == 0:
                     print(json.dumps({"run": name, "read_retry": connection_failures[name],

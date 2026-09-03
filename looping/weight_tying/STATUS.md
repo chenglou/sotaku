@@ -40,4 +40,6 @@ At 20:05 PDT, three runs had finished all 20K updates and their durable result f
 
 The result collector encountered several connection deadlines while separate CLI reads remained available. The collector recovered and saved the two tied results before its local restart. Detached workers were never restarted. A fresh collector reused the saved results. Newly allocated workers for tied/early/20260904 and untied_parameters/late/20260903 have verified configurations.
 
+A later local disconnect propagated as `grpclib.exceptions.StreamTerminatedError` rather than Modal's connection-error wrapper. The collector now retries both observed transport errors; the regression test covers both and still reports real worker exceptions separately. The error-bearing cache was preserved before resuming its seven completed results. The named worker's live log confirmed it was still advancing past 18K updates.
+
 No held-out evaluation has started. After every run finishes, verify results and matching sample digests, seal the cohort, then evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.

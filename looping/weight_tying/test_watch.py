@@ -13,6 +13,7 @@ from looping.weight_tying.common import protocol_sha256
 HAS_MODAL = importlib.util.find_spec("modal") is not None
 if HAS_MODAL:
     import modal
+    from grpclib.exceptions import StreamTerminatedError
     from looping.weight_tying.watch import wait_for_results
 
 
@@ -29,7 +30,8 @@ class WatchTests(unittest.TestCase):
         result = {"config": {"protocol_sha256": protocol_sha256(), "architecture": "tied",
                              "regime": "early", "seed": 20260902}, "status": "complete", "updates": 20000}
         call = Mock()
-        call.get.side_effect = [modal.exception.ConnectionError("Deadline exceeded"), TimeoutError(), result]
+        call.get.side_effect = [modal.exception.ConnectionError("Deadline exceeded"),
+                                StreamTerminatedError("Connection lost"), TimeoutError(), result]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             registry = self.registry(root)
@@ -37,7 +39,7 @@ class WatchTests(unittest.TestCase):
                 snapshot = wait_for_results(registry, root / "received.json", 5)
             self.assertEqual(snapshot["errors"], {})
             self.assertEqual(len(snapshot["results"]), 1)
-            self.assertEqual(call.get.call_count, 3)
+            self.assertEqual(call.get.call_count, 4)
             call.get.assert_called_with(timeout=1)
 
     def test_worker_failure_is_recorded_and_reported(self):
