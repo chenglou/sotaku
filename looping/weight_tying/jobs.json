@@ -2,7 +2,7 @@
   "study_id": "weight_tying_v1_20260902",
   "protocol_sha256": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
   "data_manifest_sha256": "597746bd3ad294d69226b5a03f42c2bbe28bc36d37a90ffaeb03b75b319c86ce",
-  "snapshot_utc": "2026-09-03T04:18:30.690Z",
+  "snapshot_utc": "2026-09-03T06:25:45.410Z",
   "jobs": [
     {
       "architecture": "tied",
@@ -102,7 +102,7 @@
       "call_id": "fc-01M1JF7QGKGWAGK3BEX1Z0EMW0",
       "container_id": "ta-01M1JPQ94XHH31Q5D17C1YB3ER",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -122,7 +122,7 @@
       "call_id": "fc-01M1JF80XK8ZG6NZ0P51BW5T4H",
       "container_id": "ta-01M1JKE83BRAQ7RW9JY6KZPQ8R",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -142,7 +142,7 @@
       "call_id": "fc-01M1JF8CDAFCY8XAJKPCD1Y714",
       "container_id": "ta-01M1JNBMG74Y1ADWM3ZRXEWCXR",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -162,7 +162,7 @@
       "call_id": "fc-01M1JF8PJ65EHNBFJF84KCR1ZC",
       "container_id": "ta-01M1JKX936B0NZKRZF1MDAMANR",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -182,7 +182,7 @@
       "call_id": "fc-01M1JF928P9J193VQR1R37HNN9",
       "container_id": "ta-01M1JMBFY3CFN9BXDZ5CVYF59R",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     }
   ]
 }

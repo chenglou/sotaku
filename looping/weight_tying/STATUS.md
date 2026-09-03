@@ -44,4 +44,6 @@ A later local disconnect propagated as `grpclib.exceptions.StreamTerminatedError
 
 At 21:20 PDT, 13 runs were complete, including all nine early-training runs. The remaining five late-training workers are active. All 18 workers' live configurations have been checked. The 13 downloaded results have identical frozen source hashes, exactly 20K updates, and matching puzzle/horizon digests within each available paired group. Validation curves have been rendered and visually checked. No worker has required a restart.
 
-No held-out evaluation has started. After every run finishes, verify results and matching sample digests, seal the cohort, then evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.
+All 18 runs finished by 23:24 PDT, each at exactly 20K updates, without a numerical failure or worker restart. `pre_evaluation_audit.json` records every durable result hash and selected step. Full configs, source hashes, paired samples and horizons, matched-compute FLOPs, and earliest-best validation selection all passed. All recorded validation predictions were finite.
+
+No held-out evaluation has started. The separate CPU cohort-sealing job now verifies the selected model files and manifests on the Volume. After the lock is committed, evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.
