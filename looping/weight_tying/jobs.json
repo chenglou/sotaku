@@ -2,7 +2,7 @@
   "study_id": "weight_tying_v1_20260902",
   "protocol_sha256": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
   "data_manifest_sha256": "597746bd3ad294d69226b5a03f42c2bbe28bc36d37a90ffaeb03b75b319c86ce",
-  "snapshot_utc": "2026-09-03T01:51:32.370Z",
+  "snapshot_utc": "2026-09-03T03:05:32.673Z",
   "jobs": [
     {
       "architecture": "tied",
@@ -12,7 +12,7 @@
       "call_id": "fc-01M1JF39A33G0HEZGG9DCG4Z4Y",
       "container_id": "ta-01M1JF39VW52AKHA9JKFJ269VR",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -52,7 +52,7 @@
       "call_id": "fc-01M1JF3YBE6JA4CY1CPDBHZ4TN",
       "container_id": "ta-01M1JF3YY1EHBT23H115JH3B4R",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -72,7 +72,7 @@
       "call_id": "fc-01M1JF6MMB0PB5FENBMQTD8QKT",
       "container_id": "ta-01M1JF6N6A0H2BGR1R7B7XDY7R",
       "config_verified": true,
-      "status": "worker_allocated"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -120,9 +120,9 @@
       "seed": 20260903,
       "app_id": "ap-tSlIys5ZsctLLJkNwHkrZo",
       "call_id": "fc-01M1JF80XK8ZG6NZ0P51BW5T4H",
-      "container_id": null,
-      "config_verified": false,
-      "status": "awaiting_worker"
+      "container_id": "ta-01M1JKE83BRAQ7RW9JY6KZPQ8R",
+      "config_verified": true,
+      "status": "worker_allocated"
     },
     {
       "architecture": "tied",
@@ -130,9 +130,9 @@
       "seed": 20260904,
       "app_id": "ap-gSO4TF885ALFir5rnqR2BE",
       "call_id": "fc-01M1JF874XTBJ8T7QEPRT95HPC",
-      "container_id": null,
-      "config_verified": false,
-      "status": "awaiting_worker"
+      "container_id": "ta-01M1JKATKZ7D5XP02E9CPXWRJR",
+      "config_verified": true,
+      "status": "worker_allocated"
     },
     {
       "architecture": "tied",
@@ -170,9 +170,9 @@
       "seed": 20260904,
       "app_id": "ap-OMT3gVdKx0rgIg0wPBSy13",
       "call_id": "fc-01M1JF8WRF5MH4ZXCS2R0RTGVY",
-      "container_id": null,
-      "config_verified": false,
-      "status": "awaiting_worker"
+      "container_id": "ta-01M1JJ4XHJ0CVRKYE3C2CR61WR",
+      "config_verified": true,
+      "status": "worker_allocated"
     },
     {
       "architecture": "untied_parameters",

@@ -10,7 +10,7 @@ import torch
 
 from checkpoint_utils import atomic_json_save, atomic_torch_save
 from dataset_utils import DATASET_REVISION
-from looping.weight_tying.analyze import paired_puzzle_counts, reliability_summary, training_summary, verify_scores
+from looping.weight_tying.analyze import paired_puzzle_counts, reliability_summary, render_markdown, training_summary, verify_scores
 from looping.weight_tying.common import atomic_npz, protocol, protocol_sha256, run_config, run_name
 from looping.weight_tying.evaluate import evaluate_arrays, seal_cohort
 from looping.weight_tying.model import StudyTransformer
@@ -125,3 +125,21 @@ class StudyAnalysisTests(unittest.TestCase):
         summary = training_summary(result)
         self.assertAlmostEqual(summary["late_validation_mean"], 0.94)
         self.assertEqual(summary["late_validation_minimum"], 0.9)
+
+    def test_report_keeps_selections_and_datasets_separate(self):
+        scores = {str(horizon): {"accuracy": 0.99} for horizon in protocol()["evaluation"]["iterations"]}
+        summary = {"status": "complete", "updates": 20000, "parameters": 796937,
+                   "late_validation_minimum": 0.9, "late_validation_mean": 0.95,
+                   "timings_seconds": {"training": 3600, "optimizer": 1800, "compilation": 3600},
+                   "best_validation": {"updates": 17000},
+                   "evaluations": {"final": {"development": scores}, "best_validation": {"holdout": scores}}}
+        rendered = render_markdown({"partial": True, "runs": {"fixture": summary},
+                                    "comparisons": {}, "reliability": {}})
+        self.assertIn("| 1.00 | 2.00 | 95.00% | 90.00% |", rendered)
+        self.assertIn("Final Checkpoints (Primary)", rendered)
+        self.assertIn("Validation-Selected Checkpoints (Secondary)", rendered)
+        self.assertEqual(rendered.count("| 20000 | 99.00%"), 1)
+        self.assertEqual(rendered.count("| 17000 | 99.00%"), 1)
+        self.assertIn("| 20000 | pending", rendered)
+        self.assertIn("| 17000 | pending", rendered)
+        self.assertEqual(rendered.count("@2048"), 4)

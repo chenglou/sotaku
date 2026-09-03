@@ -15,16 +15,40 @@ def wait_for_results(registry_path, output_path, timeout):
     registry = json.loads(Path(registry_path).read_text())
     if registry["protocol_sha256"] != protocol_sha256():
         raise ValueError("Job registry belongs to another protocol")
+    action = registry.get("action", "train")
+    if action not in ("train", "evaluate"):
+        raise ValueError("Only existing training or evaluation jobs can be collected")
+
+    def job_name(job):
+        name = run_name(job["architecture"], job["regime"], job["seed"])
+        if action == "evaluate":
+            if job["selection"] not in ("final", "best_validation"):
+                raise ValueError("Unsupported evaluation selection")
+            name += "/" + job["selection"]
+        return name
+
+    def validate_result(name, result):
+        if action == "train":
+            config = result["config"]
+            actual = run_name(config["architecture"], config["regime"], config["seed"])
+            digest = config["protocol_sha256"]
+        else:
+            identity = result["identity"]
+            actual = identity["run_name"] + "/" + identity["selection"]
+            digest = identity["protocol_sha256"]
+        if digest != protocol_sha256() or actual != name:
+            raise ValueError("Result identity mismatch")
+
     output_path = Path(output_path)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     snapshot = json.loads(output_path.read_text()) if output_path.exists() else {"results": {}, "errors": {}}
-    expected = {run_name(job["architecture"], job["regime"], job["seed"]): job for job in registry["jobs"]}
+    expected = {job_name(job): job for job in registry["jobs"]}
+    if len(expected) != len(registry["jobs"]):
+        raise ValueError("Duplicate job identity in registry")
     if set(snapshot["results"]) - set(expected) or snapshot["errors"]:
         raise ValueError("Unexpected cached results or unresolved failures")
     for name, result in snapshot["results"].items():
-        config = result["config"]
-        if config["protocol_sha256"] != protocol_sha256() or run_name(config["architecture"], config["regime"], config["seed"]) != name:
-            raise ValueError("Cached result identity mismatch")
+        validate_result(name, result)
     deadline = time.monotonic() + timeout
     connection_failures = {}
     while len(snapshot["results"]) < len(expected):
@@ -47,13 +71,15 @@ def wait_for_results(registry_path, output_path, timeout):
                 snapshot["errors"][name] = repr(error)
                 atomic_json_save(snapshot, output_path)
                 raise
-            config = result["config"]
-            if config["protocol_sha256"] != protocol_sha256() or run_name(config["architecture"], config["regime"], config["seed"]) != name:
-                raise ValueError("Remote result identity mismatch")
+            validate_result(name, result)
             snapshot["results"][name] = result
             atomic_json_save(snapshot, output_path)
-            print(json.dumps({"run": name, "status": result["status"], "updates": result["updates"],
-                              "finished": len(snapshot["results"]), "planned": len(expected)}), flush=True)
+            progress = {"run": name, "finished": len(snapshot["results"]), "planned": len(expected)}
+            if action == "train":
+                progress.update(status=result["status"], updates=result["updates"])
+            else:
+                progress.update(status="complete", elapsed_seconds=result["elapsed_seconds"])
+            print(json.dumps(progress), flush=True)
         if len(snapshot["results"]) < len(expected):
             time.sleep(60)
     return snapshot

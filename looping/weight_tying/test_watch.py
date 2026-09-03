@@ -52,3 +52,58 @@ class WatchTests(unittest.TestCase):
             saved = json.loads((root / "received.json").read_text())
             self.assertEqual(saved["results"], {})
             self.assertIn("tied_early_seed20260902", saved["errors"])
+
+    def test_evaluation_selections_are_collected_separately(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            registry = self.registry(root)
+            entries = json.loads(registry.read_text())
+            entries["action"] = "evaluate"
+            base = entries["jobs"][0]
+            entries["jobs"] = [dict(base, selection=selection, call_id=selection)
+                               for selection in ("final", "best_validation")]
+            atomic_json_save(entries, registry)
+            calls = {}
+            for selection in ("final", "best_validation"):
+                calls[selection] = Mock()
+                calls[selection].get.return_value = {
+                    "identity": {"protocol_sha256": protocol_sha256(),
+                                 "run_name": "tied_early_seed20260902", "selection": selection},
+                    "elapsed_seconds": 1.0,
+                }
+            with patch("modal.FunctionCall.from_id", side_effect=calls.__getitem__):
+                snapshot = wait_for_results(registry, root / "received.json", 5)
+            self.assertEqual(set(snapshot["results"]), {
+                "tied_early_seed20260902/final", "tied_early_seed20260902/best_validation"})
+            with patch("modal.FunctionCall.from_id") as lookup:
+                self.assertEqual(wait_for_results(registry, root / "received.json", 5), snapshot)
+                lookup.assert_not_called()
+
+    def test_evaluation_rejects_the_wrong_selection(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            registry = self.registry(root)
+            entries = json.loads(registry.read_text())
+            entries["action"] = "evaluate"
+            entries["jobs"][0]["selection"] = "final"
+            atomic_json_save(entries, registry)
+            call = Mock()
+            call.get.return_value = {"identity": {"protocol_sha256": protocol_sha256(),
+                                                  "run_name": "tied_early_seed20260902",
+                                                  "selection": "best_validation"}}
+            with patch("modal.FunctionCall.from_id", return_value=call):
+                with self.assertRaisesRegex(ValueError, "identity mismatch"):
+                    wait_for_results(registry, root / "received.json", 5)
+            self.assertFalse((root / "received.json").exists())
+
+    def test_duplicate_jobs_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            registry = self.registry(root)
+            entries = json.loads(registry.read_text())
+            entries["jobs"].append(dict(entries["jobs"][0]))
+            atomic_json_save(entries, registry)
+            with patch("modal.FunctionCall.from_id") as lookup:
+                with self.assertRaisesRegex(ValueError, "Duplicate job"):
+                    wait_for_results(registry, root / "received.json", 5)
+                lookup.assert_not_called()

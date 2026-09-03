@@ -183,35 +183,58 @@ def summarize(root, output, *, partial=False):
               "runs": results, "comparisons": comparisons, "reliability": reliability}
     atomic_json_save(report, output / "report.json")
     atomic_json_save(histories, output / "learning_curves.json")
-    lines = ["# Weight-Tying Results", "", "Partial report; no final conclusions." if partial else "All preregistered runs are included.", "",
-             "## Per-Seed Results", "", "| Run | Status | Holdout @16 | @1024 | @4096 | Training Hours | Late Validation Floor |",
+    (output / "report.md").write_text(render_markdown(report))
+    return report
+
+
+def render_markdown(report):
+    horizons = protocol()["evaluation"]["iterations"]
+    lines = ["# Weight-Tying Results", "", "Partial report; no final conclusions." if report["partial"] else "All preregistered runs are included.", "",
+             "## Training", "", "The validation floor and mean cover updates 12K-20K at iteration 16 for early training and 1024 for late-state training.", "",
+             "| Run | Status | Parameters | Training Hours | Total Recorded Hours | Validation Mean | Validation Floor |",
              "|---|---|---:|---:|---:|---:|---:|"]
-    for name, summary in results.items():
-        scores = summary["evaluations"].get("final", {}).get("holdout", {})
-        values = [f"{100 * scores[str(horizon)]['accuracy']:.2f}%" if str(horizon) in scores else "pending"
-                  for horizon in (16, 1024, 4096)]
+    for name, summary in report["runs"].items():
         floor = summary["late_validation_minimum"]
         floor_text = f"{100 * floor:.2f}%" if floor is not None else "not reached"
-        lines.append(f"| {name} | {summary['status']} | {' | '.join(values)} | "
-                     f"{summary['timings_seconds']['training'] / 3600:.2f} | {floor_text} |")
+        mean = summary["late_validation_mean"]
+        mean_text = f"{100 * mean:.2f}%" if mean is not None else "not reached"
+        timings = summary["timings_seconds"]
+        total = sum(value for category, value in timings.items() if category != "optimizer")
+        lines.append(f"| {name} | {summary['status']} | {summary['parameters']:,} | "
+                     f"{timings['training'] / 3600:.2f} | {total / 3600:.2f} | {mean_text} | {floor_text} |")
+    for selection, heading in (("final", "Final Checkpoints (Primary)"),
+                               ("best_validation", "Validation-Selected Checkpoints (Secondary)")):
+        lines.extend(["", f"## {heading}"])
+        for dataset, label in (("development", "Reused 25K Sudoku-Extreme Benchmark"),
+                               ("holdout", "New 10K QQWing Test Set")):
+            lines.extend(["", f"### {label}", "",
+                          "| Run | Selected Update | " + " | ".join(f"@{horizon}" for horizon in horizons) + " |",
+                          "|---|---:|" + "---:|" * len(horizons)])
+            for name, summary in report["runs"].items():
+                scores = summary["evaluations"].get(selection, {}).get(dataset, {})
+                missing = "not evaluated (failed)" if summary["status"] == "numerical_failure" else "pending"
+                values = [f"{100 * scores[str(horizon)]['accuracy']:.2f}%" if str(horizon) in scores else missing
+                          for horizon in horizons]
+                updates = summary["updates"] if selection == "final" else summary["best_validation"].get("updates", 0)
+                lines.append(f"| {name} | {updates} | {' | '.join(values)} |")
     lines.extend(["", "## Reliability", "",
                   "Healthy means at least 90% at 1024 iterations and no more than a 5-point drop by 4096. Numerical failures remain in the denominator. Pending runs are not failures.", "",
                   "| Architecture / Regime | Completed | Numerical Failures | Pending Training | Healthy Validation | Healthy Development | Healthy Holdout |",
                   "|---|---:|---:|---:|---:|---:|---:|"])
-    for name, counts in reliability.items():
+    for name, counts in report["reliability"].items():
         health = [f"{counts['datasets'][dataset]['healthy']}/{counts['planned']} ({counts['datasets'][dataset]['evaluated']} evaluated)"
                   for dataset in ("validation", "development", "holdout")]
         lines.append(f"| {name} | {counts['completed']} | {counts['numerical_failures']} | {counts['pending_training']} | {' | '.join(health)} |")
     lines.extend(["", "## Paired Comparisons", "",
                   "These are differences between three paired training seeds, not confidence intervals obtained by treating puzzles as independent training runs.", ""])
-    for name, comparison in comparisons.items():
+    for name, comparison in report["comparisons"].items():
         value = comparison["mean_primary_difference_percentage_points"]
         rendered = "pending" if value is None else f"{value:+.2f} percentage points"
         lines.append(f"- {name}, iteration {comparison['primary_iteration']}: {rendered}; {comparison['seed_count']} completed pairs, {comparison['missing_or_failed_pairs']} missing or failed pairs.")
     lines.extend(["", "Early-trained untied stacks beyond iteration 16 are explicit stack-repetition diagnostics. Late-trained stacks already repeat during training. Neither result represents a fully untied network with thousands of independently trained stages.", "",
-                  "Training time includes forward/backward passes, data transfer, optimizer work, and synchronization. Optimizer time is a subset, not an additional category. Preparation, compilation, evaluation, and checkpoint time are recorded separately in the JSON."])
-    (output / "report.md").write_text("\n".join(lines) + "\n")
-    return report
+                  "Training time includes forward/backward passes, data transfer, optimizer work, and synchronization. Optimizer time is a subset, not an additional category. Total recorded hours add preparation, compilation, evaluation, and checkpoint time, but exclude queueing and container setup. New compiler signatures can add compilation time to the first training batches. The JSON records these categories and nominal FLOP estimates separately.", "",
+                  "The new QQWing set and the reused sudoku-extreme benchmark are different distributions and must not be pooled. The paired comparisons above use the new set. Three training seeds do not establish a precise probability of a successful run."])
+    return "\n".join(lines) + "\n"
 
 
 def main():
