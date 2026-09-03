@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "study_id": "weight_tying_v1_20260902",
+  "seeds": [20260902, 20260903, 20260904],
+  "architectures": {
+    "tied": {"width": 128, "feedforward_width": 512, "period": 1},
+    "untied_compute": {"width": 128, "feedforward_width": 512, "period": 16},
+    "untied_parameters": {"width": 32, "feedforward_width": 124, "period": 16}
+  },
+  "regimes": {
+    "early": {"burnin_probability": 0.0, "burnin_iterations": []},
+    "late": {"burnin_probability": 0.2, "burnin_iterations": [32, 64, 128, 256, 512]}
+  },
+  "training": {
+    "steps": 20000,
+    "batch_size": 2048,
+    "supervised_iterations": 16,
+    "blocks_per_iteration": 4,
+    "attention_heads": 4,
+    "dropout": 0.1,
+    "learning_rate": 0.002,
+    "minimum_lr_ratio": 0.01,
+    "warmup_steps": 560,
+    "weight_decay": 0.01,
+    "adam_betas": [0.9, 0.95],
+    "train_rows": 2700000,
+    "probe_every": 1000,
+    "probe_per_bucket": 200,
+    "probe_iterations": [16, 128, 1024],
+    "late_floor_start": 12000,
+    "phases": [[0, 4000, 51], [4000, 8000, 11], [8000, 12000, 1], [12000, 20000, 0]],
+    "precision": "bf16",
+    "compiled": true
+  },
+  "evaluation": {
+    "precision": "fp32",
+    "compiled": false,
+    "tf32_matmul": false,
+    "batch_size": 256,
+    "iterations": [16, 128, 1024, 2048, 4096],
+    "primary_checkpoint": "final",
+    "secondary_checkpoint": "best_validation",
+    "finite_depth_primary_iteration": 16,
+    "late_primary_iteration": 1024,
+    "healthy_1024_accuracy": 0.9,
+    "maximum_1024_to_4096_drop": 0.05,
+    "holdout_per_difficulty": 2500,
+    "holdout_difficulties": ["simple", "easy", "intermediate", "expert"],
+    "holdout_generator": "qqwing",
+    "holdout_generator_version": "1.3.4",
+    "holdout_unlock": "all 18 final checkpoints and validation selections fixed"
+  }
+}
