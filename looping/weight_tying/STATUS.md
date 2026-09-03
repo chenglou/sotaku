@@ -26,4 +26,6 @@ The first tied and parameter-matched early-training runs have passed 1K updates.
 
 `watch.py` collects results from existing function-call IDs without launching, replacing, or cancelling workers. One initial result-read request timed out; the collector now retries connection errors, and the workers were unaffected.
 
+At 19:29 PDT, the first parameter-matched late-state worker was still compiling its supervised continuation. A live `py-spy` stack showed `train_run` calling PyTorch's AOT autograd partitioner, which was running NetworkX's `preflow_push` inside `minimum_cut`. No optimizer updates had started on that worker. The profiler was installed only in `/tmp/sotaku-diagnostics`; training code and dependencies were unchanged. This is compilation overhead, not a measured training failure. Other workers were already saving checkpoints and advancing.
+
 No held-out evaluation has started. After every run finishes, verify results and matching sample digests, seal the cohort, then evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.
