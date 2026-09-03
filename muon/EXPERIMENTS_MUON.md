@@ -6,7 +6,7 @@ This document tracks Muon usage in this repo, from the original Kaggle-era scrip
 
 Muon was originally added in the early training scripts and ablation experiments, typically with a **split optimizer**:
 - **Muon for ≥2D parameters**
-- **AdamW for 1D parameters** (biases, norms, embeddings)
+- **AdamW for 1D parameters** (biases and normalization parameters)
 
 Notable commits that include Muon usage (from `git log -S "optimizer_muon"`):
 - `f147270` — *Muon made loss go down _hard_. But still saturates at the same spot (not its fault)*
@@ -35,7 +35,7 @@ All runs: d_model=128, n_layers=4, n_iterations=16, batch_size=4096, cosine LR. 
 - Mixed sampling, all‑Muon, grad clip=1.0: lr 1e‑2 (exploded).
 - Mixed sampling, split Muon>=2D + AdamW 1D, no grad clip: muon lr 1e‑2, adamw lr 1.5e‑3 (exploded).
 
-## Current choice
+## Best Muon Setting In This Study
 
 Reverse curriculum, all‑Muon, lr=5e‑3, no grad clip, no mixed, no split. lr=7e‑3 matched it; lr=9e‑3 diverged (NaN).
 

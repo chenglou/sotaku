@@ -12,7 +12,7 @@ Completed September 3, 2026: 18 fresh training runs and 36 full evaluations. Eac
 | Independent stages, same width | Sixteen separately trained four-block stages | 128 | 12,693,257 |
 | Independent stages, matched parameters | Sixteen narrower four-block stages | 32 | 797,385 |
 
-The same-width pair started with identical functions: the independent stages were separate copies of the shared blocks. The pair received identical puzzle batches, sampled training iterations, and nominal transformer matmul FLOPs. Actual runtime and optimizer work differ. The input encoder, prediction-feedback projection, and output head remain shared in every model.
+Both independent-stage models store 16 groups of four blocks, or 64 distinct transformer blocks. The same-width pair started with identical functions: the independent stages were separate copies of the shared blocks. The pair received identical puzzle batches, sampled training iterations, and nominal transformer matmul FLOPs. Actual runtime and optimizer work differ. The input encoder, prediction-feedback projection, and output head remain shared in every model.
 
 For each architecture, three paired seeds trained only on iterations 1-16, and three used the v2 recipe: 80% of batches train iterations 1-16; 20% advance 32/64/128/256/512 iterations without gradients before training the next 16. The loss is ordinary cross-entropy averaged across those 16 supervised iterations. There is no added normalization, auxiliary loss, ES, or inference damping.
 

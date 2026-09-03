@@ -38,7 +38,7 @@ This encodes sudoku's constraint structure directly: cells sharing a row, column
 
 **Results:** 50.1% acc, 0 solved
 
-**Finding:** Complete failure. Standard sinusoidal encoding is designed for long sequences (hundreds+ positions) where the frequencies create distinguishable patterns. For positions 0-8, the sin/cos values are too similar to differentiate. Learned embeddings are much better for small, discrete position spaces.
+**Finding:** This sinusoidal configuration failed. The frequency range may be poorly suited to positions 0-8, but this run does not show that sinusoidal encodings generally fail on small grids.
 
 ### RRN Ablation: No Sudoku Positional Encoding
 
@@ -60,7 +60,7 @@ This encodes sudoku's constraint structure directly: cells sharing a row, column
 |--------|------|------------|-------|
 | Total | 82.8% | 83.6% | -0.8pp |
 
-**Finding:** Adding pos_embed every iteration helps **+0.8pp**. The repeated position signal acts as a constant anchor — transformer layers can distort position info over iterations. Re-adding pos_embed reinforces "where am I" at each step. Cheap to compute (just addition), so keep it.
+**Finding:** Adding pos_embed every iteration helps **+0.8pp**, at little computational cost. We did not directly measure whether the improvement comes from preserving position information in the hidden state.
 
 ---
 
@@ -78,7 +78,7 @@ The goal: replace the sudoku-specific row/col/box embeddings with more general-p
 
 **Results: 82.6%** (-0.2pp vs baseline)
 
-**Finding:** The box embedding barely matters. 2D grid coordinates do almost all the work.
+**Finding:** Dropping the box embedding cost only 0.2pp in this comparison.
 
 ### 2D RoPE (Rotary Position Embeddings)
 
@@ -88,7 +88,7 @@ The goal: replace the sudoku-specific row/col/box embeddings with more general-p
 
 **Results: 82.5%** (-0.3pp vs baseline)
 
-**Finding:** Matches baseline within noise. Position info injected through attention rotation instead of additive embeddings. Naturally re-applies every layer and iteration. More generalizable than learned embeddings — works for arbitrary grid sizes without retraining.
+**Finding:** Within 0.3pp of baseline. Position information enters through attention rotation at every layer and iteration. The formula supports other grid coordinates, but these experiments tested only 9x9 Sudoku, not accuracy on new grid sizes.
 
 ### Learned Absolute Position Embedding
 
@@ -98,7 +98,7 @@ The goal: replace the sudoku-specific row/col/box embeddings with more general-p
 
 **Results: 81.7%** (-1.1pp vs baseline)
 
-**Finding:** Respectable. The old -4.4pp gap (early ablation) shrunk to -1.1pp with better training (cosine LR, curriculum, BS=4096). The model can learn positions from scratch, just slightly less efficiently.
+**Finding:** The gap was 1.1pp with this training setup. The early ablation's 4.4pp gap measured cell accuracy on a different dataset, so the two gaps are not directly comparable.
 
 ### T5-style Relative Position Bias
 
@@ -108,7 +108,7 @@ The goal: replace the sudoku-specific row/col/box embeddings with more general-p
 
 **Results: 73.9%** (-8.9pp vs baseline)
 
-**Finding:** Significantly worse. Two compounding issues: (1) 1D flattened distance is a poor metric for a 2D grid — cells (0,8) and (1,0) are adjacent on the grid but 1 apart in 1D, while same-column cells are 9 apart; (2) passing a float mask to `nn.TransformerEncoder` disables the SDPA fast path, resulting in ~2x slower training. The model effectively got half the training.
+**Finding:** Significantly worse. Flattened distance treats cells (0,8) and (1,0) as neighbors even though they are far apart on the grid, while vertically adjacent cells are 9 apart in the flattened sequence. The float attention mask also made this implementation about 2x slower. All these runs used 50K steps, so slower execution does not mean fewer training updates.
 
 ### ALiBi (Attention with Linear Biases)
 
@@ -118,7 +118,7 @@ The goal: replace the sudoku-specific row/col/box embeddings with more general-p
 
 **Results: 18.7%** (-64.1pp vs baseline)
 
-**Finding:** Near-total failure. Fixed 1D linear decay cannot encode 2D grid structure. Same fundamental problem as T5 bias (1D distance on a 2D grid) but worse because the bias is fixed rather than learned.
+**Finding:** This fixed 1D distance bias performed poorly. Like the T5 variant, it uses flattened distance rather than 2D coordinates; the experiment does not isolate whether that choice explains the full accuracy gap.
 
 ---
 
@@ -138,21 +138,11 @@ The goal: replace the sudoku-specific row/col/box embeddings with more general-p
 
 ## Key Insights
 
-1. **Box embedding is nearly worthless** — dropping it costs only 0.2pp. The row+col grid structure does all the work.
-
-2. **2D grid knowledge matters a lot** — methods that understand 2D (rowcol, 2D RoPE) score 82.5-82.6%. Methods using 1D distance (T5, ALiBi) score 18-74%. The 2D→1D flattening destroys spatial relationships.
-
-3. **Learned vs fixed barely matters if you have the right structure** — rowcol (learned) and 2D RoPE (fixed rotations) are within 0.1pp. What matters is knowing it's a 2D grid, not whether the encoding is learned.
-
-4. **Position info every iteration helps** — +0.8pp from re-adding pos_embed each iteration. RoPE and ALiBi naturally satisfy this (position is in attention, re-applied every layer/iteration).
-
-5. **Sinusoidal fails for small position spaces** — positions 0-8 are too close in standard sin/cos. Learned embeddings or RoPE with tuned base frequency work much better.
-
-6. **Training speed matters** — T5 bias's float mask disabled flash attention, making it ~2x slower. The 73.9% result is partly a training budget issue.
+The tested 2D encodings retained almost all baseline accuracy without explicit box information. Learned absolute positions also worked reasonably well. The two flattened-distance biases performed much worse, but these comparisons do not isolate the reason or establish results beyond 9x9 Sudoku.
 
 ## Current choice
 
-**2D RoPE** is the new baseline: matches row+col+box within noise (-0.3pp) while being fully sudoku-agnostic. It only assumes a 2D grid, generalizes to arbitrary grid sizes, and naturally re-injects position info every layer/iteration.
+**2D RoPE** was selected because it came close to row+col+box accuracy while assuming only a 2D grid, not Sudoku's row/column/box rules. See the [README](../README.md) for the current model and training recipe.
 
 ## Notes on log locations
 

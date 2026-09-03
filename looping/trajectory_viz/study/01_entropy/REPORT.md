@@ -1,16 +1,14 @@
-# ARM 01: predictive-uncertainty coordinate
+# Study 01: Predicting Uncertainty From Hidden States
 
 ## Verdict
 
-**Inconclusive, with partial evidence for decodable uncertainty.** A discovery-fit linear axis predicts final-split entropy beyond exact iteration identity in all four checkpoints. The final partial R-squared values are `.385`, `.098`, `.167`, and `.225` for stable plain, collapsed plain, later-iteration training, and combined margin. Removing the eight-dimensional output-head contrast row space changes those values only slightly.
-
-The stronger hypothesis is not established. The durable run uses cell-centered hidden states without removing per-cell magnitude, so it cannot rule out accumulated state norm. It also lacks the protocol-required comparison with an unconstrained categorical probe. Later-iteration training does not beat the shuffled-label control, and the fitted axes show only weak temporal order. The result supports “predictive uncertainty is linearly accessible from hidden state” more than “the model has a norm-independent ordered uncertainty coordinate.”
+**Inconclusive.** A linear predictor fitted on discovery puzzles recovers some uncertainty information on final puzzles beyond knowing the iteration number. But the model trained on later iterations fails the shuffled-label control, the fitted predictions show weak temporal order, and two required controls are missing: state magnitude and an unrestricted categorical predictor. The results do not establish a shared uncertainty axis independent of those effects.
 
 ## Hypothesis
 
 Recurrent hidden states contain a one-dimensional ordered coordinate for predictive uncertainty or candidate entropy, rather than only iteration identity or accumulated state norm.
 
-This run operationalizes predictive uncertainty with three label-free functions of the nine output probabilities:
+The analysis measures uncertainty in three ways, all computed from the nine output probabilities without the answer key:
 
 - normalized softmax entropy, treated as the primary measure;
 - the top-one/top-two probability gap;
@@ -70,7 +68,7 @@ Missing controls:
 - **State norm:** cell centering removes board-wide translation but does not normalize each cell vector or include norm as a nuisance variable. The run therefore does not test the “not merely accumulated state norm” clause.
 - **Unconstrained categorical probe:** the protocol requires this comparison before calling a representation ordered. No entropy-bin categorical model was fit.
 
-Because these two missing controls are central to the stated hypothesis, the durable run does not meet the confirmatory verdict rule recorded in `DESIGN.md`. All three uncertainty targets were also evaluated on final rather than selecting one target globally on validation; this report treats entropy as primary and the other two as sensitivity checks instead of choosing the strongest final result.
+Without these two controls, the saved results do not meet the acceptance criteria in `DESIGN.md`. All three uncertainty targets were also evaluated on the final split rather than selecting one target on validation. This report therefore treats entropy as primary and the other two as sensitivity checks, instead of choosing the strongest final result.
 
 ## Limitations
 

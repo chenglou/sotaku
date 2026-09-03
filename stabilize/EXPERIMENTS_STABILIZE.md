@@ -2,7 +2,7 @@
 
 Training changes intended to prevent accuracy loss at large inference iteration counts; see [the reproduction study](../iters/EXPERIMENTS_ITERS.md#reproducibility-july-2026). Scripts live in this folder; they were originally under `iters/`.
 
-Headline: EMA and feedback noise failed; starting supervised training after 128 gradient-free iterations kept 6 of 7 runs at or above 80% at 1024, with scores near 90% at best. Recurrent RMSNorm produced three 50K runs whose selected checkpoints scored 91.3-92.4% at 1024. RMSNorm remains the simplest bounded-state option, while training on randomly sampled later iterations in `looping/` has achieved higher scores.
+Summary: exponential moving averages (EMA) of the weights and feedback noise did not improve reliability. Starting supervised training after 128 gradient-free iterations kept 6 of 7 runs at or above 80% at 1024, with scores near 90% at best. Recurrent RMSNorm produced three 50K runs whose selected checkpoints scored 91.3-92.4% at 1024. RMSNorm is an option when limiting hidden-state magnitude matters; [training on randomly sampled later iterations](../looping/EXPERIMENTS_LOOPING.md#training-on-later-iterations) achieved higher scores and remains the public recommendation.
 
 Run convention: parallel runs of one config used per-run copies of the base file (exp_testbed_ema_a.py, _b.py, ...) because log and checkpoint filenames derive from module constants. The copies were byte-identical to the base apart from those names and have been deleted; recreate one by copying the base file and renaming its experiment constants. Artifacts on the sudoku-outputs Modal volume keep the per-run names.
 
@@ -26,7 +26,7 @@ Full 25K-puzzle evaluation of the four burn-in-128 final checkpoints: 77-78% at 
 
 Confirmation at the full 50K schedule (`exp_lr2e3_burnin128.py`, three runs): 16-iteration accuracy recovered to baseline (80.6-81.1%), and 1024-iteration results were 88.5%, 89.4%, and 40.3%. Two passed the 80% threshold; the third lost accuracy, although less severely than the baseline's near-zero failures. Across the 20K and 50K schedules, burn-in produced 6 of 7 final checkpoints above the threshold, versus roughly 1 in 4 without it. The highest scores stayed near 90%, about 6-9 points below the successful original-model runs. Selecting an earlier checkpoint from the failed run gave 84.3%.
 
-Before the state-magnitude experiments below, the most reliable recipe was `exp_baseline_lr2e3` with 128-iteration burn-in and selection of the best checkpoint on the monitoring sample. Every such run produced a selected model at 84-90% at 1024, versus the original recipe's ~25% chance of a 92-99% model and ~75% chance of a near-total accuracy loss. Burn-in remains evidence that training on later states improves reliability, but limiting the state RMS to 1 gave better results without extra forward iterations.
+Selecting checkpoints from the fixed-128-iteration runs gave 84-90% at 1024 in every run. The state-magnitude experiments below then tested whether normalization could improve on those results without extra forward iterations. The observed success fractions describe these small groups of runs, not precise probabilities for future training.
 
 Across all 27 runs of the first five variants, 12 produced an intermediate checkpoint scoring at least 800, versus 4 ending there. Selecting the best saved checkpoint therefore roughly tripled the fraction of these runs meeting the threshold. This comparison does not establish the same improvement for every configuration.
 
@@ -94,7 +94,7 @@ The three selected checkpoints were then evaluated on 25,000 balanced test puzzl
 | 1 | 38K | 79.52% | 89.39% | **91.26%** | **91.69%** |
 | 2 | 48K | 81.32% | 90.06% | **91.38%** | **91.62%** |
 
-Before the full-schedule RMSNorm comparison below, the most reliable bounded-state recipe used an RMS limit of 1 and selected the best checkpoint on the periodic 1024-iteration evaluation. It produced a selected model at 91.3-91.9% at 1024 in 3 of 3 runs, with accuracy holding or improving at 2048, no extra training iterations, and no ES stage. Only 2 of 3 final checkpoints passed the 80% threshold. For the tested failing checkpoint, an inference RMS limit of 12 improved accuracy without retraining.
+Checkpoint selection matters: all three selected RMS-limit models exceeded 91% at 1024, but only two final models exceeded 80%. The next comparison holds the selection rule and schedule fixed while replacing the RMS limit with RMSNorm.
 
 ### Full 50K RMSNorm Confirmation
 

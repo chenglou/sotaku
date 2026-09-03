@@ -2,9 +2,7 @@
 
 ## Verdict
 
-Sotaku's hidden states make current Sudoku constraint quantities linearly readable on unseen puzzles, especially at iteration 16. This supports a narrow claim that the state contains row, column, box, peer-conflict, and candidate information. The stronger hypothesis does not survive the full protocol: in the three healthy checkpoints, iteration and certainty variables already explain almost all current-conflict variation; hidden-state geometry adds little prediction of later constraint improvement; the future effect does not beat shuffled iteration; and fitted probes mostly fail direct cross-checkpoint transfer.
-
-The failing collapsed checkpoint is the exception. Its states carry a large constraint residual and some future-improvement signal, but the signal is not stable under the temporal control. The most constraint-specific geometry in this run is therefore associated with collapse rather than shared successful solving.
+Linear predictors recover current row, column, box, conflict, and candidate information from hidden states on unseen puzzles, especially at iteration 16. But in the three accurate checkpoints, iteration number and confidence already explain most conflict variation. Hidden states add little prediction of future improvement. The failing checkpoint adds more, but shuffling iteration order matches that result. Fitted predictors also mostly fail when applied unchanged to another checkpoint. These results do not establish a shared direction that controls constraint satisfaction.
 
 ## Predefined targets
 
@@ -25,7 +23,7 @@ The saved collection contains 60 test puzzles sampled with seed `20260811`, equa
 
 Ridge probes are fit on discovery puzzles, select one of `0.01, 1, 100, 10000` on validation, and are evaluated on final puzzles. The direct target probes use iterations 16, 128, and 1024. Controls use 16 shuffled-label fits and 16 Haar-random subspaces with rank matched to the learned probe. Aggregate temporal trends use 2,000 shuffled iteration orders.
 
-The stricter residual probes pool sampled times while giving each puzzle-time pair equal total weight. The current-conflict nuisance model contains exact sampled iteration, maximum probability, top-two probability margin, and entropy. The future-improvement nuisance model also contains current expected and hard conflicts, candidate deviation, and correctness. The state coefficient is fit only to the remaining discovery residual. Its learned scalar axis is compared with shuffled labels, a matched rank-one random projection, and hidden states whose sampled iterations are shuffled within every puzzle-cell trajectory.
+The stricter residual probes pool sampled times while giving each puzzle-time pair equal total weight. A baseline model first predicts current conflicts from exact sampled iteration, maximum probability, top-two probability margin, and entropy. The future-improvement baseline also includes current expected and hard conflicts, candidate deviation, and correctness. These are called nuisance models in the tables. The hidden-state predictor fits only what the baseline leaves unexplained on discovery puzzles. Its fitted direction is compared with shuffled labels, a matched rank-one random projection, and hidden states whose sampled iterations are shuffled within every puzzle-cell trajectory.
 
 Cross-checkpoint transfer applies the complete source-checkpoint standardization, nuisance model, and state probe to another checkpoint's final puzzles without refitting.
 

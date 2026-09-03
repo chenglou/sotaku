@@ -13,7 +13,7 @@ Current conclusions:
 - Delayed damping remains an optional inference setting for checkpoints whose accuracy declines at larger iteration counts. It keeps three independently trained final checkpoints at 94.69-96.91% at iteration 4096, but is unnecessary when ordinary inference already meets the desired accuracy at the target iteration count.
 - Use 20K runs for routine comparisons, then validate promising changes at 50K. Training on later iterations improved the 20K results across three random seeds, while 10K did not reliably preserve later rankings. A 20K result can still miss a positive or negative phase change after step 20K.
 
-All current runs use the first 2.7M puzzles from the training split. The full schedule has 50K optimizer steps, batch size 2048, a 1,400-step warmup, and actual rating pools 51+, 11+, 1+, and 0+ over phases of 10K, 10K, 10K, and 20K steps. Historical config and log labels say 21+ and 6+ for the first two phases, but the trainer selects whole buckets by their lower endpoint, producing 51+ and 11+. The training behavior is unchanged. The 20K schedule is useful for preliminary comparisons; 10K did not preserve the later ranking, and the current recipe has not been tested with a smaller puzzle pool while holding other settings fixed.
+All current runs use the first 2.7M puzzles from the training split. The full schedule has 50K optimizer steps, batch size 2048, a 1,400-step warmup, and actual rating pools 51+, 11+, 1+, and 0+ over phases of 10K, 10K, 10K, and 20K steps. Historical config and log labels say 21+ and 6+ for the first two phases, but the trainer selects whole buckets by their lower endpoint, producing 51+ and 11+. The training behavior is unchanged. The current recipe has not been tested with a smaller puzzle pool while holding other settings fixed.
 
 An iteration is one pass through the shared model blocks; a training step is an optimizer update. Monitoring evaluations use 1,000 fixed test puzzles and are called probes in historical logs. Full evaluations use 25,000 puzzles. A score can fall across training checkpoints or across inference iterations; the tables specify which changes. Experiment IDs and filenames retain their historical names.
 
@@ -108,7 +108,7 @@ Delayed damping complements the training intervention. Leaving iterations 1-512 
 | later-iteration training, trial 1 | 93.83% | 94.80% | 94.74% | 94.71% | 94.69% |
 | later-iteration training, trial 2 | 94.36% | 96.76% | **96.84%** | **96.88%** | **96.91%** |
 
-The three final checkpoints span 94.69-96.91% at 4096, with a mean of 95.47%. Their token RMS changes by at most 0.12 after damping begins. Accuracy stays flat or improves, so under-relaxation is stabilizing useful continued computation rather than merely freezing the iteration-512 answer. The selected trial-2 checkpoint reached 96.80% at 1024 and 96.88% at 4096; final weights were slightly better.
+The three final checkpoints span 94.69-96.91% at 4096, with a mean of 95.47%. Their per-cell state RMS changes by at most 0.12 after damping begins. Accuracy stays flat or improves; where it improves, damping does more than preserve the iteration-512 answer. The selected trial-2 checkpoint reached 96.80% at 1024 and 96.88% at 4096; final weights were slightly better.
 
 The comparisons make the useful intervention fairly specific. A fixed 128-iteration burn-in peaked at 82.9% and fell to 9.4% by the end. Recurrent RMSNorm plus training on random later iterations reached only 81.7%; compact AABB plus that training reached 79.4%. Increasing the later-iteration batches from 20% to 50% finished at 93.6% but was slower and did not improve on the paired run. In these tests, sampling the initial iteration count from the powers of two worked better than a fixed count or combining the training with normalization.
 
@@ -127,7 +127,7 @@ The same comparison separated two ways of introducing later-iteration training a
 | second late window | 72.8% | 81.9% | 78.6% | **79.5%** |
 | second late window plus consistency | 72.8% | 79.8% | **79.4%** | 79.4% |
 
-The second-window arms were also much steadier late in training. Across the five probes from steps 6K through the final checkpoint, `stay_recheck` averaged 77.8% at 1024 and never fell below 75.4%; `stay_consistency` averaged 77.3% and never fell below 74.9%. The matched control averaged 49.0% and fell as low as 0.8%. The consistency term did not raise the best 1024 score over recheck-only, but it reduced the final 128-to-1024 drop from 3.3 points to 0.4 points. At this sample size, the main useful intervention is the second supervised window; the extra consistency term is a possible refinement rather than a demonstrated requirement.
+The second-window variants were also much steadier late in training. Across the five monitoring evaluations from steps 6K through the final checkpoint, `stay_recheck` averaged 77.8% at 1024 and never fell below 75.4%; `stay_consistency` averaged 77.3% and never fell below 74.9%. The matched control averaged 49.0% and fell as low as 0.8%. The consistency term did not raise the best 1024 score over recheck-only, but it reduced the final 128-to-1024 drop from 3.3 points to 0.4 points. In this comparison, adding the second supervised window helped; the extra consistency term was not required for that improvement.
 
 These preliminary results did not justify a new recommended recipe. The first comparison compressed the warmup and every curriculum phase by half, which made the delayed step-2K start coincide with a training-data transition. The model had only 26.9-42.5% accuracy at 128 iterations at that point, so these runs do not answer what happens when training on later iterations begins from an already accurate model. `exp_stay_solved.py` now preserves the original 560-step warmup and full 0-4K hard-puzzle phase in `_healthy_screen` runs, and a regression test protects that ordering. The corrected comparison and longer runs follow below.
 
@@ -205,7 +205,7 @@ Earlier damping reduces the spread between the two random seeds and allows both 
 
 ## Delayed recurrent damping
 
-The strongest inference-time intervention leaves the first 128 recurrent iterations unchanged, then under-relaxes each later update with `alpha = 0.25`:
+The strongest inference-time intervention in this comparison leaves the first 128 iterations unchanged, then takes only a fraction of each proposed state update (`alpha = 0.25`). This is called damping, or under-relaxation:
 
 ```text
 proposed = F(hidden)
@@ -234,7 +234,7 @@ The full 25K-puzzle evaluation confirmed the effect and showed that it covers ev
 | collapsed, undamped | 80.62% | 93.39% | 5.64% | 3.06% |
 | collapsed, damped after 128 | 80.62% | 93.39% | **95.66%** | **96.20%** |
 
-On the collapsed checkpoint at 2048 iterations, per-bucket accuracy after damping was 99.84%, 99.54%, 92.80%, 92.84%, and 95.96% from easiest to hardest. The rescue is not an aggregate dominated by one subset. On the naturally stable checkpoint, damping is unnecessary and costs 1.55 points at 2048.
+On the failing checkpoint at 2048 iterations, per-bucket accuracy after damping was 99.84%, 99.54%, 92.80%, 92.84%, and 95.96% from easiest to hardest. The improvement covers every difficulty bucket. On the accurate original checkpoint, damping reduces accuracy by 1.55 points at 2048.
 
 The nearby policy grid explains why the selected setting matters. Starting damping at 64 iterations sacrifices 128-iteration accuracy. Waiting until 256 preserves more of the original trajectory but allows instability to develop. With a 128-iteration warmup, `alpha = 0.5` falls to 55.7% by 2048, `0.375` to 78.3%, `0.25` reaches 95.9%, and `0.125` reaches 95.3%. For this checkpoint, 128 then 0.25 is the best tested balance.
 
@@ -248,9 +248,9 @@ The same policy was then applied across the clean-A training trajectory:
 | 45K, collapsed | 93.5% | 7.9% | 96.2% | 96.6% |
 | 50K, collapsed | 93.1% | 5.8% | 95.6% | 95.9% |
 
-The 35K checkpoint needed stronger damping. With the same 128-iteration warmup and `alpha = 0.0625`, it scored 91.1%, 91.3%, and 91.4% at 1024, 2048, and 4096. Delayed damping therefore substantially rescued all four collapsed checkpoints from this run, but the useful alpha depends on the checkpoint.
+The 35K checkpoint needed stronger damping. With the same 128-iteration warmup and `alpha = 0.0625`, it scored 91.1%, 91.3%, and 91.4% at 1024, 2048, and 4096. Delayed damping therefore improved all four failing checkpoints from this run, but the useful alpha depends on the checkpoint.
 
-Four checkpoints from the earlier ES rescue-boundary study provide the harder test. Selecting between `alpha = 0.25`, `0.125`, `0.0625`, and `0.03125` on the 1,000-puzzle probe gave:
+Four checkpoints from the earlier study of when ES improves accuracy provide a harder test. Selecting between `alpha = 0.25`, `0.125`, `0.0625`, and `0.03125` on the 1,000-puzzle monitoring sample gave:
 
 | checkpoint | undamped at 128 | undamped at 1024 | selected damped at 1024 | selected damped at 4096 |
 |---|---:|---:|---:|---:|
@@ -267,7 +267,9 @@ Small alpha preserves short-horizon behavior on these harder checkpoints, but us
 
 ## Sudoku Jacobian and loss-gradient diagnostics
 
-`eval_loop_diagnostics.py` adapts [Anthropic's Jacobian lens](https://transformer-circuits.pub/2026/workspace/index.html) to Sudoku. It runs a checkpoint to each requested iteration without gradients, differentiates only the next recurrent Sudoku iteration, and averages the gradient direction for each of the nine digit logits at every block boundary. It separately differentiates the correct-answer margin, preserving puzzle and cell identity, and computes the 16-by-16 cosine matrix between the parameter gradients from the 16 supervised cross-entropy losses. A gradient direction describes which small changes to the current state would most change the measured output; it does not describe the entire future trajectory.
+`eval_loop_diagnostics.py` adapts [Anthropic's Jacobian lens](https://transformer-circuits.pub/2026/workspace/index.html) to Sudoku. It runs a checkpoint to each requested iteration without gradients, differentiates only the next recurrent Sudoku iteration, and averages the gradient for each of the nine digit logits at every block boundary. It separately differentiates a smooth correct-answer margin, preserving puzzle and cell identity, and computes the 16-by-16 cosine matrix between the parameter gradients from the 16 supervised cross-entropy losses. Here the smooth margin subtracts `logsumexp` of the eight incorrect logits from the correct logit, rather than subtracting only the largest incorrect logit. A gradient direction describes which small changes to the current state would most change the measured output; it does not describe the entire future trajectory.
+
+The tables use two different comparisons. Gradient cosine measures alignment with the iteration-16 margin gradient. Centered kernel alignment (CKA) compares the pairwise similarity structure of the nine averaged digit gradients. High CKA does not require those gradients to point in the same directions: rotating all nine together preserves that structure.
 
 The 100-puzzle reference comparison gave:
 
@@ -277,7 +279,7 @@ The 100-puzzle reference comparison gave:
 | failing original checkpoint, no state normalization | 82/100 | 91/100 | 8/100 | 0.298 | 0.970 |
 | reliable RMSNorm | 83/100 | 91/100 | 92/100 | 0.680 | 0.997 |
 
-The broad nine-digit causal subspace therefore remains nearly unchanged even when answers collapse. The puzzle-specific answer-margin direction is more informative: RMSNorm preserves it best, while the collapsed model rotates much farther away from its iteration-16 direction.
+The digit-gradient similarity structure remains similar even when answers become incorrect. The margin-gradient alignment distinguishes these checkpoints more clearly: RMSNorm retains the highest alignment with iteration 16, while the failing model has the lowest. The two columns measure different properties and should not be read as comparable amounts of rotation.
 
 A same-run comparison removes initialization as a confound. The clean-A run was healthy at step 30K and collapsed by 35K:
 
@@ -296,9 +298,9 @@ The comparison of models trained on later iterations points in the same directio
 | randomized states through 512, trial 2 | 76/100 | 92/100 | 96/100 | 0.356 | 0.996 | 142.9 |
 | randomized states through 1024, trial 0 | 79/100 | 93/100 | 97/100 | 0.470 | 0.995 | 205.4 |
 
-Extending sampled states to 1024 improves preservation of the puzzle-specific answer direction while leaving the broad digit subspace unchanged. Its hidden states are substantially larger, so lower magnitude is not the cause of the accuracy gain; delayed damping bounds that already-useful computation afterward.
+The run sampling through iteration 1024 has higher margin-gradient alignment, similar digit-gradient CKA, and larger hidden states. In this comparison, higher accuracy therefore does not coincide with smaller state magnitude. These two runs alone do not isolate the effect of extending the sampled iteration range.
 
-The iteration-loss gradient matrix did not show a corresponding reduction in conflict. For the clean-A transformer-block parameters, the mean early-versus-late cosine changed from 0.080 at 30K to 0.033 at 35K, while the fraction of negative off-diagonal pairs decreased from 0.200 to 0.142. In the two models trained on later iterations above, extending through 1024 changed the early-versus-late cosine from 0.051 to -0.058 and increased the negative-pair fraction from 0.117 to 0.350 despite improving long-horizon accuracy. Gradient conflict may still contribute to optimization noise, but these diagnostics do not support it as the immediate cause of collapse. The sharper description is that training changes a narrow, puzzle-specific causal direction while leaving the general digit-output geometry intact.
+The iteration-loss gradient matrix did not show a corresponding reduction in conflict. For the clean-A transformer-block parameters, the mean early-versus-late cosine changed from 0.080 at 30K to 0.033 at 35K, while the fraction of negative off-diagonal pairs decreased from 0.200 to 0.142. In the two models trained on later iterations above, extending through 1024 changed the early-versus-late cosine from 0.051 to -0.058 and increased the negative-pair fraction from 0.117 to 0.350 despite improving accuracy at larger iteration counts. Conflicting gradients may still affect training, but these measurements do not identify them as the immediate cause of the accuracy loss.
 
 ## Recovery and update-component diagnostics
 
@@ -332,7 +334,7 @@ The compact structure is shared most clearly in feature space, not as one whole-
 
 ### Held-out recurrent-state geometry study
 
-The [twelve-part geometry study](trajectory_viz/study/README.md) followed this diagnostic with 20 discovery, 20 validation, and 20 final puzzles per analysis, balanced across rating buckets. Each arm used frozen analysis choices, shuffled controls, random projections, and checkpoint transfer where applicable. It compared the stable plain, collapsed plain, standalone later-iteration training, and combined margin checkpoints.
+The [twelve-part geometry study](trajectory_viz/study/README.md) followed this diagnostic with 20 discovery, 20 validation, and 20 final puzzles per analysis, balanced across rating buckets. Each analysis used frozen choices, shuffled controls, random projections, and checkpoint transfer where applicable. It compared the stable plain, collapsed plain, standalone later-iteration training, and combined margin checkpoints.
 
 The state contains substantial current Sudoku information. Answer margin is decoded within each checkpoint with held-out R-squared values of 0.947-0.987. Current expected conflicts are decoded with R-squared values of 0.860-0.945, and candidate-set size remains readable after subtracting direct input-symbol effects. A board-level solve-progress coordinate also transfers to unseen puzzles, with mean within-puzzle Spearman correlation 0.811. Digit identity occupies a compact categorical subspace, but natural numeric and cyclic digit orders do not beat shuffled orders.
 

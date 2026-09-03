@@ -75,7 +75,7 @@ result: 1,441 / 25,000 solved = 5.764%
 B200 gpu_seconds: 375
 ```
 
-The eval job used one attempt slot, verified the checkpoint SHA sidecar, loaded the 422,786-row test split, and selected 25,000 puzzles with the same bucket sampling as `iters/eval_more_iters.py`. This result is far below the repo's released-checkpoint reference of `24,728 / 25,000 = 98.9%` at 1024 test-time iterations.
+The eval job used one attempt slot, verified the checkpoint SHA sidecar, loaded the 422,786-row test split, and selected 25,000 puzzles with the same bucket sampling as `iters/eval_more_iters.py`. This result was far below the then-released v1 checkpoint's reference of `24,728 / 25,000 = 98.9%` at 1024 test-time iterations.
 
 Follow-up diagnostic at 16 and 128 iterations:
 
@@ -111,15 +111,15 @@ sample: 500 puzzles per rating bucket, 2,500 total
 1024 iters: 139 / 2,500 solved = 5.56%
 ```
 
-The replacement path is `repo/train_canonical.py` plus `presign_canonical_train_r2.py`. That runner calls `iters.exp_baseline_lr2e3.train(output_dir=...)` directly and only handles Viridian/R2 concerns outside the training loop: slot claiming, optional checkpoint download for resume, background upload of the canonical log/checkpoints/final model, status, and duplicate-attempt skipping. This removes the custom training-loop fork as a variable. If canonical Viridian training still fails after that, the remaining suspect is a runtime/platform difference, e.g. the torch/CUDA/compiler stack.
+The replacement was `repo/train_canonical.py` plus `presign_canonical_train_r2.py`. That runner calls `iters.exp_baseline_lr2e3.train(output_dir=...)` directly and handles Viridian/R2 concerns outside the training loop: slot claiming, optional checkpoint download for resume, background upload of logs/checkpoints/final model, status, and duplicate-attempt skipping. This removed the custom training-loop fork as a variable.
 
 **Resolution (2026-07-02, with later follow-up):** the wrapper and platform hypotheses above did not explain the difference. A line-by-line comparison plus adversarial review found the recreated loop mathematically identical in distribution to the standard trainer, and the training data byte-identical (verified by digest). Fresh standard-code runs lost accuracy on Modal H200 with the original February image and retained high accuracy once on Viridian B200. Both platforms produced both outcomes. A later study of uninterrupted runs rejected interruptions as the explanation: four uninterrupted H200 runs finished at 5.4 / 92.3 / 31.2 / 1.2% at 1024 iterations, the same observed failure rate as interrupted-and-resumed runs. With the controlled settings held fixed, only 2 of 12 July runs retained high 1024-iteration accuracy, versus February's 4 of 4; that split remains unexplained. See [the reproduction study](../../iters/EXPERIMENTS_ITERS.md#reproducibility-july-2026).
 
 Saving intermediate checkpoints and fine-tuning a suitable one with evolution strategies improved several runs, but did not work regardless of the starting checkpoint. The [ES results](../../es/EXPERIMENTS_ES.md) document both successes and failures. `viridian/train/` replaced this test wrapper and packages the live repo files at submit time instead of maintaining a separate training-loop copy.
 
-## Eval Harness
+## Evaluation Runner
 
-The Viridian eval harness lives in `repo/eval_sudoku_extreme.py`, with presigned-R2 job generation in `presign_eval_r2.py`. It downloads the final checkpoint and SHA sidecar, verifies the SHA-256 before loading, runs the same bucketed test selection as `iters/eval_more_iters.py`, and writes compact `status.json`, `report.jsonl`, and `latest.json` objects under per-attempt R2 slots.
+The evaluation runner is `repo/eval_sudoku_extreme.py`, with presigned-R2 job generation in `presign_eval_r2.py`. It downloads the final checkpoint and SHA sidecar, verifies the SHA-256 before loading, runs the same bucketed test selection as `iters/eval_more_iters.py`, and writes compact `status.json`, `report.jsonl`, and `latest.json` objects under per-attempt R2 slots.
 
 ## Pilot Result
 
@@ -174,7 +174,9 @@ That points to Viridian losing contact with the GPU eval server and starting ano
 
 ## Duplicate-Writer Defense
 
-The wrapper now supports an `attempt-slots` artifact layout. The presigner uploads a private manifest with pre-signed URLs for several attempt slots. At startup, each eval tries to claim a slot by writing `attempts/slot-NNN/lease.json` with `If-None-Match: *`. R2 returns `200` for the first claimant and `412` for later claimants, so overlapping eval attempts land in different slots.
+This workaround was later retired after the platform bug was fixed; see the [Viridian overview](../README.md). The implementation is documented here to explain the historical artifacts.
+
+The wrapper added an `attempt-slots` artifact layout. The presigner uploads a private manifest with pre-signed URLs for several attempt slots. At startup, each eval tries to claim a slot by writing `attempts/slot-NNN/lease.json` with `If-None-Match: *`. R2 returns `200` for the first claimant and `412` for later claimants, so overlapping eval attempts land in different slots.
 
 Each slot has its own:
 
@@ -190,7 +192,7 @@ attempts/slot-NNN/checkpoints/checkpoint-00000.pt.sha256
 
 This removes cross-attempt overwrites. `latest.json` is only per-slot now. The source of truth is the set of step/ordinal checkpoint files under each claimed slot.
 
-Future specs also include a duplicate-attempt guard. A nonzero slot checks slot 0's status; if slot 0 is finished or has updated recently, the duplicate records `duplicate_attempt_skipped`, uploads its short report, prints `METRIC: 0`, and exits. If slot 0 is stale or failed, the duplicate can continue as a fallback.
+Later job specifications also included a duplicate-attempt guard. A nonzero slot checks slot 0's status; if slot 0 is finished or has updated recently, the duplicate records `duplicate_attempt_skipped`, uploads its short report, prints `METRIC: 0`, and exits. If slot 0 is stale or failed, the duplicate can continue as a fallback.
 
 The presigner can also build a resume spec from a known R2 checkpoint:
 

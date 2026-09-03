@@ -1,4 +1,4 @@
-# Arm 12 — adversarial audit
+# Study 12: Testing Whether The Apparent Shapes Survive Controls
 
 ## Hypothesis
 
@@ -35,7 +35,7 @@ The study uses the protocol minimum of 20 puzzles per split and one trained chec
 
 ## Verdict
 
-The skeptical conclusion is narrow: recurrent trajectories are strongly and consistently smooth in time. The evidence does not support a shared arc, loop, or helix. Attractive arcs survive shuffled time because the underlying dynamics are smooth, but they do not survive the combination of matched-rank projection controls, representation robustness, and checkpoint transfer. The loop claim is directly contradicted by the held-out temporal control.
+The trajectories are consistently smooth in time, but the controls do not support a shared arc, loop, or helix. Shuffling time can leave an arc-shaped point cloud intact even though its temporal order is gone. The apparent arcs fail the combined checks using matched-rank projections, different state representations, and transfer across checkpoints. The held-out temporal control also contradicts the loop claim.
 
 ## Artifacts
 

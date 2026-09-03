@@ -1,12 +1,12 @@
-# ARM 02: decision-margin geometry
+# Study 02: Correct-Answer Margin
 
 ## Hypothesis
 
-Recurrent hidden states contain an ordered coordinate for the correct-answer decision margin. Healthy deep-horizon motion should preserve or increase useful margin, while collapsed motion should carry vulnerable cells toward or through the output decision boundary.
+The correct-answer margin is the correct digit's score minus the highest incorrect digit's score. The hypothesis is that a hidden-state direction tracks this margin, and that models retaining correct answers preserve a positive margin as they continue iterating.
 
 ## Protocol
 
-The authoritative run is `margin_boundary_v1_20260811`. It sampled 60 test puzzles with seed 20260811 and split whole puzzles before fitting: 20 discovery, 20 validation, and 20 final puzzles, with four puzzles from each of the five rating buckets in every split. It used the four checkpoints required by the study protocol. Discovery fitted probes and projections. Validation selected the residual-PCA rank from 1, 2, 4, 8, and 16; rank 16 won. The primary analysis was fixed as the collapsed plain checkpoint observed at iteration 128, after requiring cells to remain correct through a 64-iteration guard, with loss of correctness at iteration 1024 as the outcome. The final split was then evaluated once.
+Run `margin_boundary_v1_20260811` sampled 60 test puzzles with seed 20260811 and split whole puzzles before fitting: 20 discovery, 20 validation, and 20 final puzzles, with four puzzles from each of the five rating buckets in every split. It used the four checkpoints required by the study protocol. Discovery fitted predictors and projections. Validation selected residual-PCA rank 16 from 1, 2, 4, 8, and 16. The primary analysis used the failing original checkpoint at iteration 128, with loss of cell correctness at iteration 1024 as the outcome. Only cells that remained correct over the predefined 64-iteration interval were eligible. The final split was then evaluated once.
 
 The cell-level comparison included the current correct-answer logit margin, an unconstrained margin-history classifier, an ordered margin-history classifier, full recent logit history, raw hidden state, and a PCA projection after removing the output head's eight digit-contrast directions. For that removal, center the nine output-weight rows and project the state perpendicular to their row space; this does not remove every representation of digit identity. The board-level analysis used the minimum margin, tenth-percentile margin, and weakest recent margin slope among eligible blank cells. All masks were defined from originally blank cells and the predeclared correctness guard rather than from the final outcome.
 
@@ -32,7 +32,7 @@ The final split contains only 20 puzzles, so puzzle-level uncertainty is substan
 
 ## Verdict
 
-**Partially supported.** A strong ordered margin coordinate exists within every checkpoint, and held-out deep trajectories separate healthy preservation from collapsed boundary crossing. The stronger claim does not survive: the coordinate does not transfer across checkpoints, ordered history is only marginally better than an unconstrained history probe, and the extra residual-hidden predictive signal is matched by random subspaces. The reliable result is checkpoint-local margin geometry and its deep temporal evolution, not a universal or uniquely low-dimensional margin axis.
+**Partially supported.** Hidden states predict the margin within each checkpoint, and margins fall below zero when cells become incorrect. The fitted direction does not transfer across checkpoints. Ordered margin history has no established advantage over an unrestricted history predictor, and random subspaces match the extra predictive value of residual PCA. The study does not identify a universal or uniquely low-dimensional margin direction.
 
 ## Artifacts
 

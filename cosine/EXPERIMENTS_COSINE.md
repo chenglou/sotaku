@@ -1,6 +1,6 @@
 # Cosine LR Experiments
 
-Experiments investigating cosine LR decay and related training recipe changes. All experiments use reverse curriculum, BS=4096, 70K steps unless noted otherwise. Baseline before cosine: 78.5% (warmup only).
+Historical experiments investigating cosine learning-rate (LR) decay and related training changes. All experiments use reverse curriculum, BS=4096, 70K steps unless noted otherwise. Baseline before cosine: 78.5% (warmup only). See the [README](../README.md) for the current recipe.
 
 ## Cosine LR Decay (SOTA at the time)
 
@@ -17,7 +17,7 @@ After 2K-step linear warmup, LR decays via cosine schedule to 1% of peak (final 
 | Rating 51+ | 80.0% | 74.0% | +6.0pp |
 | **Total** | **84.0%** | **78.5%** | **+5.5pp** |
 
-**Finding:** Single largest improvement found (+5.5pp). Late-stage LR decay enables fine-tuning without jumping over good solutions.
+**Finding:** Cosine LR decay gave the largest improvement in this study (+5.5pp).
 
 **Remaining gap with nano-trm:** 84.0% vs 87.4% (3.4pp gap, down from 8.9pp).
 
@@ -33,7 +33,7 @@ After 2K-step linear warmup, LR decays via cosine schedule to 1% of peak (final 
 | Mixed (no curriculum) | 83.8% | -0.2pp |
 | Regular (easy→hard) | 80.6% | -3.4pp |
 
-**Finding:** Mixed nearly matches reverse with cosine (-0.2pp, vs -2.6pp pre-cosine). Cosine's gradual LR decay provides implicit curriculum structure, reducing the importance of explicit ordering. Regular (easy→hard) still hurts — easy puzzles teach shortcuts.
+**Finding:** Mixed nearly matches reverse with cosine (-0.2pp, vs -2.6pp pre-cosine). Regular (easy-to-hard) still performs worse. These runs do not establish why the ordering matters.
 
 ---
 
@@ -47,7 +47,7 @@ Plain AdamW instead of SAM. **2x faster training** (one forward-backward per ste
 |--------|--------|----------|-------|
 | **Total** | **83.6%** | **84.0%** | **-0.4pp** |
 
-**Finding:** SAM only contributes 0.4pp with cosine (vs +6pp pre-cosine). Both cosine and SAM aim to find flat minima — with cosine doing that job, SAM becomes redundant. **Cosine without SAM is the recommended baseline** (83.6%, ~2h vs ~4h).
+**Finding:** SAM contributes 0.4pp with cosine (vs +6pp pre-cosine), at twice the training time. This study therefore used cosine without SAM as its baseline (83.6%, ~2h vs ~4h).
 
 ---
 
@@ -61,7 +61,7 @@ Tested several techniques from nano-trm on the cosine no-SAM baseline (83.6%):
 | GELU Activation | `exp_cosine_gelu.py` | GELU instead of ReLU | 83.2% | -0.4pp |
 | ReLU Squared | `exp_cosine_relu2.py` | ReLU² activation | 81.9% | -1.7pp |
 
-**Finding:** None of nano-trm's techniques transfer to our smaller model (800K vs 5M params). High WD is catastrophic (-13.5pp) — our model has less capacity to spare. Keep ReLU and WD=0.01.
+**Finding:** None of these changes improved the tested baseline. High weight decay caused the largest drop (-13.5pp). The results favored keeping ReLU and WD=0.01; they do not establish that model size explains the difference from nano-trm (800K vs 5M params).
 
 ---
 
@@ -71,11 +71,11 @@ Tested several techniques from nano-trm on the cosine no-SAM baseline (83.6%):
 
 | Config | Steps | Result | vs 70K | Notes |
 |--------|-------|--------|--------|-------|
-| Longer | 140K | 82.4% (at 95K, incomplete) | -1.2pp | Timed out; slower LR decay means still in "learning" mode at 95K |
-| **Shorter** | **50K** | **82.8%** | **-0.8pp** | **30% fewer steps, pareto-optimal for fast iteration** |
+| Longer | 140K | 82.4% (at 95K, incomplete) | -1.2pp | Timed out before the LR schedule finished |
+| **Shorter** | **50K** | **82.8%** | **-0.8pp** | **30% fewer steps, useful for faster experiments** |
 | Baseline | 70K | 83.6% | — | |
 
-**Finding:** LR curve shape matters more than total steps. 50K still reaches minimum LR for refinement. Longer training doesn't help — it just takes longer to reach the "refining" phase.
+**Finding:** The shorter run lost 0.8pp. The longer run was incomplete, and changing the planned duration also changed the LR schedule, so this is not a clean test of whether more training helps.
 
 ---
 
@@ -85,7 +85,7 @@ Tested several techniques from nano-trm on the cosine no-SAM baseline (83.6%):
 
 EMA (decay=0.999) on cosine no-SAM baseline: **0pp difference** (83.6% with or without EMA).
 
-**Finding:** EMA is redundant with cosine LR. Both aim for stable final weights. Pre-cosine EMA hurt (-1pp) because it averaged over noisy high-LR updates. With cosine, both EMA and live weights converge to the same stable point.
+**Finding:** Exponential moving averaging (EMA) of the weights did not improve accuracy in this run; before cosine it had hurt by 1pp. Equal accuracy does not imply that the averaged and final weights are identical.
 
 ---
 
@@ -97,7 +97,7 @@ BS=8192 with 25K steps (same total samples): **OOM on H200** (140GB). 16 iterati
 
 ---
 
-## 1M Parameters (Pareto)
+## 1M Parameters
 
 **File:** `exp_cosine_50k_1M.py`
 
@@ -109,4 +109,4 @@ d_model=144 (from 128), d_ff=576 (from 512), ~1M params total.
 | **50K/1M** | **1M** | **50K** | **83.2%** |
 | 50K/800K | 800K | 50K | 82.8% |
 
-**Finding:** 1M params with 50K steps matches 70K/800K baseline with 30% less training time. More capacity offsets fewer steps. Pareto-optimal for fast iteration.
+**Finding:** The larger model at 50K steps came within 0.4pp of the 70K/800K baseline, with about 30% less training time. It was a useful speed/accuracy tradeoff among these tested configurations.

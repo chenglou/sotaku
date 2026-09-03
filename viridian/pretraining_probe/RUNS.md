@@ -1,17 +1,19 @@
-# Viridian Pretraining Probe Runs
+# Viridian Training Infrastructure Runs
 
-## Current Summary
+This is the historical run record, not a live service-status report. Some workarounds below were subsequently retired; see the [Viridian overview](../README.md).
 
-Viridian runner mode works for small GPU jobs. Use `agents: 0`, `limits.max_gens: 1`, and `contract.eval_cmd`; the old `train.py` workaround and old required-looking compat fields are obsolete.
+## Recorded Results
 
-What is proven:
+Viridian runner mode worked for small GPU jobs using `agents: 0`, `limits.max_gens: 1`, and `contract.eval_cmd`, without the old `train.py` workaround or compatibility fields.
+
+Verified in these runs:
 
 - CPU and L4 runner jobs can execute a one-line `eval.py`.
 - The tier endpoint lists CPU, L4, A100, H100, and B200. The training-mechanics probes have tested L4, H100, and B200.
 - L4 and H100 can import PyTorch and see CUDA. H100 ran a tiny CUDA matmul; L4 ran the R2 checkpoint/resume PyTorch probe.
 - H100 can run a minutes-long PyTorch optimizer loop, write a local checkpoint and log, validate both, and finish with a metric.
 - B200 can run a tiny real-Sotaku training/resume probe with `torch.compile`, checkpoint upload, SHA-256 sidecars, checkpoint download, `torch.load`, resume, and report upload.
-- A six-minute B200 logging probe can update `status.json` and `report.jsonl` through R2 without log size blowup.
+- A six-minute B200 logging test updated `status.json` and `report.jsonl` through R2 without excessive log growth.
 - B200 can load the real Hugging Face `sapientinc/sudoku-extreme` train split, encode 2.7M training rows, compile the current Sotaku model, train into phase 3, and upload a resumable checkpoint with model state, optimizer state, config, and step.
 - A full B200 Sotaku training run can reach step 50,000 on Viridian by resuming from a verified R2 checkpoint.
 - The `attempt-slots` artifact layout prevents overlapping eval attempts from overwriting each other's reports, status, and checkpoints. A B200 smoke reproduced the duplicate eval behavior and kept the two attempts separated.
@@ -22,7 +24,7 @@ What is proven:
 - L4 jobs can use controlled R2 object storage for checkpoint upload, hash sidecars, checkpoint download, `torch.load`, resume, and report upload.
 - CPU jobs have no network, so storage upload/download probes must use a GPU tier.
 
-What is not proven yet:
+Not verified in these runs:
 
 - Useful eval stdout/stderr through `/v1/jobs/{id}/logs`; all tested runner jobs returned `entries: []`.
 

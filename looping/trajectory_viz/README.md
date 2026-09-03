@@ -17,7 +17,7 @@ The follow-up [twelve-part held-out study](study/README.md) tested which quantit
 - [`controls/stable_plain_local_normalized_states_3d.png`](controls/stable_plain_local_normalized_states_3d.png): normalization and projection controls
 - [`controls/REPORT.md`](controls/REPORT.md): why attractive arcs are not stable across projections
 - [`spatial/artifacts_downloaded/spatial/index.html`](spatial/artifacts_downloaded/spatial/index.html): interactive per-cell spatial gallery
-- [`spatial/artifacts_downloaded/spatial/aggregate_geometry.png`](spatial/artifacts_downloaded/spatial/aggregate_geometry.png): healthy versus collapsed update magnitude and spatial coherence
-- [`helix_tests/artifacts/stable_plain_cyclic_projection.png`](helix_tests/artifacts/stable_plain_cyclic_projection.png): a supervised cyclic digit projection; useful as a warning that the probe can manufacture a ring
+- [`spatial/artifacts_downloaded/spatial/aggregate_geometry.png`](spatial/artifacts_downloaded/spatial/aggregate_geometry.png): update magnitude and agreement between cell update directions in accurate versus failing checkpoints
+- [`helix_tests/artifacts/stable_plain_cyclic_projection.png`](helix_tests/artifacts/stable_plain_cyclic_projection.png): a projection fitted to place digits on a circle; the fitted circle alone does not establish the original geometry
 - [`helix_tests/artifacts/helix_results.json`](helix_tests/artifacts/helix_results.json): held-out cyclic, categorical, and shuffled-order measurements
 - [`study/README.md`](study/README.md): controlled study of uncertainty, margin, constraints, progress, digit symmetry, cell roles, difficulty, temporal modes, settling, early warning, and causal axes

@@ -6,8 +6,6 @@ Sotaku has strong, stable digit-category geometry, but these tests do not suppor
 
 The collapsed checkpoint is the only nominal exception: its raw combined-code permutation values are `p = .0303–.0481`, depending on label and output-head projection. Those values do not survive family-wise correction, the natural linear component is ordinary after conditioning on the cyclic component (`p = .252–.320`), and the pattern is absent from the healthy checkpoints. This agrees with the earlier finding of a localized natural-order deformation during collapse, not a geometry shared by successful recurrent solving.
 
-The strongest interpretation is therefore categorical rather than numerical. A low-dimensional probe can compress some of the nine digit regions into a chosen ramp and circle, but natural numerical order is not reliably distinguished from alternative label orders across checkpoints and does not survive family-wise correction.
-
 ## Operational definition
 
 The arithmetic “number helix” result motivates a representation with a linear number coordinate plus periodic Fourier coordinates. For Sudoku's nine symbols, the fixed one-turn analogue used here is
@@ -132,8 +130,6 @@ These results reinforce the preceding analyses from a different statistical dire
 - [Per-cell temporal geometry](../dynamics/REPORT.md) finds real smooth, low-dimensional dynamics and model-specific nonnumeric digit cycles, but no shared natural digit cycle in states before or after removing digit contrasts, output rows, or actual prediction changes.
 - [Visual geometry tests](../visual/REPORT.md) find high-rank digit centroids and no pooled natural cycle, with a localized collapse-specific update exception.
 - [Whole-board projection controls](../../controls/REPORT.md) find smooth rays and arcs whose visible shape changes with the projection, rather than a repeated helix.
-
-The present analysis adds difficulty-balanced whole-puzzle cross-validation, simultaneous linear and cyclic regressors, nested component tests, global label-permutation inference, confidence/margin sensitivities, exact position controls, and learned-parameter nulls. Every route leads to the same distinction: digit identity is real; natural digit order is not the organizing principle.
 
 ## Limits
 

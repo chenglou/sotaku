@@ -1,4 +1,4 @@
-# Arm 07: difficulty and solve latency
+# Study 07: Puzzle Difficulty And Solving Time
 
 ## Hypothesis
 
@@ -22,7 +22,7 @@ The collapsed checkpoint separated initial solving from reliable settling. Its i
 
 ## Verdict
 
-The supported result is that recurrent geometry contains a strong ordering of model solve progress in healthy checkpoints. The result transfers across the three healthy models and is not explained by puzzle clue count. The compact state-displacement direction at iteration 8 is sufficient for both late-state-trained checkpoints.
+Geometry tracks how many iterations the accurate models need to solve a puzzle more closely than it tracks dataset difficulty. Rank correlations are high in all three accurate checkpoints, but the shuffled-label results are not uniformly significant. The two models trained on later iterations use a four-component state-displacement predictor at iteration 8; both beat matched random projections. This is an association with solving time, not a demonstrated early-warning mechanism.
 
 The study does not support a general geometric representation of the dataset's difficulty rating. One checkpoint produced a held-out rating association, but the effect did not replicate across checkpoints or in the categorical control.
 

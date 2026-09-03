@@ -6,7 +6,7 @@
 
 ## Next Experiments
 
-- Replicate adding the second supervised window and consistency loss at step 39K on independent training runs. Use full 25K evaluation before recommending the addition over training on later iterations with inference damping.
+- Replicate adding the second supervised window and consistency loss at step 39K on independent training runs. Compare against the released later-iteration recipe using ordinary FP32 inference and full 25K evaluation.
 - Compare adding a second supervised window alone against adding both that window and KL consistency late in training. Existing preliminary experiments show that the second supervised window carries most of the benefit.
 - Test a deliberately contractive or monotone recurrent update. The existing checkpoint is not a DEQ and cannot be converted into one after training.
 - Run a muP width study before concluding that wider Sotaku models are intrinsically unstable.

@@ -1,6 +1,6 @@
 # Sudoku Transformer Experiments (Archived)
 
-> **Note:** This file is archived and preserved only as a historical, chronological trace of our experiments before we reorganized them into thematic folders (cosine/, iters/, arch/, recur/, curriculum/, rrn/, misc/, pos_embedding/, muon/). See the EXPERIMENTS_*.md files in each folder for the current documentation.
+> **Historical record:** These experiments predate the current model. Baselines, datasets, and evaluation sizes changed during this work; comparisons apply to the settings stated in each section. See the [README](README.md) for current recommendations and research links. Original results are retained below, with speculative explanations separated from observations.
 
 Early experiments use 100k training steps on easiest difficulty puzzles (100k train, 1k test).
 Later experiments (curriculum, recurrence) use full 2.7M training set across all difficulties (2.5k test).
@@ -34,7 +34,7 @@ Later experiments (curriculum, recurrence) use full 2.7M training set across all
 
 **Results:** 64.3% acc, 0 solved
 
-**Finding:** Iteration is critical. Single-pass cannot do constraint propagation ("if A=5, then B≠5"). Complete failure.
+**Finding:** The single-pass version solved no puzzles in this test. This does not establish that single-pass networks cannot solve Sudoku.
 
 ---
 
@@ -101,7 +101,7 @@ Moved to [pos_embedding/EXPERIMENTS_POS.md](pos_embedding/EXPERIMENTS_POS.md).
 
 **Results:** 84.2% acc, 162 solved
 
-**Finding:** Significantly worse than baseline. Depth per iteration matters more than phase specialization. 2 layers insufficient for constraint reasoning within each iteration.
+**Finding:** Significantly worse than baseline. This changed both weight sharing and total computation, so it does not isolate the effect of specialized early and late weights.
 
 ---
 
@@ -118,7 +118,7 @@ Moved to [pos_embedding/EXPERIMENTS_POS.md](pos_embedding/EXPERIMENTS_POS.md).
 
 **Results:** 72.7% acc, 0 solved
 
-**Finding:** Complete failure. 1-layer transformers cannot reason through constraints, even with specialized weights. Depth is essential.
+**Finding:** No puzzles solved. As above, the change reduced total computation as well as changing weight sharing.
 
 ---
 
@@ -135,12 +135,12 @@ Moved to [pos_embedding/EXPERIMENTS_POS.md](pos_embedding/EXPERIMENTS_POS.md).
 
 **Results:** 90.1% acc, 581 solved (peak ~566)
 
-**Finding:** Weight sharing HELPS, not hurts. Despite 16x more parameters:
+**Finding:** Weight sharing performed better in this comparison. Despite 16x more parameters, the unrolled model had:
 - Lower accuracy (90.1% vs 92.8%)
 - Fewer puzzles solved (581 vs 643)
 - Slower training throughout
 
-Weight sharing acts as regularization - forcing the model to learn ONE general iterative function is better than learning 16 specialized ones.
+Weight sharing may act as regularization, but this early comparison does not establish the mechanism. See the later [three-seed weight-sharing study](looping/weight_tying/RESULTS.md) for controlled comparisons on both hard and easier puzzles.
 
 ---
 
@@ -185,7 +185,7 @@ Also added bf16 mixed precision + TF32 for ~2.4x speedup.
 
 **Hypothesis:** Large batch training finds sharp minima that generalize poorly (the "generalization gap"). SAM explicitly seeks flat minima by optimizing for worst-case loss in a weight neighborhood. Can SAM close the gap for large batches?
 
-**Background:** The generalization gap is well-documented (Keskar et al., 2017). Large batches give precise gradients that navigate into sharp valleys. Small batches have noisy gradients that can't enter narrow valleys, naturally finding flat minima. SAM addresses this by computing gradients at perturbed weights (w + rho * g/||g||) and updating with those instead.
+**Background:** SAM computes gradients at perturbed weights (`w + rho * g/||g||`) and uses those gradients for the update. It is designed to reduce loss sensitivity to nearby weight perturbations. The experiments below measure accuracy, not whether a particular minimum explains the result.
 
 **Results:**
 
@@ -203,9 +203,7 @@ Also added bf16 mixed precision + TF32 for ~2.4x speedup.
 - SAM pushes past vanilla's ceiling entirely (959 vs 897 best vanilla)
 - Overhead is ~25% for BS=512 (6.3h vs 5h), acceptable for massive gains
 
-**Why it works:** SAM prevents the optimizer from settling into sharp minima by penalizing regions where small weight perturbations spike the loss. This gives large-batch training the generalization benefits of small-batch noise, without sacrificing throughput.
-
-**Update (post-cosine):** With cosine LR decay, SAM's benefit drops from +6pp to just **+0.4pp** (84.0% → 83.6%). Cosine decay provides similar flat-minima benefits, making SAM largely redundant. See "Experiment: Cosine LR Without SAM" for details.
+**Update (post-cosine):** With cosine LR decay, SAM's benefit drops from +6pp to **+0.4pp** (84.0% with SAM, 83.6% without). See the [cosine experiments](cosine/EXPERIMENTS_COSINE.md#cosine-lr-without-sam) for that speed/accuracy comparison.
 
 ---
 
@@ -279,19 +277,7 @@ Also added bf16 mixed precision + TF32 for ~2.4x speedup.
 - Hard-only is **much worse** on easy puzzles (0.x-2.x): -47 to -334 puzzles per bucket
 - The skills don't transfer bidirectionally
 
-**Why doesn't hard subsume easy?**
-
-Several theories:
-
-1. **Simplicity bias**: Neural nets naturally learn simple patterns first, then compose them for complex cases. Training only on hard puzzles may force the model to learn complex patterns that don't decompose well to simple cases.
-
-2. **Distribution shift**: Easy puzzles have many "naked singles" (cells with only one legal value). Hard puzzles require chain reasoning. The model trained on hard puzzles may over-rely on chain reasoning even when simpler deduction suffices.
-
-3. **Different skills, not a spectrum**: Easy and hard Sudoku may require qualitatively different reasoning strategies, not just "more" of the same skill. This mirrors the distinction between reasoning and non-reasoning language models - they may be fundamentally different capabilities.
-
-4. **Task interference**: Hard puzzle patterns may interfere with learning easy puzzle patterns, similar to how training a language model for complex reasoning can hurt its performance on simple factual recall.
-
-This result suggests that **difficulty levels are not strictly hierarchical** - expertise at hard puzzles doesn't automatically confer expertise at easy puzzles. Mixed training remains the best strategy.
+The comparison shows that training only on hard puzzles did not generalize as well to easy puzzles. It does not identify the reasoning strategies learned by either model. Mixed training performed better across the full tested range.
 
 ---
 
@@ -345,49 +331,7 @@ This result suggests that **difficulty levels are not strictly hierarchical** - 
 
 ## Key Insights
 
-1. **Iteration is essential** - Sudoku requires multi-step constraint propagation. Single-pass fails completely.
-
-2. **Depth per iteration matters** - 4 layers needed for effective reasoning. 2 layers marginal, 1 layer broken.
-
-3. **Weight sharing actively helps** - Not just "fine" - it's beneficial! Unrolled model with 16x params performed worse. Weight sharing acts as regularization, forcing a single general iterative function.
-
-4. **Simple concat input is fine** - Fancy projection schemes (project-then-add, project-then-concat) showed high variance and no reliable gains. Simpler is better.
-
-5. **Intermediate supervision helps** - Gradient signal to all iterations stabilizes training.
-
-6. **Positional encoding** - See [pos_embedding/EXPERIMENTS_POS.md](pos_embedding/EXPERIMENTS_POS.md) for full analysis. Key finding: 2D RoPE matches sudoku-specific row/col/box embeddings within noise (-0.3pp), so we use it as the baseline.
-
-8. **Training has high variance** - Results can vary significantly between runs. Always rerun to verify improvements.
-
-9. **Batch size 256 was sweet spot** - Before SAM, BS=256 achieved best vanilla results (897 peak). Larger BS=512 showed the generalization gap - more data but worse results.
-
-10. **SAM closes the generalization gap** - Sharpness-Aware Minimization lets large batches find flat minima. SAM + BS=512 achieves 959 peak (vs vanilla's 897 best), with 948 final (vs 833). The ~25% overhead is worth the massive gains.
-
-11. **Mixed difficulty training is essential** - Training only on easy puzzles fails catastrophically on hard ones (12.5% solve rate). Training on uniformly mixed difficulties achieves 77.5% on hardest while maintaining 96% on easiest. No curriculum learning needed.
-
-12. **Hard doesn't subsume easy** - Training only on hard puzzles (difficulty >= 3.0) improves hard puzzle performance (+25 puzzles on 5.x+) but **hurts** easy puzzle performance (-334 puzzles on 2.x). This suggests easy and hard Sudoku require qualitatively different reasoning skills, not just "more" of the same skill. This parallels the distinction between reasoning and non-reasoning language models - they may be fundamentally different capabilities that don't transfer bidirectionally.
-
-13. **Reverse curriculum beats traditional curriculum** - Starting with hard puzzles (hard→easy) outperforms both mixed training and traditional curriculum (easy→hard). Traditional curriculum actually hurts performance.
-
-14. **Hidden state recurrence is a major win** - Passing the full hidden state (128-dim) between iterations instead of just predictions (9-dim) gives +13.6% improvement (1994→2265). The hidden state acts as a "scratchpad" for working memory, allowing the model to accumulate reasoning across iterations. Simplest approach (just `+ h_prev`) beats complex gating mechanisms.
-
-15. **Keep explicit predictions with recurrence** - Even though h_prev theoretically contains all info needed to derive predictions, removing explicit preds from input hurts performance (-27 to -62 puzzles). The 9-dim prediction acts as a useful compressed summary alongside the 128-dim hidden state.
-
-16. **MLP-Mixer ≈ Transformer for Sudoku** - Swapping Transformer attention for MLP-Mixer yields nearly identical results (71.9% vs 71.4%). TRM's 87.4% advantage over our 71% is NOT due to architecture choice. Despite Sudoku having fixed constraint structure where attention's dynamic routing seems wasteful, the two architectures perform equivalently at our scale (~800K params). TRM's edge likely comes from model size (5M params), data augmentation, or training tricks.
-
-17. **Puzzle input is needed only once** - Removing the puzzle input x after the first iteration (TRM-style) costs only -0.7% (2248 vs 2265). The hidden state h_prev captures all necessary puzzle information after initial encoding. This simplifies the architecture and aligns with TRM's design.
-
-18. **Training stabilizes around 50-60K steps** - Analysis of training curves shows: rapid gains 0-20K (0%→82%), moderate gains 20K-50K (82%→87%), then plateau with variance 50K-100K (bounces 88-91%). The last 40K steps add noise without consistent improvement. For quick experiments, 50-70K steps is sufficient to evaluate an approach.
-
-19. **Training data domain matters more than quantity** - Training on 400K sudoku-extreme puzzles achieves 63.4% on sudoku-extreme test, vs 31.7% from 2.7M Kaggle puzzles (+32pp with 7x less data). However, the Kaggle-trained model still wins on Kaggle test (89.9% vs 81.3%). Models specialize to their training domain rather than learning universal sudoku solving.
-
-20. **Cosine LR decay is the key technique** - After ruling out architecture (MLP-Mixer ≈ Transformer), model size (5M params hurts), fixed random init (-1.0pp), and carry across batches (diverged), we found that **cosine LR decay** is the critical technique. With warmup (78.5%) + cosine decay to 1% of peak LR, we achieve **84.0%** (+5.5pp). EMA (decay=0.999) **didn't help** (-1.0pp vs warmup). The cosine schedule allows the model to refine learned features in late training rather than continuing to jump around. Remaining gap to nano-trm (87.4%) reduced from 8.9pp to 3.4pp.
-
-21. **Test-time iteration scaling works** - Running a 16-iter trained model at 32 test iters gives 88.4% (+5.9pp) for free. The shared-weight iterative architecture naturally generalizes beyond its training iteration count, up to ~2x. Beyond that, predictions oscillate and accuracy collapses (48 iters: 72.4%, 64 iters: 20.8%).
-
-22. **Adaptive stopping surpasses nano-trm** - Per-puzzle stopping based on model confidence yields **91.5%**, beating nano-trm's 87.4% with only 800K params (vs 5M). Peak confidence (pick iteration with highest mean max-softmax over empty cells) and oscillation detection (stop when predictions form a 2-cycle, 91.1%) are both domain-agnostic — no sudoku-specific knowledge needed.
-
-23. **Learned halt signals don't work** - Training a Q-head (Linear(d_model, 1) on mean-pooled hidden state) to predict "done" hurts accuracy across the board. The Q-loss (BCE, weight 0.5) competes with the main CE loss, degrading predictions. The Q-head learns to fire too eagerly (99.7%+ accuracy), halting hard puzzles prematurely. Confidence-based heuristic stopping (91.5%) beats the best Q-head config (82.1%) by 9.4pp with zero additional training.
+The experiment-specific findings are recorded beside their results rather than repeated here. Later summaries cover [positional encodings](pos_embedding/EXPERIMENTS_POS.md), [learning-rate schedules](cosine/EXPERIMENTS_COSINE.md), [iteration counts and stopping](iters/EXPERIMENTS_ITERS.md), and [weight sharing](looping/weight_tying/RESULTS.md).
 
 ---
 
@@ -430,22 +374,7 @@ Mixed training uses all difficulties from step 0.
 3. **Hard puzzles benefit most**: reverse achieves 62% vs curriculum's 45.4% (37% relative improvement)
 4. **No trade-off on easy**: Reverse scores highest on easy puzzles too (99.6%)
 
-**Why reverse works:**
-
-- **Hard-first forces robust features**: Model must learn actual constraint propagation, not shortcuts
-- **Easy puzzles don't teach reasoning**: Many can be solved with simple pattern matching
-- **Transfer is asymmetric**: Hard→easy skills transfer well; easy→hard skills don't
-- **Iterative architecture benefits**: The 16-iteration design needs multi-step reasoning that hard puzzles demand
-
-**Why traditional curriculum fails:**
-
-Traditional curriculum learning works well when easier tasks teach foundational skills that compose into harder skills. For Sudoku, this assumption breaks down:
-- Easy puzzles can be "solved" with pattern matching shortcuts
-- These shortcuts don't generalize to hard puzzles
-- The model must unlearn these shortcuts when hard puzzles arrive
-- By then, training is partially wasted on the wrong inductive biases
-
-**Conclusion:** For iterative reasoning tasks, consider **anti-curriculum (hard→easy)** over traditional curriculum learning.
+**Conclusion:** Hard-to-easy training performed best in these runs. We did not measure whether the models learned different reasoning strategies, so the results do not establish a general rule for iterative reasoning tasks.
 
 ---
 
@@ -557,21 +486,7 @@ This suggests the model lacks persistent memory to accumulate reasoning across i
 4. **Gated recurrence underperforms**: GRU-style gating may be too complex, learning to gate away useful information
 5. **All recurrence methods beat baseline**: Even the worst (gated, 2141) significantly outperforms baseline (1994)
 
-**Why recurrence helps:**
-
-The hidden state h (128-dim per cell) can encode richer information than predictions alone (9-dim per cell):
-- "This cell is entangled with cells 3 and 47"
-- "I tried value 5 here and it caused problems"
-- "I'm waiting on more info before committing"
-
-With recurrence, this working memory persists across iterations instead of being discarded. The model can accumulate reasoning rather than starting fresh each iteration.
-
-**Why simple addition beats complex methods:**
-
-- No extra parameters to learn = faster convergence
-- Transformer can learn to extract what it needs from the added signal
-- Acts like a residual connection across iterations
-- Complex gating may learn to suppress useful information
+**Interpretation:** Passing the 128-dimensional hidden state lets later iterations use information beyond the nine digit probabilities. These experiments did not identify what that information represents or why addition outperformed gating.
 
 ---
 
@@ -593,13 +508,7 @@ With recurrence, this working memory persists across iterations instead of being
 
 **Finding:** Removing preds **hurts** across the board, especially for the memory variant (-62 puzzles).
 
-**Why explicit preds helps despite being "redundant":**
-1. **Compressed summary**: 9-dim preds is a clean "what I currently think" signal vs 128-dim h which contains everything
-2. **Supervision signal path**: Loss flows through preds → model may learn to structure h around producing good preds
-3. **Easier to learn**: Extracting current prediction from h requires learning; having it explicit is free
-4. **Different roles**: h_prev = "how I got here", preds = "where I am now" - both useful
-
-**Conclusion:** Keep both preds and h_prev for best results.
+**Conclusion:** Keeping both preds and h_prev performed best here. The experiment does not establish why supplying the predictions explicitly helps.
 
 ---
 
@@ -613,7 +522,7 @@ With recurrence, this working memory persists across iterations instead of being
 
 **Results:** 2248/2500 (89.9%) vs baseline 2265/2500 (90.6%) = -17 puzzles (-0.7%)
 
-**Finding:** Removing x after initialization has essentially no cost. The model encodes all necessary puzzle information in the first iteration, and subsequent iterations can rely on h_prev alone. This is consistent with TRM's design and suggests the hidden state is a sufficient representation of the puzzle state.
+**Finding:** Encoding x only at initialization cost 0.7pp in this comparison. The hidden state retained enough puzzle information for similar accuracy, though this does not prove it preserved every relevant detail.
 
 ---
 
@@ -661,7 +570,7 @@ With recurrence, this working memory persists across iterations instead of being
 
 **Analysis:**
 
-Recurrence helps (+8.5pp overall), but we're still far from nano-trm. Later experiments (MLP-Mixer, Scale UP) ruled out architecture and model size as the gap. See Key Insight #20 for current understanding.
+Recurrence helped (+8.5pp overall), but a gap remained to nano-trm. Later architecture and size experiments below did not close that gap; the [cosine experiments](cosine/EXPERIMENTS_COSINE.md) found a larger improvement from the learning-rate schedule.
 
 ---
 
@@ -699,7 +608,7 @@ Recurrence helps (+8.5pp overall), but we're still far from nano-trm. Later expe
 
 1. **Domain match matters hugely**: +32pp on sudoku-extreme (31.7% → 63.4%) with 7x less data
 2. **Not universally better data**: -8.6pp on Kaggle (89.9% → 81.3%), models specialize to their domain
-3. **Still far from TRM**: 63.4% vs 87.4% despite training on same domain. Architecture gap remains.
+3. **Still far from TRM**: 63.4% vs 87.4% despite training on the same domain. The cause of the remaining gap was not isolated.
 4. **Hard puzzles benefit most**: Rating 51+ jumps from 6.6% to 62.8% (+56pp!)
 
 **Stabilization:** Similar to Kaggle experiments - rapid gains until 50K, plateau with variance 50-100K. 70K steps sufficient.
@@ -741,7 +650,7 @@ Recurrence helps (+8.5pp overall), but we're still far from nano-trm. Later expe
 
 1. **More data helps**: +8pp on sudoku-extreme (63.4% → 71.4%) by increasing from 400K to 2.7M
 2. **Cross-domain also improves**: +2pp on Kaggle (81.3% → 83.3%) despite never seeing Kaggle puzzles
-3. **Still far from nano-trm**: 71.4% vs 87.4% - later experiments ruled out architecture as the bottleneck
+3. **Still far from nano-trm**: 71.4% vs 87.4%; later architecture changes did not close the gap.
 4. **Hard puzzles benefit most**: Rating 51+ jumps from 57.5% to 71.3% (+14pp)
 
 **This is now the new baseline** for sudoku-extreme experiments: 2.7M data, 70K steps, no_x_after_init architecture
@@ -770,12 +679,7 @@ Recurrence helps (+8.5pp overall), but we're still far from nano-trm. Later expe
 
 Interesting pattern: MLP-Mixer is *worse* on hard puzzles (51+: 63.4% vs 71.3%) but *better* on easy (1-2: 86.6% vs 83.1%). The architectures trade off differently across difficulties but converge to the same overall accuracy.
 
-**Conclusion:** Swapping Transformer for MLP-Mixer does NOT explain TRM's advantage. The 16pp gap must come from:
-1. **Model size**: TRM 5M params vs our 870K (6x larger)
-2. **Data augmentation**: TRM uses 1000 digit relabelings per puzzle
-3. **Training tricks**: EMA, different supervision schedule (H_cycles/L_cycles)
-
-Architecture alone is not the bottleneck.
+**Conclusion:** This MLP-Mixer substitution did not close the gap to nano-trm. It does not rule out other architectural differences or interactions with the training recipe.
 
 ---
 
@@ -805,9 +709,7 @@ Architecture alone is not the bottleneck.
 
 **Finding:** Catastrophic failure. The small model can barely solve easy puzzles (32%) and essentially nothing harder.
 
-This confirms Key Insight #2: depth per iteration matters. With only 2 layers, the model cannot perform the multi-step constraint reasoning needed within each iteration. Combined with smaller d_model, the model lacks both the depth and capacity for Sudoku.
-
-**Minimum viable size** appears to be somewhere between 100K and 800K params.
+Both width and depth changed, so the result does not isolate which reduction caused the loss of accuracy or establish a minimum viable model size.
 
 ---
 
@@ -838,16 +740,7 @@ This confirms Key Insight #2: depth per iteration matters. With only 2 layers, t
 
 **Reference:** TRM (5M params): 87.4%
 
-**Finding:** Scaling up 6x to 5M params made results **WORSE** (-1.7pp). Despite matching TRM's parameter count, we don't match its performance. Key insights:
-
-1. **Model size is NOT the bottleneck** - More params doesn't help, may even hurt
-2. **Our architecture has trouble utilizing capacity** - The larger model trains more efficiently early (51% vs 12% at step 5K) but converges to worse results
-3. **TRM's advantage must be elsewhere**:
-   - Data augmentation (1000 digit relabelings per puzzle)
-   - Training methodology (H_cycles/L_cycles nested loops, EMA)
-   - Possibly better inductive biases in their specific MLP-Mixer design
-
-**The gap with TRM (69.7% vs 87.4%) is NOT due to model size** - both have ~5M params. Combined with the MLP-Mixer experiment (71.9% ≈ 71.4%), we've ruled out both architecture type and model size as the bottleneck. The remaining differences are in training methodology.
+**Finding:** This larger configuration performed worse (-1.7pp), despite learning faster early on (51% vs 12% at step 5K). It did not match nano-trm's 87.4%, but one unsuccessful scaling run does not rule out model size as a factor. The next experiment also changed the result by removing gradient accumulation.
 
 ---
 
@@ -855,7 +748,7 @@ This confirms Key Insight #2: depth per iteration matters. With only 2 layers, t
 
 **File:** `exp_scale_up_big_gpu.py`
 
-**Hypothesis:** The previous Scale UP used gradient accumulation (micro_batch=128 × 4). True large batches may behave differently due to BatchNorm statistics, gradient noise, etc. Rerun on H200 GPU with true BS=512.
+**Hypothesis:** The previous Scale UP used gradient accumulation (micro_batch=128 × 4). Rerun on H200 GPU with a single BS=512 batch per update to compare the implementations.
 
 **Setup:**
 - Same architecture as Scale UP: d_model=256, n_layers=8, n_heads=8, d_ff=1024 (~6.3M params)
@@ -873,7 +766,7 @@ This confirms Key Insight #2: depth per iteration matters. With only 2 layers, t
 | 51+ | 67.3% | 63.0% | 71.3% |
 | **Total** | **73.5%** | **69.7%** | **71.4%** |
 
-**Finding:** True batch size matters! +3.8pp over gradient accumulation version. Now beats baseline by +2.1pp.
+**Finding:** This run improved by 3.8pp over the gradient-accumulation version and beat baseline by 2.1pp. The comparison does not establish the source of the difference.
 
 ---
 
@@ -1010,13 +903,7 @@ Reverse: 0% → 3% → 36% → 63% → 68.5% → 70.5% (keeps improving). Regula
 
 **Finding:** TRM's architecture **hurts** performance significantly (-16pp vs baseline).
 
-The nested H_cycles/L_cycles structure with no-gradient outer loops appears to be harmful when combined with our training setup. Several possible explanations:
-
-1. **Data mismatch**: TRM trains on 1K puzzles × 1000 augmentations. The nested loop structure may be designed for that small-data regime, not 2.7M puzzles.
-2. **No-gradient warmup wasteful**: Running 2 full outer cycles without gradients may work when each "step" sees many augmented versions of the same puzzle, but wastes computation when each step sees fresh data.
-3. **MLP-T not inherently better**: Despite fixed Sudoku constraints favoring fixed mixing patterns, MLP-T doesn't outperform attention at this scale.
-
-**Conclusion:** nano-trm's architecture is NOT the source of their advantage. Subsequent experiments with their exact recipe (exp_trm_exact.py) also failed (~14% accuracy due to massive overfitting). The gap likely comes from subtle training details: non-learned hidden state init with std=1.0, carry persisting across batches, or no-grad warmup cycles. See nano-trm analysis in Key Insight #20.
+This comparison changed the architecture, learning rate, and weight decay together; it does not isolate the effect of running initial iterations without gradients. A follow-up intended to reproduce the nano-trm recipe (`exp_trm_exact.py`) also performed poorly (~14% accuracy). Neither result rules out benefits from individual parts of that recipe. Later [training on later iterations](looping/EXPERIMENTS_LOOPING.md) succeeded without adopting the full TRM architecture.
 
 ---
 
@@ -1160,15 +1047,10 @@ Still need to test: EMA, cosine LR decay, carry across batches, no-grad warmup c
 
 **Finding:** EMA **hurts** by 1.0pp (78.5% → 77.5%). The shadow weights averaged over training are worse than the final live weights.
 
-**Why it didn't help:**
-- Our training with SAM already finds flat minima, reducing the need for weight averaging
-- EMA may average in older, less refined weights that hurt final performance
-- nano-trm may benefit from EMA due to their different training dynamics (carry across batches, nested loops)
-
-**Conclusion:** EMA does NOT help our architecture. Crossed off the list.
+**Conclusion:** EMA did not help this configuration. The [later cosine retest](cosine/EXPERIMENTS_COSINE.md#ema-retest) found no accuracy difference with or without EMA.
 
 ---
 
 Continued in:
 - [cosine/EXPERIMENTS_COSINE.md](cosine/EXPERIMENTS_COSINE.md) — Cosine LR experiments
-- [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md) — Iteration scaling experiments (current SOTA: 98.9%)
+- [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md) — Iteration scaling experiments, including the historical 98.9% checkpoint
