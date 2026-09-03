@@ -42,4 +42,6 @@ The result collector encountered several connection deadlines while separate CLI
 
 A later local disconnect propagated as `grpclib.exceptions.StreamTerminatedError` rather than Modal's connection-error wrapper. The collector now retries both observed transport errors; the regression test covers both and still reports real worker exceptions separately. The error-bearing cache was preserved before resuming its seven completed results. The named worker's live log confirmed it was still advancing past 18K updates.
 
+At 21:20 PDT, 13 runs were complete, including all nine early-training runs. The remaining five late-training workers are active. All 18 workers' live configurations have been checked. The 13 downloaded results have identical frozen source hashes, exactly 20K updates, and matching puzzle/horizon digests within each available paired group. Validation curves have been rendered and visually checked. No worker has required a restart.
+
 No held-out evaluation has started. After every run finishes, verify results and matching sample digests, seal the cohort, then evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.
