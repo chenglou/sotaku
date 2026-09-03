@@ -56,4 +56,6 @@ modal run --detach looping/weight_tying/modal_run.py --action evaluate --archite
 
 Outputs are under `weight_tying_v1_20260902/` on `sudoku-outputs`. The training log records UTC timestamps and optimizer-only time separately from total training time. Every checkpoint saves optimizer, sampler and dropout RNG states, config, source hashes, and data identity. A mismatched retry is rejected instead of silently continuing another experiment.
 
+Compilation time covers the explicit warm-up. A new compiled input signature can still add compilation time to the first training batches, so use later validation-to-validation timing differences for steady-state throughput. Total elapsed work includes preparation, compilation, training, evaluation, and checkpoint time; optimizer time is already included in training time.
+
 Create a local destination before recursively downloading completed results with `modal volume get`. Final reports use `python -m looping.weight_tying.analyze LOCAL_STUDY_DIRECTORY --output NEW_REPORT_DIRECTORY`; `--partial` produces an explicitly incomplete progress report. The analysis verifies saved prediction checksums and independently recomputes scores. Failed runs remain in reliability denominators; paired score averages include only completed pairs and show how many pairs are missing.

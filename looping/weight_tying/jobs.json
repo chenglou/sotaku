@@ -1,0 +1,188 @@
+{
+  "study_id": "weight_tying_v1_20260902",
+  "protocol_sha256": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+  "data_manifest_sha256": "597746bd3ad294d69226b5a03f42c2bbe28bc36d37a90ffaeb03b75b319c86ce",
+  "snapshot_utc": "2026-09-03T01:51:32.370Z",
+  "jobs": [
+    {
+      "architecture": "tied",
+      "regime": "early",
+      "seed": 20260902,
+      "app_id": "ap-XQ8yebmRD9H9CDpqKcD73g",
+      "call_id": "fc-01M1JF39A33G0HEZGG9DCG4Z4Y",
+      "container_id": "ta-01M1JF39VW52AKHA9JKFJ269VR",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "tied",
+      "regime": "late",
+      "seed": 20260902,
+      "app_id": "ap-EZsmtI7RQDvuOFN3IGcHVd",
+      "call_id": "fc-01M1JF3ED40SQNWBF8YWZV9AC6",
+      "container_id": "ta-01M1JF3ES0ZSSA8W0KP28AYYGR",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_compute",
+      "regime": "early",
+      "seed": 20260902,
+      "app_id": "ap-PJuPjYZBYQcd7817NY5rex",
+      "call_id": "fc-01M1JF3KTVXEY29SP7MAX3JHDH",
+      "container_id": "ta-01M1JF3MJ7XS2A37NB87G7EJXR",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_compute",
+      "regime": "late",
+      "seed": 20260902,
+      "app_id": "ap-f4Kocpzflk1bbunmGwv7LC",
+      "call_id": "fc-01M1JF3RRTVF016RAZ4EW5QADE",
+      "container_id": "ta-01M1JF3S7VV16HHXNDMHN9TJQR",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_parameters",
+      "regime": "early",
+      "seed": 20260902,
+      "app_id": "ap-VkFQIJtJJ7KCksxwEX5p9p",
+      "call_id": "fc-01M1JF3YBE6JA4CY1CPDBHZ4TN",
+      "container_id": "ta-01M1JF3YY1EHBT23H115JH3B4R",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_parameters",
+      "regime": "late",
+      "seed": 20260902,
+      "app_id": "ap-rZpKxkujVsZUOitoIsXPSF",
+      "call_id": "fc-01M1JF42R4TG3NPT6S5GGH5BS7",
+      "container_id": "ta-01M1JF438GJBC4VPXNXN5SN5WR",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "tied",
+      "regime": "early",
+      "seed": 20260903,
+      "app_id": "ap-aUPZZ7sS3YDU64jqfd956x",
+      "call_id": "fc-01M1JF6MMB0PB5FENBMQTD8QKT",
+      "container_id": "ta-01M1JF6N6A0H2BGR1R7B7XDY7R",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "tied",
+      "regime": "late",
+      "seed": 20260903,
+      "app_id": "ap-BPp5lPN81FuKmRxTQZhxHi",
+      "call_id": "fc-01M1JF7D73GJVG3VYK841QNYA1",
+      "container_id": "ta-01M1JF7DRMFP81BWX5QW5E5FER",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_compute",
+      "regime": "early",
+      "seed": 20260903,
+      "app_id": "ap-n0wkKilN2w6lzwbMrOgRfb",
+      "call_id": "fc-01M1JF7H797TPX50S5GPD7CC77",
+      "container_id": "ta-01M1JF7HTJ4ZEYGKNBCENXTP4R",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_compute",
+      "regime": "late",
+      "seed": 20260903,
+      "app_id": "ap-GbjtXqq4kigZLlOqT8Qzuc",
+      "call_id": "fc-01M1JF7QGKGWAGK3BEX1Z0EMW0",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "untied_parameters",
+      "regime": "early",
+      "seed": 20260903,
+      "app_id": "ap-pEdRXAPBiqDnGjXm9E8TcV",
+      "call_id": "fc-01M1JF7VW3Q7Z956S694W1X0A9",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "untied_parameters",
+      "regime": "late",
+      "seed": 20260903,
+      "app_id": "ap-tSlIys5ZsctLLJkNwHkrZo",
+      "call_id": "fc-01M1JF80XK8ZG6NZ0P51BW5T4H",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "tied",
+      "regime": "early",
+      "seed": 20260904,
+      "app_id": "ap-gSO4TF885ALFir5rnqR2BE",
+      "call_id": "fc-01M1JF874XTBJ8T7QEPRT95HPC",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "tied",
+      "regime": "late",
+      "seed": 20260904,
+      "app_id": "ap-cLUdxjOsshqonPYRXgR6Eq",
+      "call_id": "fc-01M1JF8CDAFCY8XAJKPCD1Y714",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "untied_compute",
+      "regime": "early",
+      "seed": 20260904,
+      "app_id": "ap-sBbx9kWtN92xGCcbVqySrh",
+      "call_id": "fc-01M1JF8J25H4QEX19WESR3CEH0",
+      "container_id": "ta-01M1JF8JJD61NEKKDHGQEFP7FR",
+      "config_verified": true,
+      "status": "worker_allocated"
+    },
+    {
+      "architecture": "untied_compute",
+      "regime": "late",
+      "seed": 20260904,
+      "app_id": "ap-aGmXFMe0h0Abrn7JvQO47E",
+      "call_id": "fc-01M1JF8PJ65EHNBFJF84KCR1ZC",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "untied_parameters",
+      "regime": "early",
+      "seed": 20260904,
+      "app_id": "ap-OMT3gVdKx0rgIg0wPBSy13",
+      "call_id": "fc-01M1JF8WRF5MH4ZXCS2R0RTGVY",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    },
+    {
+      "architecture": "untied_parameters",
+      "regime": "late",
+      "seed": 20260904,
+      "app_id": "ap-UE8xeTldaoMiBQEmVEVYLj",
+      "call_id": "fc-01M1JF928P9J193VQR1R37HNN9",
+      "container_id": null,
+      "config_verified": false,
+      "status": "awaiting_worker"
+    }
+  ]
+}

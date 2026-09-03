@@ -8,8 +8,18 @@ Outputs: `sudoku-outputs/weight_tying_v1_20260902/`.
 
 | Job | Modal App | Status |
 |---|---|---|
-| Generate and screen fresh puzzles | `ap-VTOGKyY7Ju9uzzTgLcSKZT` | Running |
+| Generate and screen fresh puzzles | `ap-VTOGKyY7Ju9uzzTgLcSKZT` | Complete; manifest committed to the Volume |
 | Initial GPU preflight | `ap-DVASDpLJBCJW0HRmMOuzpD` | Stopped before training; corrected the test's expectation of encoder gradients on gradient-free batches |
-| Corrected full-batch GPU preflight | `ap-ZI82BAMLnEkyx1xTn7Rm68` | Running |
+| Corrected full-batch GPU preflight | `ap-ZI82BAMLnEkyx1xTn7Rm68` | Passed for all three architectures |
 
-No study training or held-out evaluation has started. Training requires successful data preparation and a preflight whose source hashes match the worker's code. The extra gradient test confirms that the input encoder has no gradient on late-state batches while all subsequently used weights do.
+Data preparation finished at 2026-09-03 01:08 UTC after 870 seconds. The frozen set contains 10,000 puzzles, 2,500 per generator difficulty. All generated puzzles have one solution. Screening covered 3,831,994 original training rows and 422,786 test rows; no duplicate candidate questions or solved grids were found under the documented checks. The held-out NPZ checksum is `c8f610dffc04150525eb579c5fd8f98b7baf6d6d6185ff6c1a23dac6653b1cde`.
+
+All 154 local tests pass, including exact interrupted/resumed training, weight-copy independence, gradient relationships, cohort locking, and independent score recomputation. The full-batch GPU preflight passed early training and 32/512-iteration gradient-free prefixes for all three architectures, with checkpoint reloads. Peak allocated memory was 50.1 GiB for tied, 47.4 GiB for compute-matched untied, and 12.3 GiB for parameter-matched untied. Compilation and checks took about 47 minutes total on one H200.
+
+The committed preflight result has SHA256 `29c171eba0650e1783cc3acbefd9f722e79df519e1daefed42b31d3f384a0bb9`. All source hashes were verified against local code before launching. The input encoder has no gradient on late-state batches while all subsequently used weights do.
+
+## Training
+
+All 18 preregistered 20K runs were submitted in separate detached invocations between 18:45 and 18:49 PDT on September 2. At the initial status check, Modal had allocated 10 workers; eight inputs were waiting for GPUs. App and function-call IDs are recorded in `jobs.json`. Do not launch replacements merely because a worker has not been allocated yet.
+
+No held-out evaluation has started. After every run finishes, verify results and matching sample digests, seal the cohort, then evaluate both final and best-validation checkpoints using the commands in `README.md`. Final-checkpoint performance remains primary.
