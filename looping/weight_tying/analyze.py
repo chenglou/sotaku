@@ -190,7 +190,7 @@ def summarize(root, output, *, partial=False):
 def render_markdown(report):
     horizons = protocol()["evaluation"]["iterations"]
     lines = ["# Weight-Tying Results", "", "Partial report; no final conclusions." if report["partial"] else "All preregistered runs are included.", "",
-             "## Training", "", "The validation floor and mean cover updates 12K-20K at iteration 16 for early training and 1024 for late-state training.", "",
+             "## Training", "", "The validation floor and mean cover updates 12K-20K. The measured inference count is 16 for models trained only on iterations 1-16, and 1024 for models also trained on later iterations.", "",
              "| Run | Status | Parameters | Training Hours | Total Recorded Hours | Validation Mean | Validation Floor |",
              "|---|---|---:|---:|---:|---:|---:|"]
     for name, summary in report["runs"].items():

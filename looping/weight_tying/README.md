@@ -2,6 +2,8 @@
 
 Preregistered on 2026-09-02, after the v2 release. This study tests whether sharing transformer weights changes what training discovers, separately from parameter storage and arithmetic cost. The released model and public defaults are unchanged.
 
+**Completed:** all 18 training runs and 36 full evaluations. [Results and plots](RESULTS.md) show a trade-off: shared weights solve more sudoku-extreme puzzles under this recipe, while independent same-width stages often retain correct predictions better on the new, easier set. [Operational status](STATUS.md) records verification and artifact locations.
+
 ## Comparisons
 
 Each model performs four transformer blocks per iteration and shares the input encoder, prediction-feedback projection, and output head. `tied` uses the same four blocks at every iteration. `untied_compute` has sixteen independent four-block stages at the same width. Its stages start as copies of the tied model, so the two models initially compute the same function. The copies can subsequently learn different weights. `untied_parameters` narrows the independent stages to width 32 and feedforward width 124, keeping the parameter count within 0.1% of `tied`.
@@ -17,6 +19,8 @@ An untied finite stack has no stage 17. Its primary early-training comparison en
 Training uses the pinned sudoku-extreme revision and its first 2.7M training rows. Models share independently seeded puzzle and horizon samplers; model size and dropout cannot change the sampled examples. The existing 25K benchmark supplies a fixed 1K validation sample. Validation is deliberately not called held-out testing.
 
 A new 10K-puzzle test set is generated with QQWing 1.3.4, 2,500 puzzles per generator difficulty. Each puzzle must have exactly one solution. Questions and completed grids are screened against the entire pinned sudoku-extreme train and test splits, including digit relabelings and the eight rotations/reflections. This does not establish non-equivalence under every Sudoku symmetry. QQWing uses its own random generation; the accepted dataset bytes, generator version, binary hash, raw output, and checksums are frozen. Reproducing the evaluation uses those bytes rather than assuming a seed reproduces QQWing's process.
+
+The exact accepted puzzles are included in [test_data/holdout.npz](test_data/holdout.npz), with [format and provenance notes](test_data/README.md). Scores on this set are now known; do not reuse it as untouched testing for further tuning.
 
 The new set is a different distribution from sudoku-extreme. Report its scores separately; it cannot replace or be pooled into the published benchmark. The generator and solver are used only for dataset construction, never to assist neural inference. No model sees the new test set until all 18 final checkpoints and validation-based selections have been fixed. Future tuning would require another untouched set.
 
@@ -59,6 +63,10 @@ Outputs are under `weight_tying_v1_20260902/` on `sudoku-outputs`. The training 
 Compilation time covers the explicit warm-up. A new compiled input signature can still add compilation time to the first training batches, so use later validation-to-validation timing differences for steady-state throughput. Total elapsed work includes preparation, compilation, training, evaluation, and checkpoint time; optimizer time is already included in training time.
 
 Create a local destination before recursively downloading completed results with `modal volume get`. Final reports use `python -m looping.weight_tying.analyze LOCAL_STUDY_DIRECTORY --output NEW_REPORT_DIRECTORY`; `--partial` produces an explicitly incomplete progress report. The analysis verifies saved prediction checksums and independently recomputes scores. Failed runs remain in reliability denominators; paired score averages include only completed pairs and show how many pairs are missing.
+
+For the completed study, download `cohort_lock.json`, `data/`, `runs/`, and `evaluations/` from the Volume root above. A recursive download into an existing directory includes the remote directory's basename: downloading `weight_tying_v1_20260902/evaluations/` into the local study root creates `LOCAL_STUDY_DIRECTORY/evaluations/`. The full evaluation archive is about 559 MB; training checkpoints are larger. Use a new local destination and verify hashes before analysis.
+
+`python -m looping.weight_tying.audit LOCAL_STUDY_DIRECTORY --output NEW_AUDIT.json` additionally checks runtime settings, matches Volume results against the collector's `received_evaluations.json`, replays training-time validation counts from the full predictions, and compares exports saved at the same training step. The completed audit found no differences in any of these replay checks.
 
 Render individual-seed training curves and final-checkpoint iteration profiles with `python -m looping.weight_tying.plot REPORT_DIRECTORY`. Plotting requires Matplotlib and does not evaluate a model. Synthetic rendering fixtures are explicitly labelled and never use the locked test puzzles.
 

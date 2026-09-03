@@ -11,7 +11,7 @@
       "selection": "final",
       "app_id": "ap-wzjSG5nO1tsKy3PlHbX7ph",
       "call_id": "fc-01M1JZ76M573EPM153V29EXASP",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -20,7 +20,7 @@
       "selection": "final",
       "app_id": "ap-NNPvFLppWwBJ2HpfGyGyGv",
       "call_id": "fc-01M1JZ9054Z4QQCNXNQM48BJSQ",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -29,7 +29,7 @@
       "selection": "final",
       "app_id": "ap-MyO7gYy7KWjmGHOUOzqt3v",
       "call_id": "fc-01M1JZ9JBYBX2SR3259VD8E49G",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -38,7 +38,7 @@
       "selection": "final",
       "app_id": "ap-vJonSc2kf7CYMArBviTxdG",
       "call_id": "fc-01M1JZA40Y5C9GBGN90C8GP0CJ",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -47,7 +47,7 @@
       "selection": "final",
       "app_id": "ap-XqGKB1BlLRQSftSPU9jm3T",
       "call_id": "fc-01M1JZAN7PKECG0198HKZM07YZ",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -56,7 +56,7 @@
       "selection": "final",
       "app_id": "ap-4nzXlL9Q3swB3BvIoOruxG",
       "call_id": "fc-01M1JZB750Q1S9VD49RCVVRRZS",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -65,7 +65,7 @@
       "selection": "final",
       "app_id": "ap-fS2IZd5cICB9pUXpkZZBgp",
       "call_id": "fc-01M1JZD3BJP5AS8V70TK3P3F4V",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -74,7 +74,7 @@
       "selection": "final",
       "app_id": "ap-TOZDmSfaWxqcoX81rkBZbq",
       "call_id": "fc-01M1JZE5RZX0TXHPM3Y6GPAREY",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -83,7 +83,7 @@
       "selection": "final",
       "app_id": "ap-G5BiLS6qWw90vY2YlZYNtQ",
       "call_id": "fc-01M1JZES3J35VJQEV6TV4HG6W1",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -92,7 +92,7 @@
       "selection": "final",
       "app_id": "ap-inNJ5eLqrKhBV496Q6in4d",
       "call_id": "fc-01M1JZFC6KZ3X61CY61SAGXS80",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -101,7 +101,7 @@
       "selection": "final",
       "app_id": "ap-wdhiTX5kyDtqMt9pdyiCiv",
       "call_id": "fc-01M1JZFYFP9S5915SPW45EHJZT",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -110,7 +110,7 @@
       "selection": "final",
       "app_id": "ap-im7PXg4SZ3sYxCWfDfEDtj",
       "call_id": "fc-01M1JZGG42R3VMPW3XT7S56VDZ",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -119,7 +119,7 @@
       "selection": "final",
       "app_id": "ap-DekkRz814wi2BRkLf3bWwM",
       "call_id": "fc-01M1JZH1HWA2MQFXYTW69MBBTR",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -128,7 +128,7 @@
       "selection": "final",
       "app_id": "ap-qZEErgJ886lHEvAddnGZgo",
       "call_id": "fc-01M1JZHJTQG82N9G0RJS5GFQ15",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -137,7 +137,7 @@
       "selection": "final",
       "app_id": "ap-WNGrlYqdJYSdDgSM3wGPur",
       "call_id": "fc-01M1JZJ4PEM2E9EB98Z2MM8TJ0",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -146,7 +146,7 @@
       "selection": "final",
       "app_id": "ap-4S8X1kfIEa0izaVyAwnnyn",
       "call_id": "fc-01M1JZJNPX04PCMJWNFCHX8N17",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -155,7 +155,7 @@
       "selection": "final",
       "app_id": "ap-FQRfsCR4hsP55yE7HAobQB",
       "call_id": "fc-01M1JZK6VVZ8AKYR3ZB49Z0Q3H",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -164,7 +164,7 @@
       "selection": "final",
       "app_id": "ap-45kVdhGv0fgEuFoHx7Uzmv",
       "call_id": "fc-01M1JZKTXS1EV0962PWSRZDTTD",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -173,7 +173,7 @@
       "selection": "best_validation",
       "app_id": "ap-QjnaYGhqoYVJfnvwQtwGDX",
       "call_id": "fc-01M1JZMY7DWAM10WQJ9ZH84HMQ",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -182,7 +182,7 @@
       "selection": "best_validation",
       "app_id": "ap-X1AIu42gyGsJhI6tdvfZgB",
       "call_id": "fc-01M1JZNFDEDB4NQ4MW49W57AC1",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -191,7 +191,7 @@
       "selection": "best_validation",
       "app_id": "ap-ZeLTPhjfYOACQG9xB7Kl4c",
       "call_id": "fc-01M1JZP0PMG17S8Q3XQMHHEWNP",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -200,7 +200,7 @@
       "selection": "best_validation",
       "app_id": "ap-bbULsvpbw3uYSSMmcBSZq4",
       "call_id": "fc-01M1JZPQCV4JND3VF146ZSN8EX",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -209,7 +209,7 @@
       "selection": "best_validation",
       "app_id": "ap-7ohairW6yh8Pkns5CyzdJy",
       "call_id": "fc-01M1JZQKWTTVQ6E3ETMR6ZS727",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -218,7 +218,7 @@
       "selection": "best_validation",
       "app_id": "ap-EjCvLogyop8qbPL1OgNeKp",
       "call_id": "fc-01M1JZR63P66Q249ATR7WBWG5F",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -227,7 +227,7 @@
       "selection": "best_validation",
       "app_id": "ap-wZupyL2uXZ8rILtCMLHPjO",
       "call_id": "fc-01M1JZRQDXVCPWQ0SKNSMMK6RW",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -236,7 +236,7 @@
       "selection": "best_validation",
       "app_id": "ap-B8ha8CWQC5ggYIYB8wtAib",
       "call_id": "fc-01M1JZS7TWTTP00J67W54MVRN2",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -245,7 +245,7 @@
       "selection": "best_validation",
       "app_id": "ap-Dd7yk2APLPUHmB7G1VmEeH",
       "call_id": "fc-01M1JZSR5N6YVX5R7ANVXT9SRC",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -254,7 +254,7 @@
       "selection": "best_validation",
       "app_id": "ap-NBynQ7zGQbMIugnJHsH41E",
       "call_id": "fc-01M1JZT969JTYN9SP64484YY59",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -263,7 +263,7 @@
       "selection": "best_validation",
       "app_id": "ap-TjWOfeSk0h0uXrL5HyQH3Q",
       "call_id": "fc-01M1JZTTPTB2CZ5SCEMM70QBQP",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -272,7 +272,7 @@
       "selection": "best_validation",
       "app_id": "ap-ewLTo1k8brYy9NgQml8EI8",
       "call_id": "fc-01M1JZVCD0TRA6C3VGZH48GDVJ",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -281,7 +281,7 @@
       "selection": "best_validation",
       "app_id": "ap-tBwZp8APzIUobqc7KFiBpF",
       "call_id": "fc-01M1JZVZ463P0DKHHK6MB9A7FH",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "tied",
@@ -290,7 +290,7 @@
       "selection": "best_validation",
       "app_id": "ap-4Oo1gIQfidTNhXgdOqVS5O",
       "call_id": "fc-01M1JZWGPA9FWX71BMHJDCYCNP",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -299,7 +299,7 @@
       "selection": "best_validation",
       "app_id": "ap-0Qa8Q2e9iXINJF924ChS4B",
       "call_id": "fc-01M1JZX43HE42RPAQEJVWKVXZ5",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_compute",
@@ -308,7 +308,7 @@
       "selection": "best_validation",
       "app_id": "ap-bMtWIcuQlfJoQY1iSHv6dJ",
       "call_id": "fc-01M1JZXNJVERYFFZ3V6E7AFB9N",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -317,7 +317,7 @@
       "selection": "best_validation",
       "app_id": "ap-SpNrvuyK6aU9bAc78xWbRD",
       "call_id": "fc-01M1JZY7VYG9H7R3CN31J7FC8E",
-      "status": "launched"
+      "status": "complete"
     },
     {
       "architecture": "untied_parameters",
@@ -326,7 +326,7 @@
       "selection": "best_validation",
       "app_id": "ap-kiJRo9eJY9dnjrTSDU0snN",
       "call_id": "fc-01M1JZYVQ54K6FE8VXXNW80YV6",
-      "status": "launched"
+      "status": "complete"
     }
   ]
 }

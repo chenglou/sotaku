@@ -1,0 +1,1338 @@
+{
+  "checks": [
+    "Frozen training results, configs, and source hashes",
+    "Dataset and prediction checksums; scores recomputed from all saved predictions",
+    "FP32 eager H200 environments with TF32 matmul disabled",
+    "Identical results from durable Volume files and returned function calls",
+    "Validation puzzle identity and selected-checkpoint subset replay"
+  ],
+  "cohort_lock_sha256": "1fdc572cdbc32ddbec6162bee0a83d7881d53a46d46e2f34be61c2b994c366f0",
+  "created_at": "2026-09-03T08:07:37.969544+00:00",
+  "evaluations": {
+    "tied_early_seed20260902/best_validation": {
+      "environment_sha256": "7026fb338a3c5bb7adee98a6a6a70e264b5938a3890f45029c77a8371222c474",
+      "prediction_sha256": {
+        "development": "a27aae6b5c6f8b6b488faf42189006b0314310942010772e938912e76d5aa656",
+        "holdout": "f63f04cb9250e2aeca0d07c852e6f7aa72ee63642ed86e4f9b60ad4b16812db9"
+      },
+      "result_sha256": "dd8811722572e6fa2034ada58de456a8d04254b0be9b0449a4fe0b86401d3149",
+      "selected_update": 18000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 5,
+          "training_probe_solved": 5
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 554,
+          "training_probe_solved": 554
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 786,
+          "training_probe_solved": 786
+        }
+      },
+      "weights_sha256": "0a797ba497a0c478e5c2406e474756621b515345a679ce3ac56c94fcec4ecaaf"
+    },
+    "tied_early_seed20260902/final": {
+      "environment_sha256": "e904a8b4351ced4ddc032a6bcc0950fc7226495b66a08a2eb79a19557a23f37e",
+      "prediction_sha256": {
+        "development": "c11dd29163c8e07af21a22efc097479adabb37061a31eb6ec61be047000e11ac",
+        "holdout": "5989b024e4cdd6aec018cff509e199b1a69a7aa9f65ff45a89503a5f590b8104"
+      },
+      "result_sha256": "da7f8a45ece37c999b55a7dd063b3cc49ac96f04256fce4f1a0ddaebda954f3e",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 1,
+          "training_probe_solved": 1
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 114,
+          "training_probe_solved": 114
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 780,
+          "training_probe_solved": 780
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 0,
+          "training_probe_solved": 0
+        }
+      },
+      "weights_sha256": "b3b66845db611c552935cc5edc197b0e8c4435ac05650531b21345f02429b762"
+    },
+    "tied_early_seed20260903/best_validation": {
+      "environment_sha256": "1ae039d90cd316b5d4cc69f0750c64c30fb5a7630eea13812559a0c915cd5e46",
+      "prediction_sha256": {
+        "development": "9147d3bc67264d09c87cdf137a58802443bf267da82b466980e22ad75917fb49",
+        "holdout": "22fff89946b0074a5cd8153b826b9acd427931dde23f9c9b067e0aae36853027"
+      },
+      "result_sha256": "b29697225e3a81711153d01ca0b2fbad15cee5884ed1e696c0953c625b13c9b7",
+      "selected_update": 19000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 302,
+          "training_probe_solved": 302
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 922,
+          "training_probe_solved": 922
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 779,
+          "training_probe_solved": 779
+        }
+      },
+      "weights_sha256": "8f0d726b0003e111461e8a2caad2ae5c25e9925d0aed28c3ca56e5f25b648882"
+    },
+    "tied_early_seed20260903/final": {
+      "environment_sha256": "a24e46c386225dc9b0cf146eca61f8bab33cbb38074ac79290b62340c2c64da6",
+      "prediction_sha256": {
+        "development": "affe1ac1b69a86582096f8f219120d0f2ad54662744a8f80b67aeb6e0492edcf",
+        "holdout": "1760bcd9f69ad985a0bb1b7cd6bab356cb3356876b30a761fd0952c2f3e8bad1"
+      },
+      "result_sha256": "b52ad0c71a7c6580fda6931cdb5c3d5106a4b0a92a1edc2f4446d0759da9a674",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 110,
+          "training_probe_solved": 110
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 934,
+          "training_probe_solved": 934
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 778,
+          "training_probe_solved": 778
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 25,
+          "training_probe_solved": 25
+        }
+      },
+      "weights_sha256": "9c2ddb8be14a47e0a82ac78161441f3c7a6745a1aa7900d0605b16d568900f86"
+    },
+    "tied_early_seed20260904/best_validation": {
+      "environment_sha256": "744a7fbe04f05cf4f3c0e8c34b6756490f8387566c0d822cf6e07b791df0e858",
+      "prediction_sha256": {
+        "development": "465d9c702c9f3b2961c6461f3ea431312166461adab040719b09bf0c8b4d3439",
+        "holdout": "f9c822cd688f08675f279163a2a9d2e0b4372ef77888a4f9b661f56ba81c570d"
+      },
+      "result_sha256": "b09bdb23d1160f6b912486638bcda99870ed22a30ed7a8de6a06e60cfab3ffc1",
+      "selected_update": 19000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 970,
+          "training_probe_solved": 970
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 930,
+          "training_probe_solved": 930
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 788,
+          "training_probe_solved": 788
+        }
+      },
+      "weights_sha256": "bdf7d1ff264a0925d6d09a3ea3f139a0d33e52185352f81291b74b60ef4f1655"
+    },
+    "tied_early_seed20260904/final": {
+      "environment_sha256": "3ade1d3bfdf0901ef6cd509afa601e3b24d6bc1a81a3c91b5fe4bcf2bfc155d3",
+      "prediction_sha256": {
+        "development": "3aaa5ed664ff2deda145b4c6a66eef5dfaa3d81ebffceda46b59e3dd09978199",
+        "holdout": "d3fca8f990dcb6d0ea1035b76f503b29dd993d15d01dd14eddabf2dad4ff119f"
+      },
+      "result_sha256": "9e36d1b6d2f3ec3d8f7b16c3ac2412d156469ea0106069068adafb3c9cb8e4ae",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 963,
+          "training_probe_solved": 963
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 933,
+          "training_probe_solved": 933
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 788,
+          "training_probe_solved": 788
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 974,
+          "training_probe_solved": 974
+        }
+      },
+      "weights_sha256": "a4dea947fae485514e8285598d932ff3f7a2d898b964a59e190f4b37eb793316"
+    },
+    "tied_late_seed20260902/best_validation": {
+      "environment_sha256": "87ca82a2b07563582d340629c89bfbda45c27d8f3f8e8c8ac7d84c6f5b53b39e",
+      "prediction_sha256": {
+        "development": "8646aba461719f2e48f7748d8bba154164e489223e7de78d4ce64d94bbd0410a",
+        "holdout": "208c59992bb2f7055efa70447588f98fe3f26ac222abbc2ef2e56e577392f8f4"
+      },
+      "result_sha256": "b7d1fd9a4f847b9635634d8eb6b59e5456064bc440b7584208b0885a540f5a19",
+      "selected_update": 17000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 962,
+          "training_probe_solved": 962
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 930,
+          "training_probe_solved": 930
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 753,
+          "training_probe_solved": 753
+        }
+      },
+      "weights_sha256": "83b36594497d036cff552fe1fc74ac45389aea5e679c16974e27a63aec3d7b24"
+    },
+    "tied_late_seed20260902/final": {
+      "environment_sha256": "8ab6e806069e7df1934fa4cf3c212a012277013d6ce36b2a069ec528faf1d42d",
+      "prediction_sha256": {
+        "development": "313ab464026398cb5edca913866655e50e28ef2a7ced3ac1cd0633211762e500",
+        "holdout": "641040ccadda56da9e35c5d8b61c7209c179e63a8c0786e71e105a3e3a0d2b2e"
+      },
+      "result_sha256": "b409b6d66a298c2c857e25437bde10ce54c38f3c671ea6d7dc69e4ace4ad1e9b",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 953,
+          "training_probe_solved": 953
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 938,
+          "training_probe_solved": 938
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 765,
+          "training_probe_solved": 765
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 783,
+          "training_probe_solved": 783
+        }
+      },
+      "weights_sha256": "ce79d320c07631588bc62563d5377b55d9c9e72b54d49d2a4bc28b92bb2a7984"
+    },
+    "tied_late_seed20260903/best_validation": {
+      "environment_sha256": "0ca2074b10bd880b4d78e249f752b5697b8b44d43c880ba073c7c1c1c2e9a136",
+      "prediction_sha256": {
+        "development": "a8d41f2d8ec46f600d7bd57b9fdb9428a2fd2e1d68c0a1d287ff2e51739300a5",
+        "holdout": "7891ff475fe31d05e38ec42c34522e7fe808e34ec698548573f44a8b0c9604ff"
+      },
+      "result_sha256": "9145d872bd680aff1d60ec497e894a8e65b1309a29c20a1315b1b096d32b5e5b",
+      "selected_update": 18000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 942,
+          "training_probe_solved": 942
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 945,
+          "training_probe_solved": 945
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 780,
+          "training_probe_solved": 780
+        }
+      },
+      "weights_sha256": "7a965f4f13b882e7fd61abec22e1d86aa1ee2ad7120d71879ce5a1910e55f148"
+    },
+    "tied_late_seed20260903/final": {
+      "environment_sha256": "cf29598232912f4a8d7b3e0f880059df8865b4607ed709c4df05b9cebfffbb80",
+      "prediction_sha256": {
+        "development": "1edeb50c1c2050d71d330dd6d2f795c190b00642b7a42b5a49dfd974c2105b8e",
+        "holdout": "3a6d5a0f24dd2c08a295110857402f644a7a106bc87bd74f23c9de27ea57c0b9"
+      },
+      "result_sha256": "4946882ff71799fc6455491617036b57aba21c53f2e659c660a70fef9ae9f34a",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 920,
+          "training_probe_solved": 920
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 931,
+          "training_probe_solved": 931
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 785,
+          "training_probe_solved": 785
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 897,
+          "training_probe_solved": 897
+        }
+      },
+      "weights_sha256": "3df1c834d44dfc3d9d5a981c45f80618b1942dc23b559b721da99237abd0e036"
+    },
+    "tied_late_seed20260904/best_validation": {
+      "environment_sha256": "bb96a2b662e95c98183fc1997b53526f044fdf6c2707f68730c17afd9d439c26",
+      "prediction_sha256": {
+        "development": "99c2b0bbd7ef542c9f48b8ea74c68f66c12b9f2bc046f0ed0f934a63c3bcab84",
+        "holdout": "aab6217a11321ff4fe9d35df5ff949cb58466ff7d9bf6cdef3fef29efafd221e"
+      },
+      "result_sha256": "154f05c98bc8b6e1ee3007347557a26bb64fe06861a0bd85a1a2459dc7f6b9c3",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 936,
+          "training_probe_solved": 936
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 927,
+          "training_probe_solved": 927
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 774,
+          "training_probe_solved": 774
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 911,
+          "training_probe_solved": 911
+        }
+      },
+      "weights_sha256": "cb6ba82d90caa4eec3fed58ef3b16903de0224037b1e3ff3e17866ea2d031fd7"
+    },
+    "tied_late_seed20260904/final": {
+      "environment_sha256": "e7e01dff36e29ecda82068a01795d963c747f38be17ae9b2f8d84c61d87a4f0f",
+      "prediction_sha256": {
+        "development": "99c2b0bbd7ef542c9f48b8ea74c68f66c12b9f2bc046f0ed0f934a63c3bcab84",
+        "holdout": "aab6217a11321ff4fe9d35df5ff949cb58466ff7d9bf6cdef3fef29efafd221e"
+      },
+      "result_sha256": "1c2efe4e287269edc6c686ff7a0fee6fb55912c4bca465f5f8e22a3705d398da",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 936,
+          "training_probe_solved": 936
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 927,
+          "training_probe_solved": 927
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 774,
+          "training_probe_solved": 774
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 911,
+          "training_probe_solved": 911
+        }
+      },
+      "weights_sha256": "5ded3360b7aecae912457d4ad61057bf1564e3789eb8eaf75fb1b80d17d8f33d"
+    },
+    "untied_compute_early_seed20260902/best_validation": {
+      "environment_sha256": "eca66ca9b3fc1e798c79af55b56dd4918a4269d8d455b36d70221cd6006e9b23",
+      "prediction_sha256": {
+        "development": "1f2d3758e05d27485ec9b33f70587ae6ac42230013473fe87ae7bd8f49b98557",
+        "holdout": "522f68858918644c9db9dc56798829d8e7a5d93427ad9a64e6cb912ec7dcb14b"
+      },
+      "result_sha256": "047591639cd0e560d56a444a353a655cd8d63b1c378377ebc4b5b8637f9d6870",
+      "selected_update": 19000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 801,
+          "training_probe_solved": 801
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 799,
+          "training_probe_solved": 799
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 751,
+          "training_probe_solved": 751
+        }
+      },
+      "weights_sha256": "867055086cf596865f40fd866f75fde70556b550e7068ae581c01b76fbacbbf3"
+    },
+    "untied_compute_early_seed20260902/final": {
+      "environment_sha256": "6e1a2630aeeb67b40bf9e407b61aa5ab5b5b8f1b1a8f0d3827c335ce0303f731",
+      "prediction_sha256": {
+        "development": "9b2eef39394f169c12817ac12087bd1a3f8e997ce580eb2e35ce879c910571cc",
+        "holdout": "cfbfac3fae37a263767b7f1a6f768230cc6e17afa80a2ef055839a3e9c15ff2b"
+      },
+      "result_sha256": "ebd6e507693008aa9bde0f330f7ad924877a9cc6e396c39d4da24bc0657f1787",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 797,
+          "training_probe_solved": 797
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 797,
+          "training_probe_solved": 797
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 745,
+          "training_probe_solved": 745
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 797,
+          "training_probe_solved": 797
+        }
+      },
+      "weights_sha256": "cc152261a06220bd181d5cc00e241174530849c5b8b0b0db94f2b60c87e212ba"
+    },
+    "untied_compute_early_seed20260903/best_validation": {
+      "environment_sha256": "887574fd8edb84752032e5764b0758af7ab6ef3bf0db3f9662dcf4601c67b51a",
+      "prediction_sha256": {
+        "development": "5ef3e225aa8b997cd4fa0ec79cc0d77d4f7b392401aff18a67cfaf69594866fe",
+        "holdout": "29a8f81a1a9eaac3a2efd76fba6e4cda689fd000c9b4cae50d53b61bca0bb28a"
+      },
+      "result_sha256": "e128fe19a482eb27c5f907fd8b5b15d237622b45a8fba77048fa8bfd870c1179",
+      "selected_update": 19000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 753,
+          "training_probe_solved": 753
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 789,
+          "training_probe_solved": 789
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 743,
+          "training_probe_solved": 743
+        }
+      },
+      "weights_sha256": "56be940505ec5e7e798aaa5c459f063e12572e2dc79d6a583eb71c55e720c3b9"
+    },
+    "untied_compute_early_seed20260903/final": {
+      "environment_sha256": "0db18c0c3aee2845df70e511fc1b7805f9e285b3cc9af9769f8dda7f2ed08522",
+      "prediction_sha256": {
+        "development": "080f14a2f20080a119df5376c53d6aac469ba247b7f33b750e3a8a3410f5e85d",
+        "holdout": "055331ae0fc724a6a1d6d62b07d58d77d3d8ec019cce573d6acf79cd14cb9a00"
+      },
+      "result_sha256": "15079c12737457ccfb63eba0a4f9f9334e46c9cbf4c311c07f74bf85ededda92",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 742,
+          "training_probe_solved": 742
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 784,
+          "training_probe_solved": 784
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 740,
+          "training_probe_solved": 740
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 711,
+          "training_probe_solved": 711
+        }
+      },
+      "weights_sha256": "e959fb0cd9e8a0fbc2faa01b6fe35ad35baf50343350b5dce0acac3bccf5d72a"
+    },
+    "untied_compute_early_seed20260904/best_validation": {
+      "environment_sha256": "de101f078f35ce4df4b75ea397b20c3d1e1ccac9c7dd54c88fc7ca180cad5ea2",
+      "prediction_sha256": {
+        "development": "4ea6b9d9186716e603c9220fd2e5c06b42f42322b31f1f9648e0f3c4b864b106",
+        "holdout": "032bba3a0508b37f7913ea675fd978ebd9175944fd4b16d0d1a4ae875b6fcf69"
+      },
+      "result_sha256": "828d2ec680a818f142b3617e6f603f4cb9f96245993c3416815f4fbdd1563f8d",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 38,
+          "training_probe_solved": 38
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 789,
+          "training_probe_solved": 789
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 727,
+          "training_probe_solved": 727
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 0,
+          "training_probe_solved": 0
+        }
+      },
+      "weights_sha256": "c554d416635db365be1eda505e6881dcba442fab43fb4f9e7cf8a7d9eb2fa520"
+    },
+    "untied_compute_early_seed20260904/final": {
+      "environment_sha256": "adf791c4b8cc2a79c27d93d7a3ddd50590f681f6cae0d77b84c026881d8347e9",
+      "prediction_sha256": {
+        "development": "4ea6b9d9186716e603c9220fd2e5c06b42f42322b31f1f9648e0f3c4b864b106",
+        "holdout": "032bba3a0508b37f7913ea675fd978ebd9175944fd4b16d0d1a4ae875b6fcf69"
+      },
+      "result_sha256": "55409d40398c9bddfc773ebd50433665a39643bfb1da3f408e1a091349fd23bb",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 38,
+          "training_probe_solved": 38
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 789,
+          "training_probe_solved": 789
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 727,
+          "training_probe_solved": 727
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 0,
+          "training_probe_solved": 0
+        }
+      },
+      "weights_sha256": "6ee2df4b627d1aa64a41172b29cae4732edefbdbe1fdd9c9d4cc2d5ddb8bd98d"
+    },
+    "untied_compute_late_seed20260902/best_validation": {
+      "environment_sha256": "e8818486b1a0ca34e4dbe3a675d43435ac8fbaf19f8d0d53284151f29c282a65",
+      "prediction_sha256": {
+        "development": "b08a0d82b0f81e94d3fd449f5933baca1eddcc7fd9a19137d430a097c0389999",
+        "holdout": "cc7fde23a7ae394fabbccd329e1e063bafc438bf31a8b998c8af6d4cc4ecd146"
+      },
+      "result_sha256": "ae955238962997810531abed8298837d4d4292e15388acbd6743ada550abfe6e",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 854,
+          "training_probe_solved": 854
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 827,
+          "training_probe_solved": 827
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 688,
+          "training_probe_solved": 688
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 854,
+          "training_probe_solved": 854
+        }
+      },
+      "weights_sha256": "45e44f12ff69347054f0604903d89cc95259019aacae846404f1c6cb7f955030"
+    },
+    "untied_compute_late_seed20260902/final": {
+      "environment_sha256": "68b920cb62b064f9c3e49d7ce9ad0214c51e9d29cb00e350522940014e066a5e",
+      "prediction_sha256": {
+        "development": "b08a0d82b0f81e94d3fd449f5933baca1eddcc7fd9a19137d430a097c0389999",
+        "holdout": "cc7fde23a7ae394fabbccd329e1e063bafc438bf31a8b998c8af6d4cc4ecd146"
+      },
+      "result_sha256": "d04abd55dbd351c8af62cc1ffd750bcac8b9bd38f663b238fa2d4b71788207c1",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 854,
+          "training_probe_solved": 854
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 827,
+          "training_probe_solved": 827
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 688,
+          "training_probe_solved": 688
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 854,
+          "training_probe_solved": 854
+        }
+      },
+      "weights_sha256": "8d4bc5718975f08e0f04594b41d575bc60c2089fcec1f895642e5c26790de7d9"
+    },
+    "untied_compute_late_seed20260903/best_validation": {
+      "environment_sha256": "6fbe047580f2a65bb7897741eaae8e120efef6b4ad3f7cc63019828989630dde",
+      "prediction_sha256": {
+        "development": "e4cd12cfb0538c2065077afebe5546701d95cc37047a94dc9292d5cf71a3952f",
+        "holdout": "e2f4ec58989c9658593c09a79ea417e6f00b385b192e48086d85732bfb2bd36c"
+      },
+      "result_sha256": "47cbc8cf3c358bc7afa92edebd7f4e896b975e4af94b393b8e5927c0604869ed",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 826,
+          "training_probe_solved": 826
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 815,
+          "training_probe_solved": 815
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 679,
+          "training_probe_solved": 679
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 763,
+          "training_probe_solved": 763
+        }
+      },
+      "weights_sha256": "0cf4b6a0de1ae8966cf99f723f46dd448f28d9e35e90821c11759007fca1778e"
+    },
+    "untied_compute_late_seed20260903/final": {
+      "environment_sha256": "e906de7ccad312a9ec8a61e982021ce756deb5908b2907d2cca38dc719038432",
+      "prediction_sha256": {
+        "development": "e4cd12cfb0538c2065077afebe5546701d95cc37047a94dc9292d5cf71a3952f",
+        "holdout": "e2f4ec58989c9658593c09a79ea417e6f00b385b192e48086d85732bfb2bd36c"
+      },
+      "result_sha256": "7446d7c8358f0c8eaa461b89855d145c7ddc2aac59b8fa435cddd302591a8edc",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 826,
+          "training_probe_solved": 826
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 815,
+          "training_probe_solved": 815
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 679,
+          "training_probe_solved": 679
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 763,
+          "training_probe_solved": 763
+        }
+      },
+      "weights_sha256": "31276256a5daa23b5f06e11e1910d541e505e471debe15f4f36c89915ab4530b"
+    },
+    "untied_compute_late_seed20260904/best_validation": {
+      "environment_sha256": "f2961e351dae55a088cf566a1b4f26c64135f22fd216f5a6699424bfdfb4ead3",
+      "prediction_sha256": {
+        "development": "2292294ebb117765829a9a6d62c23d1cec82c2c569f537b4fe79f0a2c40df029",
+        "holdout": "87fd0ff17990574b68e52cb5c6956955c12ed28eb505323552666a119ad49003"
+      },
+      "result_sha256": "f08b757c3f899862ba52e32c95b3cb1420a1e070164b86a17d2e03c08d6d1f0b",
+      "selected_update": 16000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 853,
+          "training_probe_solved": 853
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 832,
+          "training_probe_solved": 832
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 679,
+          "training_probe_solved": 679
+        }
+      },
+      "weights_sha256": "da286eb64538655d5211bb316049c4da94d82ce47bf58a61428a80ba9f29df36"
+    },
+    "untied_compute_late_seed20260904/final": {
+      "environment_sha256": "bf2663b5a2ddd33915be5ab64144e1bba63767f736e4dc56d8045ef90db07faf",
+      "prediction_sha256": {
+        "development": "66c88ec11a2d34a712a93e4ec877e7e419714f794f4e09923d714970d6d41da3",
+        "holdout": "04341ac0f055e8952416387225a0e67fb0c369d40495aeec59a8e198247e0397"
+      },
+      "result_sha256": "a1ab10be607d16c26b26bea17a99692c7d8cdcfae8b0830c0440dacfad5c97ad",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 853,
+          "training_probe_solved": 853
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 836,
+          "training_probe_solved": 836
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 701,
+          "training_probe_solved": 701
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 853,
+          "training_probe_solved": 853
+        }
+      },
+      "weights_sha256": "52c71d95f24708a800517e841269e7ddcee5d6f6750dd45d433a34c5a6da736a"
+    },
+    "untied_parameters_early_seed20260902/best_validation": {
+      "environment_sha256": "7a434bf88f62d82614a756b290dd52ece5c47b5647af9a2fe60aa18c9fd6ae58",
+      "prediction_sha256": {
+        "development": "5ff5642f8737ac1db7b5ed6dcbc9c6dcd093cf40f351cb0ab7247bea3d264902",
+        "holdout": "3a741c3231c5b574d7aebcbbaa53a41a14565b4a7c7b0ff2f1eab97fdd4759d8"
+      },
+      "result_sha256": "cec35b61f5028980829be525c2be1cdc5a92f18f9f68b3e6edd882daa0a54868",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 26,
+          "training_probe_solved": 26
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 479,
+          "training_probe_solved": 479
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 406,
+          "training_probe_solved": 406
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 2,
+          "training_probe_solved": 2
+        }
+      },
+      "weights_sha256": "3b3f21885d0549417400fb43471eaf496e0fde92f59a142fd38ca271311f1533"
+    },
+    "untied_parameters_early_seed20260902/final": {
+      "environment_sha256": "248b76aaf2bf4d30ef6bfa72ed3d9b661d1a3d706e0c4d69b1cfcd5a7291fbb0",
+      "prediction_sha256": {
+        "development": "5ff5642f8737ac1db7b5ed6dcbc9c6dcd093cf40f351cb0ab7247bea3d264902",
+        "holdout": "3a741c3231c5b574d7aebcbbaa53a41a14565b4a7c7b0ff2f1eab97fdd4759d8"
+      },
+      "result_sha256": "40b56ec2562726102ce77eaa14ed04249e479fcc74e08fa19323d96713306fa3",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 26,
+          "training_probe_solved": 26
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 479,
+          "training_probe_solved": 479
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 406,
+          "training_probe_solved": 406
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 2,
+          "training_probe_solved": 2
+        }
+      },
+      "weights_sha256": "e8725850f7e82e77e93e290970accdfec8e4b72cda94120f468b43faeaf96534"
+    },
+    "untied_parameters_early_seed20260903/best_validation": {
+      "environment_sha256": "946dc5e32b9ff260500339f787d246c447942ca874a0fd1c916ea463654041df",
+      "prediction_sha256": {
+        "development": "354ce388a50f260a603b51296e0554ba1fe4d73935130e0f4ec8ac3f7674dcb3",
+        "holdout": "31516aa1305cda1f5f435d19456f1060dbf9e404c9bf93514df9adbca64aa13c"
+      },
+      "result_sha256": "708875885f54ac804d41058ca5a7a8d5c76edbf621399c1b06c585974bc57594",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 22,
+          "training_probe_solved": 22
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 431,
+          "training_probe_solved": 431
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 385,
+          "training_probe_solved": 385
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 2,
+          "training_probe_solved": 2
+        }
+      },
+      "weights_sha256": "2e1afff90c527141ad65664f50b89d8871f3851380f85d34e789f2e7bfc6f131"
+    },
+    "untied_parameters_early_seed20260903/final": {
+      "environment_sha256": "2ff27fadf15cecfcd471a53cef4be603c96f6e9f3a8320c719d631cfa813bc96",
+      "prediction_sha256": {
+        "development": "354ce388a50f260a603b51296e0554ba1fe4d73935130e0f4ec8ac3f7674dcb3",
+        "holdout": "31516aa1305cda1f5f435d19456f1060dbf9e404c9bf93514df9adbca64aa13c"
+      },
+      "result_sha256": "17452d42eb1daa50b308ef41cc04ef6d717e7a5eece60ea2d38f53435866c3e7",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 22,
+          "training_probe_solved": 22
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 431,
+          "training_probe_solved": 431
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 385,
+          "training_probe_solved": 385
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 2,
+          "training_probe_solved": 2
+        }
+      },
+      "weights_sha256": "b5082437213f4bc3ef926558676911f3c7979a28fd68da680a334eb3bb97d511"
+    },
+    "untied_parameters_early_seed20260904/best_validation": {
+      "environment_sha256": "90dc113d50afc9d3d511a08a4a97e75d3b29b7255dcf57d406e78fe539a78e4f",
+      "prediction_sha256": {
+        "development": "0301cd4148b4f2d6ba4985aa90b0e19b180b1950239a2c3015616f0cc60af309",
+        "holdout": "73d827e69d27ded9d808bef463a89a563192e0c0ba9248253ee17a04590d3ba3"
+      },
+      "result_sha256": "ef6b18881f413457750ede4cbb5aab29704b48084b2de0b857a5b01587bd79b0",
+      "selected_update": 19000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 442,
+          "training_probe_solved": 442
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 518,
+          "training_probe_solved": 518
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 433,
+          "training_probe_solved": 433
+        }
+      },
+      "weights_sha256": "add3cb278b87d9a42956cdbbe2a6d0aab788f4c69b8e60c061dcb3e095f0f823"
+    },
+    "untied_parameters_early_seed20260904/final": {
+      "environment_sha256": "3b572022a78ecae07a550299b639b66de22f0149eb82c29672ba32febdcff108",
+      "prediction_sha256": {
+        "development": "3da18c99978ee85348e3cada7782e180e6c4835d8e72722ae198d7bb8cdcdb51",
+        "holdout": "d1cd43a29cedda88efdcd5e036a05ed8dfdf6df10fd493b1793acfb2f0577c9f"
+      },
+      "result_sha256": "18539954cae81c53cf1663b15926dd424b7bdfaeddec55ce11d23cdbd21950de",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 445,
+          "training_probe_solved": 445
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 516,
+          "training_probe_solved": 516
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 431,
+          "training_probe_solved": 431
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 323,
+          "training_probe_solved": 323
+        }
+      },
+      "weights_sha256": "e1bb851641b223bc1e5401f0e3870a2f3b9de3a211550ac8f71b61421e45f8ae"
+    },
+    "untied_parameters_late_seed20260902/best_validation": {
+      "environment_sha256": "ddc68c07d65f84b9dc0ac3aa47488a60845483c2a238e6d68ef0a35790864b0c",
+      "prediction_sha256": {
+        "development": "8da2d8238bcdc6e327760ec4a5a65cb201f29e78a754145a96e99dc7573e7ea6",
+        "holdout": "7c03fe24a64e15fdcb18c6148a76f1c7a727d319b17c402a23b7425d4eb04044"
+      },
+      "result_sha256": "ca5611c7f2aa69feadf172d7527258b60006d8522ab221ec4f0d7186d7078c42",
+      "selected_update": 17000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 338,
+          "training_probe_solved": 338
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 299,
+          "training_probe_solved": 299
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 214,
+          "training_probe_solved": 214
+        }
+      },
+      "weights_sha256": "36eac8e6347f0ce0f937f25e754517cfc04988bbd5673ed36df663cc55046df3"
+    },
+    "untied_parameters_late_seed20260902/final": {
+      "environment_sha256": "5befd8e7e4178587843f38b7e4001561e0c01c410bc7b9bd0234d7500f45ec76",
+      "prediction_sha256": {
+        "development": "49216d06ac55bd9bb07bc14e0e65b43a11becc040712313d161bdec2ed82a415",
+        "holdout": "9ebfc38fcede2f672d35d194ed4b4088e592dd0111216f8be7309190ad18be80"
+      },
+      "result_sha256": "1e611df297827bc36033e61d6edad76dfbab36610f280dc3116551f0334613b7",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 324,
+          "training_probe_solved": 324
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 290,
+          "training_probe_solved": 290
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 217,
+          "training_probe_solved": 217
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 341,
+          "training_probe_solved": 341
+        }
+      },
+      "weights_sha256": "5f676f6a5d86afd242b46f9fa2181dd57edf2ad31e7d546dd483e9644d783378"
+    },
+    "untied_parameters_late_seed20260903/best_validation": {
+      "environment_sha256": "587c5642bb852c1a62411bdfd2e6aaa009f937845505ec34258ce737e37fbedf",
+      "prediction_sha256": {
+        "development": "95ed7810ef285f0abe11678b322eba62a8d3195e42cc96ea2db95794f5dbf085",
+        "holdout": "fa00e0bdcce096582a86283d6afb44b5f28c48a9ce4a0486733d70c691dfbf91"
+      },
+      "result_sha256": "1f1ca807a2955dbcccf8c124fbc83be41ebc5cf2c0626a0125440c957349e84b",
+      "selected_update": 17000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 346,
+          "training_probe_solved": 346
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 301,
+          "training_probe_solved": 301
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 228,
+          "training_probe_solved": 228
+        }
+      },
+      "weights_sha256": "ea6b7e76ddc901a589f7df43bd3a4e4ac2d125734c0fa7e35f2d7ca2423095e5"
+    },
+    "untied_parameters_late_seed20260903/final": {
+      "environment_sha256": "f2b7175d6e3ca864ef22818ac4da4cc6e2ec67d065643e364cb690cea420e53a",
+      "prediction_sha256": {
+        "development": "e7cd3bdc8a09e65bf14ac5810824b77c0d154b82b26e334e01753cae34e3ff90",
+        "holdout": "e2299f27cc24bcc5bbc5f83e4c18fc7b9bbd9ab6d8fc587860e8e9079a5a05fd"
+      },
+      "result_sha256": "f2ce3a8dfb7d0b828cf0aa9f80e0b1e4ce8abd12e245ace6c1cfceecdb431683",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 343,
+          "training_probe_solved": 343
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 300,
+          "training_probe_solved": 300
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 235,
+          "training_probe_solved": 235
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 366,
+          "training_probe_solved": 366
+        }
+      },
+      "weights_sha256": "1fc8873bc061b9acce1c14aee253b0e7edcec41c74f067bef48a41f1ede72bad"
+    },
+    "untied_parameters_late_seed20260904/best_validation": {
+      "environment_sha256": "9f032d82078ad2835fc8747e4e25d31ae1362b36db15fdac51e8222a19aa7b3b",
+      "prediction_sha256": {
+        "development": "274114fd62da68f1488a81f05eb6f5fd3228bcd83f89ca9754213c6029d340a0",
+        "holdout": "6629a10a3a234151527c1d47de46d115fc7809fe96473017e20b0368cbb351f5"
+      },
+      "result_sha256": "570c7fb97f592c094e07469dbf5e08d8ac8c6ed0b458d6ae7d8a0b1a4ae4806e",
+      "selected_update": 18000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 402,
+          "training_probe_solved": 402
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 363,
+          "training_probe_solved": 363
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 244,
+          "training_probe_solved": 244
+        }
+      },
+      "weights_sha256": "3244d5c810012e1957b8b049f44f797051c1f57078f7ba6ac9a4a965d59de5ec"
+    },
+    "untied_parameters_late_seed20260904/final": {
+      "environment_sha256": "211cb1bf912484e28bd1e32e97435ef12d0f3464daf693fce6d46714e0303bfc",
+      "prediction_sha256": {
+        "development": "23fb478b88c4efb842c7aec252c3af9975e872d7558b1436660eef102f378257",
+        "holdout": "c42a6b4a4847338258decfaa384f9b7efef7e197a3b44a33c8a8697e205b6597"
+      },
+      "result_sha256": "6732b950b0f9138b6b0992a28f3c3f297de67da0cf2990bb04897299bf910496",
+      "selected_update": 20000,
+      "validation_replay": {
+        "1024": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 394,
+          "training_probe_solved": 394
+        },
+        "128": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 354,
+          "training_probe_solved": 354
+        },
+        "16": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 250,
+          "training_probe_solved": 250
+        },
+        "4096": {
+          "difference": 0,
+          "full_evaluation_subset_solved": 407,
+          "training_probe_solved": 407
+        }
+      },
+      "weights_sha256": "579a8391083ef7d8baf25ad62a31e0e3d897cb31508f0ef9a0f648c705e08f95"
+    }
+  },
+  "evaluations_verified": 36,
+  "maximum_validation_solved_count_difference": 0,
+  "protocol_sha256": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+  "same_step_export_differences": {
+    "tied_late_seed20260904": {
+      "development": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      },
+      "holdout": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      }
+    },
+    "untied_compute_early_seed20260904": {
+      "development": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      },
+      "holdout": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      }
+    },
+    "untied_compute_late_seed20260902": {
+      "development": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      },
+      "holdout": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      }
+    },
+    "untied_compute_late_seed20260903": {
+      "development": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      },
+      "holdout": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      }
+    },
+    "untied_parameters_early_seed20260902": {
+      "development": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      },
+      "holdout": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      }
+    },
+    "untied_parameters_early_seed20260903": {
+      "development": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      },
+      "holdout": {
+        "finite_1024": 0,
+        "finite_128": 0,
+        "finite_16": 0,
+        "finite_2048": 0,
+        "finite_4096": 0,
+        "labels": 0,
+        "predictions_1024": 0,
+        "predictions_128": 0,
+        "predictions_16": 0,
+        "predictions_2048": 0,
+        "predictions_4096": 0,
+        "solved_1024": 0,
+        "solved_128": 0,
+        "solved_16": 0,
+        "solved_2048": 0,
+        "solved_4096": 0
+      }
+    }
+  }
+}

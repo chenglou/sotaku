@@ -12,8 +12,8 @@ import numpy as np
 
 from looping.weight_tying.common import protocol, run_name
 
-NAMES = {"tied": "Shared weights", "untied_compute": "Untied: matched compute",
-         "untied_parameters": "Untied: matched parameters"}
+NAMES = {"tied": "Shared weights", "untied_compute": "Independent stages: same width",
+         "untied_parameters": "Independent stages: matched parameters"}
 COLORS = {"tied": "#009E73", "untied_compute": "#CC5877", "untied_parameters": "#0072B2"}
 SEED_COLORS = ("#0072B2", "#D55E00", "#009E73")
 
@@ -55,7 +55,8 @@ def plot_training(report, histories, directory):
                 axis.text(0.5, 0.5, "No completed run", ha="center", transform=axis.transAxes, color="#666666")
             for step in (4000, 8000, 12000):
                 axis.axvline(step, color="#BBBBBB", linestyle=":", linewidth=0.7)
-            axis.set_title(f"{NAMES[architecture]}\n{'Early' if regime == 'early' else 'Late-state'} training, evaluated at {iteration}", fontsize=10)
+            training_label = "Train on iterations 1-16" if regime == "early" else "Train on later iterations too"
+            axis.set_title(f"{NAMES[architecture]}\n{training_label}; evaluate at {iteration}", fontsize=10)
             axis.set_xlim(0, 20000)
             axis.set_xticks([0, 5000, 10000, 15000, 20000], ["0", "5K", "10K", "15K", "20K"])
             style_axis(axis)
@@ -93,7 +94,7 @@ def plot_horizons(report, directory, dataset):
                 axis.plot(x, np.mean(traces, axis=0), color=COLORS[architecture], linewidth=2.2,
                           marker="o", markersize=4, linestyle=style,
                           label=f"{NAMES[architecture]} ({len(traces)}/3)")
-        axis.set_title("Early training: primary at 16" if regime == "early" else "Late-state training: primary at 1024", fontsize=11)
+        axis.set_title("Train on iterations 1-16: primary at 16" if regime == "early" else "Train on later iterations too: primary at 1024", fontsize=10)
         axis.set_xticks(x, [str(horizon) for horizon in horizons])
         axis.set_xlabel("Inference iterations (log scale)")
         style_axis(axis)
@@ -104,7 +105,7 @@ def plot_horizons(report, directory, dataset):
     title = "Synthetic layout check (not study results)" if report.get("synthetic") else f"{label}: final checkpoints" + (" (partial report)" if report["partial"] else "")
     figure.suptitle(title, fontsize=14)
     figure.text(0.5, 0.02, "Thin lines: individual seeds. Thick lines: mean of evaluated seeds; failures remain in the report.\n"
-                "Dashed lines beyond 16 repeat an early-trained untied stack, not additional independently trained layers.",
+                "Dashed lines beyond 16 repeat the same 16 independent stages, not a longer stack of independently trained layers.",
                 ha="center", fontsize=8)
     figure.tight_layout(rect=(0, 0.075, 1, 0.94))
     return save_figure(figure, directory / f"{dataset}_final_horizons.png")

@@ -18,4 +18,4 @@ Code, recipes, experiment notes, and the checkpoint: https://github.com/chenglou
 
 Is tying weights through a loop just premature optimization? My hunch is no: it changes the learning problem. An untied network can represent the same computation, but shared weights force training to find an update that works at many iterations. That's a constraint on optimization, not just a way to save parameters.
 
-We're testing that hunch with separate compute-matched and parameter-matched comparisons, multiple seeds, and newly generated Sudoku puzzles. Results pending.
+We tested that hunch with 18 fresh 20K runs: separate compute and parameter comparisons, three seeds, and newly generated puzzles. Shared weights solved more of the hard sudoku-extreme puzzles under our recipe, while independent stages sometimes retained correct answers better. So the evidence supports "different learning behavior," not "sharing always wins." Full results: `looping/weight_tying/RESULTS.md` on the research branch.

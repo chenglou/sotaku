@@ -1,51 +1,40 @@
 # Study Status
 
-Research branch: `codex/weight-tying-study`. Protocol recorded in commit `29c276d` before training or test-set evaluation. The v2 release and public defaults are unchanged.
+**Complete, September 3, 2026:** all 18 exact-20K training runs and all 36 full evaluations. No numerical failures or training-worker restarts. Do not launch replacement jobs. [Results and plots](RESULTS.md) give the conclusions; the v2 checkpoint and public defaults are unchanged.
 
-Outputs: `sudoku-outputs/weight_tying_v1_20260902/`.
+Research branch: `codex/weight-tying-study`. Protocol committed in `29c276d` before training or test-set evaluation. Durable artifacts are on `sudoku-outputs` under `weight_tying_v1_20260902/`.
 
-## Preparation
+## Completion Record
 
-| Job | Modal App | Status |
-|---|---|---|
-| Generate and screen fresh puzzles | `ap-VTOGKyY7Ju9uzzTgLcSKZT` | Complete; manifest committed to the Volume |
-| Initial GPU preflight | `ap-DVASDpLJBCJW0HRmMOuzpD` | Stopped before training; corrected the test's expectation of encoder gradients on gradient-free batches |
-| Corrected full-batch GPU preflight | `ap-ZI82BAMLnEkyx1xTn7Rm68` | Passed for all three architectures |
+| Stage | Record |
+|---|---|
+| Data preparation | `ap-VTOGKyY7Ju9uzzTgLcSKZT`; completed September 2, 18:08 PDT |
+| Corrected full-batch H200 preflight | `ap-ZI82BAMLnEkyx1xTn7Rm68`; passed all three architectures |
+| Training | [18 job IDs](jobs.json); launched September 2, 18:45-18:49 PDT; all results downloaded by 23:24 |
+| Pre-evaluation audit | [Audit](pre_evaluation_audit.json); September 2, 23:24 PDT |
+| Checkpoint selection lock | `ap-4KEwak9KkdaEoM15a1t0ZB`; [lock](cohort_lock.json) created September 2, 23:26 PDT |
+| Full evaluation | [36 job IDs](evaluation_jobs.json); launched September 2, 23:27-23:41 PDT; all results retrieved by September 3, 01:01 |
+| Download and verification | [Final artifact audit](results/artifact_audit.json); all saved predictions checked locally |
 
-Data preparation finished at 2026-09-03 01:08 UTC after 870 seconds. The frozen set contains 10,000 puzzles, 2,500 per generator difficulty. All generated puzzles have one solution. Screening covered 3,831,994 original training rows and 422,786 test rows; no duplicate candidate questions or solved grids were found under the documented checks. The held-out NPZ checksum is `c8f610dffc04150525eb579c5fd8f98b7baf6d6d6185ff6c1a23dac6653b1cde`.
+The new 10K QQWing set has 2,500 puzzles per difficulty. Screening covered all 3,831,994 sudoku-extreme training rows and 422,786 test rows under the checks described in the protocol. No candidate question or solution duplicates were found. The [frozen accepted puzzles](test_data/README.md) are included in the repository; generator output and uniqueness-check records remain on the Volume.
 
-All 161 local tests pass, including exact interrupted/resumed training, weight-copy independence, gradient relationships, cohort locking, independent score recomputation, and read-only result collection. The full-batch GPU preflight passed early training and 32/512-iteration gradient-free prefixes for all three architectures, with checkpoint reloads. Peak allocated memory was 50.1 GiB for tied, 47.4 GiB for compute-matched untied, and 12.3 GiB for parameter-matched untied. Compilation and checks took about 47 minutes total on one H200.
+## Verification
 
-The committed preflight result has SHA256 `29c171eba0650e1783cc3acbefd9f722e79df519e1daefed42b31d3f384a0bb9`. All source hashes were verified against local code before launching. The input encoder has no gradient on late-state batches while all subsequently used weights do.
+- All 18 training results match the full registered configs, source hashes, exactly 20K updates, and paired puzzle/horizon digests. Same-width paired runs have identical nominal transformer matmul FLOPs.
+- The best checkpoint is the earliest maximum of the registered validation metric. Both final and selected weights and manifests were verified and locked before opening the new set.
+- All 36 evaluations match their selected weight hashes, locked data, and returned function-call results. Runtime records show H200, PyTorch 2.10.0+cu128, eager FP32, and TF32 matmul disabled.
+- All 6.3 million saved board predictions were checked against their recorded exact-puzzle scores, difficulty counts, and endpoint gains/losses. Dataset and prediction checksums match.
+- All 132 validation-score comparisons reconstructed from the full evaluations match the training records exactly. Six final/best export pairs share a training step; their separately evaluated prediction arrays are identical on both datasets.
+- All 165 local tests pass, covering exact resumed training, independent weight storage and gradients, selection locking, score recomputation, rendering, result-collection transport errors, and validation replay. The GPU preflight covered full-batch early training and 32/512-iteration gradient-free prefixes, finite gradients, and checkpoint reloads.
 
-## Training
+Lock SHA256: `1fdc572cdbc32ddbec6162bee0a83d7881d53a46d46e2f34be61c2b994c366f0`. Preflight result SHA256: `29c171eba0650e1783cc3acbefd9f722e79df519e1daefed42b31d3f384a0bb9`.
 
-All 18 preregistered 20K runs were submitted in separate detached invocations between 18:45 and 18:49 PDT on September 2. At the initial status check, Modal had allocated 10 workers; eight inputs were waiting for GPUs. App and function-call IDs are recorded in `jobs.json`. Do not launch replacements merely because a worker has not been allocated yet.
+## Operational Issues
 
-The first tied and parameter-matched early-training runs have passed 1K updates. Their matching sample digests were checked at common steps, and the tied run's resumable checkpoint and selected weights were verified on the Volume. All 10 allocated workers' live configurations match their intended architecture, training regime, seed, 20K schedule, batch size, and data manifest. Waiting inputs cannot have their live logs verified until workers start.
+The initial preflight (`ap-DVASDpLJBCJW0HRmMOuzpD`) stopped before training because a test incorrectly expected input-encoder gradients through a detached prefix. The test was corrected; the second preflight passed without changing model or training behavior. It took about 47 minutes for all three architectures.
 
-`watch.py` collects results from existing function-call IDs without launching, replacing, or cancelling workers. One initial result-read request timed out; the collector now retries connection errors, and the workers were unaffected.
+Two narrow late-training runs spent unusually long compiling. A live stack sample showed PyTorch's AOT autograd partitioner inside NetworkX minimum-cut, not stalled optimizer updates. Both runs completed without intervention; compilation is reported separately from training.
 
-At 19:29 PDT, the first parameter-matched late-state worker was still compiling its supervised continuation. A live `py-spy` stack showed `train_run` calling PyTorch's AOT autograd partitioner, which was running NetworkX's `preflow_push` inside `minimum_cut`. No optimizer updates had started on that worker. The profiler was installed only in `/tmp/sotaku-diagnostics`; training code and dependencies were unchanged. This is compilation overhead, not a measured training failure. Other workers were already saving checkpoints and advancing.
+The local result collector encountered Modal connection errors and an unwrapped `grpclib.exceptions.StreamTerminatedError`. It was updated to retry reads and restarted with its saved cache. Remote workers were unaffected. A replacement training run was never launched. This distinction is also documented in `tips-for-running-modal`.
 
-By 19:46 PDT the same worker had completed compilation, passed 3K updates, and saved a checkpoint. A second stack sample showed ordinary backpropagation. No restart or training change was needed.
-
-At 20:05 PDT, three runs had finished all 20K updates and their durable result files were downloaded. The following scores are from the reused 1K validation sample, not the new test set. A successful save is not a successful long-iteration model.
-
-| Architecture | Regime | Seed | Final @16 | @128 | @1024 | @4096 |
-|---|---|---:|---:|---:|---:|---:|
-| tied | early | 20260902 | 78.0% | 11.4% | 0.1% | 0.0% |
-| tied | early | 20260903 | 77.8% | 93.4% | 11.0% | 2.5% |
-| untied_parameters | early | 20260902 | 40.6% | 47.9% | 2.6% | 0.2% |
-
-The result collector encountered several connection deadlines while separate CLI reads remained available. The collector recovered and saved the two tied results before its local restart. Detached workers were never restarted. A fresh collector reused the saved results. Newly allocated workers for tied/early/20260904 and untied_parameters/late/20260903 have verified configurations.
-
-A later local disconnect propagated as `grpclib.exceptions.StreamTerminatedError` rather than Modal's connection-error wrapper. The collector now retries both observed transport errors; the regression test covers both and still reports real worker exceptions separately. The error-bearing cache was preserved before resuming its seven completed results. The named worker's live log confirmed it was still advancing past 18K updates.
-
-At 21:20 PDT, 13 runs were complete, including all nine early-training runs. The remaining five late-training workers are active. All 18 workers' live configurations have been checked. The 13 downloaded results have identical frozen source hashes, exactly 20K updates, and matching puzzle/horizon digests within each available paired group. Validation curves have been rendered and visually checked. No worker has required a restart.
-
-All 18 runs finished by 23:24 PDT, each at exactly 20K updates, without a numerical failure or worker restart. `pre_evaluation_audit.json` records every durable result hash and selected step. Full configs, source hashes, paired samples and horizons, matched-compute FLOPs, and earliest-best validation selection all passed. All recorded validation predictions were finite.
-
-The separate CPU sealing job completed at 23:26 PDT after verifying every selected model and manifest. `cohort_lock.json` matches all pre-evaluation result hashes and selected steps. Its SHA256 is `1fdc572cdbc32ddbec6162bee0a83d7881d53a46d46e2f34be61c2b994c366f0`.
-
-All 36 full evaluations were submitted in separate detached invocations after the lock, from 23:27 to 23:41 PDT. `evaluation_jobs.json` records every app and function call. The first ten allocated workers have verified source hashes and FP32/TF32-off execution settings. The frozen development, validation, and new test arrays have been downloaded with matching hashes. Final-checkpoint performance remains primary; validation-selected weights are secondary. Independent checks of the saved predictions follow as the evaluations finish.
+Weights and resume checkpoints are under `runs/<run_name>/`; full predictions and environment records are under `evaluations/<run_name>/<selection>/`. Download into a new existing directory and verify hashes. The local 559 MB evaluation archive is not committed; the reports, histories, audit records, plots, and frozen new test puzzles are.

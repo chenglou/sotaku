@@ -23,6 +23,14 @@ The release audit reproduced the recommended later-iteration training checkpoint
 
 A separate [burn-in dropout experiment](BURNIN_DROPOUT.md) completed four matched 4K continuations from two high-accuracy starting checkpoints, retaining the original 50K schedule and supervised-window dropout. Turning off dropout only during the initial gradient-free iterations lowered both runs' minimum BF16 monitoring scores and both full-set 2048 results. FP32 reduced the difference but did not make dropout-off consistently better. Keep dropout on; no 50K extensions were justified. Release engineering fixes and fresh reference results are in [the audit](../V2_RELEASE_AUDIT.md).
 
+## September Weight-Sharing Study
+
+The [weight-sharing study](weight_tying/RESULTS.md) completed 18 fresh 20K runs: three architectures, training the first 16 iterations or also training later iterations, and three paired seeds. All final and validation-selected checkpoints received full FP32 evaluations on the reused 25K sudoku-extreme benchmark and a newly generated, screened 10K QQWing set. Checkpoint selections were fixed before opening the new set.
+
+At iteration 16 after early-only training, shared weights beat the same-width independent stages on both sets in all three pairs. With later-iteration training, final shared models average 93.77% at 1024 on sudoku-extreme versus 85.09% for independent same-width stages. The new, easier set reverses that comparison: 97.45% versus 99.41%, because shared models lose more already-correct answers as they continue iterating. Selecting checkpoints by validation substantially narrows the retention difference. Narrower parameter-matched independent stages perform much worse, but that comparison also changes hidden width and positional representation.
+
+These results support keeping the v2 recipe, not a universal superiority claim. Beyond 16 iterations the independent stages repeat, so the deep comparison tests a 16-stage cycle against a one-stage cycle, not a fully independent thousand-layer network. The optimizer recipe was fixed, and 20K results do not establish a 50K ordering. Full per-seed scores, timing, plots, and reproducibility checks are in the linked report.
+
 ## Initial Training Comparisons
 
 Every variant uses the original 20K training setup, random seed 20260720, 16 supervised Sudoku iterations, the existing curriculum and averaged per-iteration cross-entropy, and monitoring at 128/1024 iterations. `baseline_unscaled` is the original model without added normalization or scaling. The residual-scaling variants keep its four stored blocks and normal `ABCD` order. The layer-order variants store two blocks, apply exactly four blocks per Sudoku iteration, and use RMSNorm after each complete iteration.
