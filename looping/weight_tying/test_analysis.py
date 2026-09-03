@@ -10,7 +10,7 @@ import torch
 
 from checkpoint_utils import atomic_json_save, atomic_torch_save
 from dataset_utils import DATASET_REVISION
-from looping.weight_tying.analyze import reliability_summary, training_summary, verify_scores
+from looping.weight_tying.analyze import paired_puzzle_counts, reliability_summary, training_summary, verify_scores
 from looping.weight_tying.common import atomic_npz, protocol, protocol_sha256, run_config, run_name
 from looping.weight_tying.evaluate import evaluate_arrays, seal_cohort
 from looping.weight_tying.model import StudyTransformer
@@ -45,6 +45,14 @@ def fake_completed_cohort(root):
 
 
 class StudyAnalysisTests(unittest.TestCase):
+    def test_paired_puzzle_counts_separate_disagreements(self):
+        counts = paired_puzzle_counts(np.array([True, True, False, False]),
+                                     np.array([True, False, True, False]))
+        self.assertEqual(counts, {"both_solved": 1, "tied_only": 1, "untied_only": 1,
+                                  "neither_solved": 1, "total": 4})
+        with self.assertRaisesRegex(ValueError, "boolean vectors"):
+            paired_puzzle_counts(np.array([1]), np.array([True]))
+
     def test_failures_stay_in_reliability_denominator(self):
         scores = {"1024": {"accuracy": 0.95}, "4096": {"accuracy": 0.90}}
         results = {"tied_late_seed20260902": {"status": "complete", "evaluations": {"final": {"holdout": scores}}},

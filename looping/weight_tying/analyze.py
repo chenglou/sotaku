@@ -20,7 +20,8 @@ def training_summary(result):
             "late_validation_mean": float(np.mean(late)) if late else None,
             "late_validation_minimum": min(late) if late else None,
             "timings_seconds": result["timings_seconds"], "estimated_model_flops": result["estimated_model_flops"],
-            "processed_puzzles": result["processed_puzzles"], "sample_digest": result["sample_digest"]}
+            "processed_puzzles": result["processed_puzzles"], "sample_digest": result["sample_digest"],
+            "final_validation": result["history"][-1]["scores"] if result["history"] else {}}
 
 
 def read_evaluation(root, name, selection, entry):
@@ -77,7 +78,7 @@ def reliability_summary(results, architecture, regime):
     members = [results.get(run_name(architecture, regime, seed)) for seed in settings["seeds"]]
     summary = {"planned": len(members), "completed": 0, "numerical_failures": 0, "pending_training": 0,
                "datasets": {name: {"evaluated": 0, "healthy": 0, "pending_evaluation": 0}
-                            for name in ("development", "holdout")}}
+                            for name in ("validation", "development", "holdout")}}
     for result in members:
         if result is None or result["status"] not in ("complete", "numerical_failure"):
             summary["pending_training"] += 1
@@ -87,8 +88,9 @@ def reliability_summary(results, architecture, regime):
             continue
         summary["completed"] += 1
         for dataset, counts in summary["datasets"].items():
-            scores = result.get("evaluations", {}).get("final", {}).get(dataset)
-            if scores is None:
+            scores = (result.get("final_validation") if dataset == "validation"
+                      else result.get("evaluations", {}).get("final", {}).get(dataset))
+            if scores is None or "4096" not in scores:
                 counts["pending_evaluation"] += 1
                 continue
             counts["evaluated"] += 1
@@ -98,6 +100,14 @@ def reliability_summary(results, architecture, regime):
                     and drop <= settings["evaluation"]["maximum_1024_to_4096_drop"] + 1e-12):
                 counts["healthy"] += 1
     return summary
+
+
+def paired_puzzle_counts(left, right):
+    if left.dtype != bool or right.dtype != bool or left.shape != right.shape or left.ndim != 1:
+        raise ValueError("Paired solved masks must be matching boolean vectors")
+    return {"both_solved": int((left & right).sum()), "tied_only": int((left & ~right).sum()),
+            "untied_only": int((~left & right).sum()), "neither_solved": int((~left & ~right).sum()),
+            "total": len(left)}
 
 
 def summarize(root, output, *, partial=False):
@@ -151,7 +161,14 @@ def summarize(root, output, *, partial=False):
                 differences = {str(horizon): 100 * (left_scores[str(horizon)]["accuracy"]
                                                     - right_scores[str(horizon)]["accuracy"])
                                for horizon in settings["evaluation"]["iterations"]}
-                seed_differences.append({"seed": seed, "tied_minus_untied_percentage_points": differences})
+                left_path = root / "evaluations" / run_name("tied", regime, seed) / "final/holdout_predictions.npz"
+                right_path = root / "evaluations" / run_name(comparison, regime, seed) / "final/holdout_predictions.npz"
+                with np.load(left_path, allow_pickle=False) as left_predictions, np.load(right_path, allow_pickle=False) as right_predictions:
+                    puzzle_counts = {str(horizon): paired_puzzle_counts(left_predictions[f"solved_{horizon}"],
+                                                                       right_predictions[f"solved_{horizon}"])
+                                     for horizon in settings["evaluation"]["iterations"]}
+                seed_differences.append({"seed": seed, "tied_minus_untied_percentage_points": differences,
+                                         "paired_puzzle_counts": puzzle_counts})
             primary_differences = [row["tied_minus_untied_percentage_points"][primary_iteration] for row in seed_differences]
             comparisons[f"{regime}/{comparison}"] = {
                 "primary_iteration": int(primary_iteration), "paired_seeds": seed_differences,
@@ -165,6 +182,7 @@ def summarize(root, output, *, partial=False):
     report = {"protocol_sha256": protocol_sha256(), "partial": partial, "missing": missing,
               "runs": results, "comparisons": comparisons, "reliability": reliability}
     atomic_json_save(report, output / "report.json")
+    atomic_json_save(histories, output / "learning_curves.json")
     lines = ["# Weight-Tying Results", "", "Partial report; no final conclusions." if partial else "All preregistered runs are included.", "",
              "## Per-Seed Results", "", "| Run | Status | Holdout @16 | @1024 | @4096 | Training Hours | Late Validation Floor |",
              "|---|---|---:|---:|---:|---:|---:|"]
@@ -178,11 +196,11 @@ def summarize(root, output, *, partial=False):
                      f"{summary['timings_seconds']['training'] / 3600:.2f} | {floor_text} |")
     lines.extend(["", "## Reliability", "",
                   "Healthy means at least 90% at 1024 iterations and no more than a 5-point drop by 4096. Numerical failures remain in the denominator. Pending runs are not failures.", "",
-                  "| Architecture / Regime | Completed | Numerical Failures | Pending Training | Healthy Development | Healthy Holdout |",
-                  "|---|---:|---:|---:|---:|---:|"])
+                  "| Architecture / Regime | Completed | Numerical Failures | Pending Training | Healthy Validation | Healthy Development | Healthy Holdout |",
+                  "|---|---:|---:|---:|---:|---:|---:|"])
     for name, counts in reliability.items():
         health = [f"{counts['datasets'][dataset]['healthy']}/{counts['planned']} ({counts['datasets'][dataset]['evaluated']} evaluated)"
-                  for dataset in ("development", "holdout")]
+                  for dataset in ("validation", "development", "holdout")]
         lines.append(f"| {name} | {counts['completed']} | {counts['numerical_failures']} | {counts['pending_training']} | {' | '.join(health)} |")
     lines.extend(["", "## Paired Comparisons", "",
                   "These are differences between three paired training seeds, not confidence intervals obtained by treating puzzles as independent training runs.", ""])
