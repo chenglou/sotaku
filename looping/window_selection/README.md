@@ -2,6 +2,8 @@
 
 Protocol fixed before the runs. This tests the [suggestion to choose training iterations by confidence](https://x.com/LordoftheMounts/status/2095379923452203074), not search or answer selection at inference. The released model and inference defaults are unchanged.
 
+**Completed:** all nine 20K runs and 18 full evaluations. Confidence selection failed the predeclared comparison; always choosing the latest window was more stable at long iteration counts but had a lower ceiling than the strongest random runs. See [results and limitations](RESULTS.md).
+
 ## Comparison
 
 Nine fresh runs: random, highest-confidence, and latest-window selection, each with seeds `20260904`, `20260905`, and `20260906`. Every run uses the same four-block, 796,937-parameter model, 20K optimizer updates, batch size 2048, and 2.7M-puzzle training pool. The learning rate and curriculum match the existing 20K recipe. Cross-entropy is averaged across 16 iterations. There is no auxiliary loss, added normalization, ES, or inference damping.
@@ -39,9 +41,9 @@ modal run --detach looping/window_selection/modal_run.py --action train --select
 
 Use a separate invocation for each selector/seed. [jobs.json](jobs.json) records actual launches; no other jobs are implied by the commands above.
 
-## Launch Status
+## Execution
 
-All nine training workers launched on September 4, 2026, from code commit `7eda03c`. Their live logs verified the selector, seed, 20K budget, batch size 2048, five candidate starts, and fixed data checksums. At this check they were compiling; training and full-set evaluation results are pending. Each worker automatically evaluates its final and best-monitoring checkpoints after training.
+All nine training workers launched on September 4, 2026, from code commit `7eda03c`. Their live logs verified the selector, seed, 20K budget, batch size 2048, five candidate starts, and fixed data checksums. All workers completed training and both planned full evaluations; the downloaded results were verified on the same day.
 
 All 175 local tests passed. The [H200 preflight](results/preflight.json) passed at full batch size, used 55.48 GB peak allocated GPU memory, and restored the populated optimizer exactly. The check took 460 seconds, mostly compilation; that is not a training-runtime estimate. Its compiled BF16 scan/replay confidence differed: 0.8903/0.8477 at start 32, 1.0000/1.0000 at start 256, and 0.9488/0.9587 at start 512. These measurements are from a one-update model, not accuracy results. Restoring RNG does not make compiled gradient-free and gradient-tracked execution identical; the training logs retain those differences for analysis.
 

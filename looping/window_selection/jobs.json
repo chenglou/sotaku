@@ -26,9 +26,12 @@
       "call_id": "fc-01M1P2PW41W0M0E5F2TMH432SS",
       "launched_at": "2026-09-04T11:26:31.697Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2PWM61E57P45HZRJE4PHR",
-      "verified_at": "2026-09-04T11:30:14.374Z"
+      "verified_at": "2026-09-04T11:30:14.374Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -38,9 +41,12 @@
       "call_id": "fc-01M1P2QCQM4EC91ZN6W12XDXNH",
       "launched_at": "2026-09-04T11:26:48.673Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2QD45RP91QDXH33T0HPSR",
-      "verified_at": "2026-09-04T11:30:19.429Z"
+      "verified_at": "2026-09-04T11:30:19.429Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -50,9 +56,12 @@
       "call_id": "fc-01M1P2QWQ6B892G4B54M8KEQ35",
       "launched_at": "2026-09-04T11:27:05.079Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2QX4Y6WEMYCGCR5JM7Y8R",
-      "verified_at": "2026-09-04T11:30:23.676Z"
+      "verified_at": "2026-09-04T11:30:23.676Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -62,9 +71,12 @@
       "call_id": "fc-01M1P2SWQXMS7VB8NDB8VF2VRB",
       "launched_at": "2026-09-04T11:28:10.675Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2SX5WYGGZYV2XNBREAVXR",
-      "verified_at": "2026-09-04T11:30:27.955Z"
+      "verified_at": "2026-09-04T11:30:27.955Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -74,9 +86,12 @@
       "call_id": "fc-01M1P2TCP5J30XPHQ8DF1W5EY3",
       "launched_at": "2026-09-04T11:28:26.941Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2TDYBWA439P1PHQGZ0PQR",
-      "verified_at": "2026-09-04T11:31:05.282Z"
+      "verified_at": "2026-09-04T11:31:05.282Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -86,9 +101,12 @@
       "call_id": "fc-01M1P2TW7929M73YQ85ZWPGQ67",
       "launched_at": "2026-09-04T11:28:42.804Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2TWKYRA23FDBCNQJCWQ5R",
-      "verified_at": "2026-09-04T11:31:09.860Z"
+      "verified_at": "2026-09-04T11:31:09.860Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -98,9 +116,12 @@
       "call_id": "fc-01M1P2VBET3QZ8HPEHG3AEYHZK",
       "launched_at": "2026-09-04T11:28:58.413Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2VBX4RSZ0HG5RRBM7AT2R",
-      "verified_at": "2026-09-04T11:31:13.724Z"
+      "verified_at": "2026-09-04T11:31:13.724Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -110,9 +131,12 @@
       "call_id": "fc-01M1P2VV2C8EDD10V9WWA2W3G1",
       "launched_at": "2026-09-04T11:29:14.412Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2VVHAMVY349GQXPYGS2SR",
-      "verified_at": "2026-09-04T11:31:19.040Z"
+      "verified_at": "2026-09-04T11:31:19.040Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     },
     {
       "action": "train",
@@ -122,9 +146,12 @@
       "call_id": "fc-01M1P2WA9KN0NMFY769HPT1BES",
       "launched_at": "2026-09-04T11:29:29.970Z",
       "code_commit": "7eda03c",
-      "status": "configuration_verified",
+      "status": "complete",
       "container_id": "ta-01M1P2WAN5S9MM1CB5DCFXWE8R",
-      "verified_at": "2026-09-04T11:31:24.640Z"
+      "verified_at": "2026-09-04T11:31:24.640Z",
+      "training_steps": 20000,
+      "completed_full_evaluations": 2,
+      "results_verified_at": "2026-09-04T22:48:36Z"
     }
   ]
 }
