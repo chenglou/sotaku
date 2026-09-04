@@ -144,6 +144,7 @@ The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row
 - [Evolution strategies](es/EXPERIMENTS_ES.md): fine-tuning existing checkpoints and training from scratch.
 - [Recurrent-state geometry](looping/trajectory_viz/study/README.md): visualization study, controls, and limitations.
 - [Weight-sharing study](looping/weight_tying/RESULTS.md): 18 paired training runs comparing shared and independent stages, with separate compute and parameter comparisons and a new 10K-puzzle test set.
+- [Training-window selection](looping/window_selection/README.md): planned matched comparison of random, highest-confidence, and latest-window selection during training; ordinary inference stays unchanged.
 - [Release verification](V2_RELEASE_AUDIT.md): artifact provenance and release checks.
 - [Numerical sensitivity](release/PRECISION_RESULTS.md) and [burn-in dropout](looping/BURNIN_DROPOUT.md): fixed-checkpoint checks and matched continuation experiments.
 

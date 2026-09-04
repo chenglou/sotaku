@@ -1,0 +1,6 @@
+{
+  "study_id": "window_selection_v1_20260904",
+  "jobs": [
+    {"action": "smoke", "app_id": "ap-Dswem4lMbuRBMQGnns0BAU", "call_id": "fc-01M1P23Z63W96FFN6JVPWW25NB", "status": "failed_before_execution", "error": "Project import before remote Python path setup; corrected before training."}
+  ]
+}

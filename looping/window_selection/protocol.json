@@ -1,0 +1,51 @@
+{
+  "study_id": "window_selection_v1_20260904",
+  "seeds": [20260904, 20260905, 20260906],
+  "selectors": ["random", "confidence", "latest"],
+  "selection_unit": "whole_batch",
+  "candidate_starts": [32, 64, 128, 256, 512],
+  "window_length": 16,
+  "late_probability": 0.2,
+  "confidence": "mean FP32 max-softmax over originally blank cells and all 16 iterations",
+  "confidence_ties": "earliest candidate",
+  "data_directory": "/outputs/weight_tying_v1_20260902/data",
+  "data_files": {
+    "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+    "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d",
+    "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+  },
+  "training": {
+    "steps": 20000,
+    "train_rows": 2700000,
+    "batch_size": 2048,
+    "learning_rate": 0.002,
+    "minimum_lr_ratio": 0.01,
+    "warmup_steps": 560,
+    "adam_betas": [0.9, 0.95],
+    "weight_decay": 0.01,
+    "dropout": 0.1,
+    "phases": [[0, 4000, 51], [4000, 8000, 11], [8000, 12000, 1], [12000, 20000, 0]],
+    "probe_every": 1000,
+    "late_floor_start": 12000
+  },
+  "evaluation": {
+    "iterations": [128, 1024, 2048, 4096],
+    "benchmark": "release/benchmark_25k.json",
+    "precision": "fp32",
+    "compiled": false,
+    "batch_size": 256,
+    "track_solutions": true,
+    "primary_checkpoint": "final",
+    "secondary_checkpoint": "best_validation",
+    "selection_metric": "1024-iteration accuracy on fixed 1K monitoring sample; earliest maximum"
+  },
+  "decision": {
+    "primary_comparison": "confidence minus random, paired by training seed",
+    "minimum_mean_1024_gain_percentage_points": 1.0,
+    "minimum_improved_seed_pairs": 2,
+    "minimum_mean_4096_gain_percentage_points": 0.0,
+    "require_all_runs_complete_and_finite": true,
+    "latest_control": "If confidence does not exceed latest, do not attribute gains to adaptive selection",
+    "confirmation": "A promising 20K result requires a separate 50K confirmation before changing the recommendation"
+  }
+}
