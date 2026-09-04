@@ -38,3 +38,11 @@ modal run --detach looping/window_selection/modal_run.py --action train --select
 ```
 
 Use a separate invocation for each selector/seed. [jobs.json](jobs.json) records actual launches; no other jobs are implied by the commands above.
+
+## Launch Status
+
+All nine training workers launched on September 4, 2026, from code commit `7eda03c`. Their live logs verified the selector, seed, 20K budget, batch size 2048, five candidate starts, and fixed data checksums. At this check they were compiling; training and full-set evaluation results are pending. Each worker automatically evaluates its final and best-monitoring checkpoints after training.
+
+All 175 local tests passed. The [H200 preflight](results/preflight.json) passed at full batch size, used 55.48 GB peak allocated GPU memory, and restored the populated optimizer exactly. The check took 460 seconds, mostly compilation; that is not a training-runtime estimate. Its compiled BF16 scan/replay confidence differed: 0.8903/0.8477 at start 32, 1.0000/1.0000 at start 256, and 0.9488/0.9587 at start 512. These measurements are from a one-update model, not accuracy results. Restoring RNG does not make compiled gradient-free and gradient-tracked execution identical; the training logs retain those differences for analysis.
+
+The first preflight failed before execution because the launcher imported project code before setting up the remote Python path. That app was stopped, the import order was corrected, and the replacement preflight passed before any training job launched. No training results were discarded or replaced.
