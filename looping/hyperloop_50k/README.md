@@ -2,6 +2,8 @@
 
 Six fresh 50K runs compare the current one-state recipe with four-state Hyperloop. The [completed 20K study](../hyperloop/RESULTS.md) improved 1024-iteration accuracy in all three pairs, but both architectures still had a deep-iteration failure. These runs check whether the improvement survives the full training schedule. The public release and defaults stay unchanged.
 
+**Launched September 5:** all six detached H200 workers started with verified live configurations, source/data hashes, and paired initial weights. The new GPU check passed; 198 core tests and 163 research tests passed. See [job IDs and verification](jobs.json) and the [GPU check](results/preflight.json). Workers were compiling at the last check; results are pending. Do not launch duplicates.
+
 ## Design
 
 `baseline` and `gated_four` each use paired seeds 20260910, 20260911, and 20260912. These seeds are new, not selected from earlier results. Every run starts from fresh weights, not a completed 20K checkpoint whose learning-rate schedule has ended.
@@ -29,12 +31,14 @@ Each detached H200 job runs training and both full evaluations, with optimizer/R
 ```bash
 source venv/bin/activate
 python -m unittest looping.hyperloop_50k.test_confirmation
-modal run --detach -m looping.hyperloop_50k.modal_run --action smoke
+modal run --detach looping/hyperloop_50k/modal_run.py --action smoke
 # After the GPU check passes, use separate invocations for each arm/seed:
-modal run --detach -m looping.hyperloop_50k.modal_run --action train --arm baseline --seed 20260910
-modal run --detach -m looping.hyperloop_50k.modal_run --action train --arm gated_four --seed 20260910
+modal run --detach looping/hyperloop_50k/modal_run.py --action train --arm baseline --seed 20260910
+modal run --detach looping/hyperloop_50k/modal_run.py --action train --arm gated_four --seed 20260910
 # Repeat those two commands separately for seeds 20260911 and 20260912.
 ```
+
+Use the file-path launcher above, not `modal run -m`. Module mode mounted another `looping` package under `/root/looping`; Python loaded that copy instead of the explicit `/root/project` upload, and the source-identity check correctly failed before training.
 
 ## After Confirmation
 
