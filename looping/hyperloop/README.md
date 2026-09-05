@@ -4,6 +4,8 @@ Controlled 9x9 Sudoku experiments, specified before training. The question is wh
 
 **Complete:** all nine 20K training runs and all 18 full evaluations. Four states improved mean final 1024 accuracy from 96.392% to 98.888%, but did not eliminate collapse at 4096. See [results and limitations](RESULTS.md); do not launch duplicate jobs.
 
+Follow-up: [fresh paired 50K confirmation](../hyperloop_50k/README.md).
+
 ## Background
 
 [Hyperloop Transformers](https://arxiv.org/html/2604.21254v2) keeps several residual streams and uses input-dependent read, write, and retention gates around a repeated transformer block. Its language-model experiments use small loop counts and loop-specific parameters. Our shared-gate variant is an adaptation for arbitrary iteration counts, not a reproduction of those experiments.
