@@ -18,7 +18,7 @@ Iteration shuffling destroyed the result: the per-checkpoint shuffled-fit median
 
 ## Verdict
 
-There is a robust, transferable board-level progress coordinate. It tracks meaningful solving behavior and exposes the collapsed checkpoint's loss of monotonic progress. The evidence does not establish a dedicated internal solved-cell counter: progress, iteration, and typical solve latency remain strongly correlated, and the puzzle-shuffle control shows that much of the signal is generic across puzzles.
+The fitted coordinate tracks progress on unseen puzzles across the four tested checkpoints, including the failing checkpoint's reversal. It does not establish a dedicated internal solved-cell counter: progress, iteration, and typical solving time remain strongly correlated, and shuffling puzzle identities preserves much of the result.
 
 ## Artifacts
 

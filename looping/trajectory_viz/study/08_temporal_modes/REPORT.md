@@ -6,7 +6,7 @@ Sotaku's recurrent state may contain a reusable rotating or oscillating mode, ra
 
 ## Method
 
-The analysis used 60 balanced test puzzles: four puzzles from each of five rating buckets in each of the discovery, validation, and final splits. It evaluated the stable plain, collapsed plain, training on later iterations, and combined-margin checkpoints. No final puzzle was used to fit a projection or DMD operator.
+The analysis used 60 balanced test puzzles: four puzzles from each of five rating buckets in each of the discovery, validation, and final splits. It evaluated the stable plain, collapsed plain, training on later iterations, and combined-margin checkpoints. Dynamic mode decomposition (DMD) fits a linear next-step predictor with an offset and examines its patterns over time. No final puzzle was used to fit a projection or DMD operator.
 
 Two independent random 16-dimensional projections of the 10,368-dimensional board state were evaluated. The predefined variants were normalized states and normalized updates over iterations 0-128 and 768-1024. Validation selected early normalized updates by mean DMD R2 improvement over a model fitted after shuffling iteration order. Final controls used 32 independent time shuffles and 32 phase-randomized surrogates. Phase randomization preserved every projected channel's Fourier power exactly while removing its phase relationship to other channels.
 
@@ -18,7 +18,7 @@ On the selected early normalized updates, ordered DMD achieved final R2 of 0.80-
 
 Phase randomization reduced R2 by only 0.008-0.021. Most predictability therefore comes from each channel's autocorrelation and power spectrum, not a precise phase relationship among channels.
 
-The DMD eigenvalues cluster near the positive real axis. The largest angle among active eigenvalues was 0.09 radians, and no checkpoint showed a large, stable complex pair characteristic of sustained rotation. Simple persistence also predicted the next update better than DMD in seven of eight checkpoint/projection comparisons. The model trained on later iterations was the only exception, and only slightly: DMD improved over persistence by 0.009 and 0.018.
+The DMD eigenvalues cluster near the positive real axis. The largest angle among active eigenvalues was 0.09 radians, and no checkpoint showed a large, stable complex pair characteristic of sustained rotation. Simply predicting that the next update equals the current update outperformed DMD in six of eight checkpoint/projection comparisons. The model trained on later iterations was the exception in both projections: DMD reduced squared prediction error by about 0.9% and 1.8%.
 
 Raw cross-checkpoint DMD R2 ranged from 0.57 to 0.91, but persistence beat almost every transferred operator. The transfer result supports shared smoothness, not a shared oscillatory law.
 
@@ -45,7 +45,7 @@ Random projections can expose low-energy temporal components but cannot establis
 
 ## Verdict
 
-Sotaku has strongly ordered and predictable temporal motion, especially during the first 128 iterations. The motion is better described as smooth, mostly real-valued relaxation than as a helix, rotation, or sustained oscillation. No temporal mode found here explains long-horizon health or collapse.
+The sequence of updates is smooth and predictable, especially during the first 128 iterations. The fitted models do not establish sustained rotation or oscillation, or explain why some checkpoints retain correct answers while another loses them.
 
 ## Artifacts
 

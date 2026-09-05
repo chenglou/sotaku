@@ -20,7 +20,7 @@ Raw clue-versus-blank accuracy mostly measured persistent input identity: at ite
 
 ## Verdict
 
-The model does more than preserve its input embedding. It computes candidate difficulty and spatial role information during recurrence, with candidate size clearest around the early solving phase. Persistent clue identity is largely an input-memory effect, while position and candidate-size signals survive the input-persistence control. Deep checkpoints differ substantially in which role information remains linearly accessible after solving.
+The state acquires candidate-set size and cell-position information during recurrence, with candidate size clearest early in solving. Clue-versus-blank information mostly comes from the original input embedding; position and candidate-size information remain after that input contribution is subtracted. Which features remain readable after solving differs substantially between checkpoints.
 
 ## Limitations
 

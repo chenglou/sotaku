@@ -6,6 +6,7 @@ __pycache__/
 data/
 logs/
 runs/
+runs_modal/weight_tying_v1_20260902/
 viz/output/
 .DS_Store
 release/validation/**/*.npz

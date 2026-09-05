@@ -9,7 +9,7 @@ This file records the original `sudoku-extreme` iteration experiments. See the [
 - `eval_more_iters.py` - Test model at different iteration counts (no retraining)
 - `eval_confidence_stop.py` - Confidence-based and oscillation-based adaptive stopping
 - `eval_fixed_point.py` - Test whether one model iteration preserves an injected correct answer
-- `exp_baseline_lr2e3.py` - LR=2e-3 (**SOTA: 98.9%** at 1024 test iters)
+- `exp_baseline_lr2e3.py` - LR=2e-3 (historical best: 98.9% at 1024 test iterations)
 - `exp_bs2048_baseline.py` - BS=2048, 16-iter, reverse curriculum (prev SOTA: 98.2%)
 - `exp_bs2048_mixed.py` - BS=2048, 16-iter, mixed sampling (isolates curriculum effect)
 - `exp_bs1024_curriculum.py` - BS=1024, 16-iter, reverse curriculum (tests smaller batch)
@@ -149,16 +149,16 @@ The baseline without these modifications reaches 98.1% at 1024 iterations. These
 
 ### 100K Training Steps — LR Schedule Confound
 
-Training for 100K steps with cosine decay stretched over 100K (exp_bs2048_100k) collapses at 64 test iters. The step-50K checkpoint already collapses — confirming the cause is the stretched LR schedule (LR still high at step 50K), not overtraining. The baseline's 50K cosine fully anneals by training end, enabling the flat minimum.
+Training for 100K steps with cosine decay stretched over 100K (`exp_bs2048_100k`) loses accuracy from 64 inference iterations onward. Its step-50K checkpoint already has this problem, so the decline did not require more than 50K updates. The learning-rate schedules differ at that point: the baseline has nearly finished decaying, while the 100K schedule has not. This comparison does not isolate training duration from learning-rate effects or establish a flat-minimum explanation.
 
 ## Settings In The Early Successful Runs
 
 The early successful checkpoints used the following settings. These comparisons concern the original training recipe; they do not establish necessary conditions for every architecture or later training method.
 
-1. **LR in a narrow band** — for d=128, only LR=1.5e-3 to 2e-3 works. Both higher (2.5e-3, 3e-3) and lower (1e-3) collapse. The optimum is sharp at 2e-3. Higher LR causes oscillatory collapse; lower LR reaches a worse long-horizon answer trajectory.
+1. **Learning rate**: at width 128, the strongest tested runs used 1.5e-3 or 2e-3. The tested higher rates (2.5e-3 and 3e-3) and lower rate (1e-3) lost accuracy at larger inference iteration counts. This is an observed range, not a precise boundary between working and failing rates.
 2. **BS=2048** — BS=4096 collapses at 48 iters, while BS=1024 collapses at 256. Gradient noise or minimum geometry may explain the difference, but these experiments did not isolate the cause.
 3. **Small enough model** — d=128 scales to 1024+. d=192 collapses at every LR tested. d=96 peaks early and slowly degrades. The d=192 spectral radius rebounds near its collapse point, but that correlation does not by itself explain why width hurts.
-4. **Full LR annealing** — cosine schedule must decay to near-zero by training end. Stretched schedules (100K steps) or redistributed phase durations collapse because LR is still high late in training.
+4. **Learning-rate schedule**: the successful runs used cosine decay to near zero. Stretching the schedule or redistributing curriculum phases reduced accuracy in the tested runs, but those comparisons do not isolate the cause.
 5. **16 supervised training iterations**: the 32-iteration runs did not match the strongest 16-iteration runs at large inference iteration counts. This comparison changes the differentiable training length, unlike later experiments that run initial iterations without gradients.
 6. **No added prediction-preservation loss**: all four tested modifications (preservation weighting, L2 toward target, self-consistency, and gradient masking) hurt. They modify prediction losses, not the hidden-state fixed-point condition.
 
@@ -240,7 +240,7 @@ Scripts: `eval_interventions.py`, `modal_eval_interventions.py`.
 | Pred_scale β=0.1 | 4.5% | 4.8% | 4.9% | 4.9% | 4.6% | 4.5% | 4.2% |
 | Pre_norm | 83.6% | 89.5% | 80.2% | 30.7% | 6.1% | 0.3% | 0.0% |
 
-### Stable model (LR=2e-3, d=128 — SOTA)
+### Stable model (LR=2e-3, d=128 — historical best)
 
 | Intervention | 16 | 32 | 64 | 128 | 256 | 512 | 1024 |
 |---|---|---|---|---|---|---|---|
@@ -303,24 +303,16 @@ A fixed point is a state `h*` with `F(h*) = h*`; it does not require a zero Jaco
 Key findings:
 1. **All measured spectral radii are much greater than 1**, including the stable SOTA model at 14-56. The usual `SR < 1` fixed-point criterion cannot be applied because these measurements are taken along a moving, growing trajectory rather than at a hidden-state fixed point.
 2. **The trend correlates with stability in this small comparison.** The stable model's estimate decreases from 56 to 14, while two collapsing models flatten or rebound. The estimate remains much greater than 1, so "decreasing" does not mean that the map is approaching a contraction.
-3. **Magnitude is not sufficient.** LR=1e-3 has the lowest estimates, 26-36, but worse answers. A smaller worst-case local sensitivity does not guarantee a useful answer trajectory.
+3. **Magnitude is not sufficient.** LR=1e-3 has the lowest estimates, 26-36, but worse answers. A smaller spectral-radius estimate does not guarantee more accurate predictions.
 4. **The d=192 estimate rebounds near its collapse point.** This is a useful warning signal in that run, not proof that the rebound causes collapse.
 
 **Implication:** Treat the spectral-radius estimates as local sensitivity diagnostics. They do not show that the hidden state converges, enters a basin of attraction, or has a nearby fixed point. Direct trajectory and answer-margin measurements are more informative for the observed collapse.
 
 ## Key Findings
 
-1. **BS=2048 is the observed sweet spot for iteration stability** — BS=4096 collapses at 48 iters, BS=1024 collapses at 256 iters, and BS=2048 remains healthy through 2048. The experiments did not isolate why.
-2. **Sampling strategy doesn't matter** — curriculum vs mixed gives near-identical results in all comparisons.
-3. **32-iteration training did not match the best 16-iteration runs at large inference counts.** These runs use intermediate cross-entropy and model-generated feedback, not teacher forcing.
-4. **Predictions can stay correct while the hidden state keeps changing.** In the test spanning iterations 1022 through 1026, 24,513 of 25,000 puzzles had correct, identical predictions at all five iterations. The hidden-state norm continued growing; this is neither a hidden-state fixed point nor a guarantee about later predictions.
-5. **Useful answer trajectories emerge without a convergence loss** — successful models retain or improve answers over many iterations even though their hidden states keep moving.
-6. **The four prediction-preservation modifications reduced accuracy at large iteration counts.** They change losses on already-correct predictions; they do not impose a finite hidden-state equilibrium.
-7. **LR=2e-3 is the sharp observed optimum for iteration scaling** — at d_model=128: LR=3e-3 collapses at 64 iters, LR=2.5e-3 at 128, LR=2e-3 scales to 1024 at 98.9%, LR=1.5e-3 scales to 1024 at 98.1%, and LR=1e-3 stalls at worse long-horizon accuracy.
-8. **Wider models (d=192) collapse regardless of LR** — LR=2e-3 peaks at 64 iters (94.3%, better per-iteration than d=128's 92.5%) but collapses at 128. LR=1e-3 collapses at 256, LR=1.5e-3 at 64. The spectral radius rebounds past the collapse point (67→79 at iters 64→128), confirming the wider model's dynamics destabilize rather than converge.
-9. **3-phase curriculum works if you keep phase durations** — dropping Medium+ with original durations (40K total) is stable at 95.9%, but redistributing to maintain 50K steps collapses because the LR schedule decays slower.
-10. **The smaller model (d=96) peaks early then loses accuracy**: 87.8% at 128 iterations, falling to 73.2% at 2048. This does not by itself establish insufficient capacity as the cause.
-11. **Q-head (learned halt) failed** — loss competition degrades main task.
-12. **Test-time carried-state interventions can fix collapse.** On 25,000 puzzles, cap 12 rescues one collapsed checkpoint to 91.45% at 1024 and 91.31% at 2048. Delayed damping after iteration 128 improves the same checkpoint further, to 95.66% and 96.20%. Constant damping from iteration 1, prediction scaling, and pre-output LayerNorm still fail.
-13. **Jacobian spectral radius is much greater than 1 for every measured model, including stable ones** — estimates range from 14 to 88. A decreasing estimate correlates with stability in the original comparison, but does not establish fixed-point convergence. Later causal interventions identify loss of correct-answer margin from accumulated directional drift as the immediate collapse mechanism.
-14. **Historical released checkpoint: 98.9%** at 1024 test iterations with LR=2e-3 (`exp_baseline_lr2e3`), retaining 98.8% at 2048. The current recommendation trains on later iterations with a gradient-free initial segment; see [the looping notes](../looping/EXPERIMENTS_LOOPING.md).
+- **The original recipe was not reliably reproducible.** Batch size, learning rate, width, and schedule affected the results, but the early successful settings also produced later failures. See [the repeated runs](#reproducibility-july-2026).
+- **Correct predictions do not require an unchanged hidden state.** The answer-preservation and equilibrium tests measure different things; the original model keeps accumulating state updates even after solving a puzzle.
+- **More supervised iterations and the four prediction-preservation losses did not improve the strongest baseline.** These negative results concern those specific settings, not all forms of later-iteration training.
+- **State RMS limits and delayed damping improved some failing checkpoints without retraining.** Their settings depend on the checkpoint, and damping can reduce the score of an already accurate model.
+- **The Jacobian measurements are local diagnostics, not evidence of a hidden-state fixed point.** Their trend correlated with accuracy in a small comparison; a lower estimate alone did not identify better models.
+- **For the current recipe, see [training on later iterations](../looping/EXPERIMENTS_LOOPING.md#training-on-later-iterations).** The tables above remain the record of the original experiments, not recommendations for v2.

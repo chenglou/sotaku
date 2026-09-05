@@ -14,9 +14,9 @@ Visual inspection of both 2D and 3D figures found no repeated helix across puzzl
 
 ## Limits
 
-Only the stable baseline checkpoint was available locally. Modal execution was not authorized, so this pass does not compare the collapsed, later-iteration training, and combined checkpoints. Five puzzles are enough to reject an obvious universal helix but not enough to rule out more specific geometry, such as a representation that appears only in certain cells, digit features, or solving phases.
+Only the accurate baseline checkpoint was available locally for this initial pass. It does not compare the failing, later-iteration training, and combined checkpoints. Five puzzles showed no obvious shared helix, but cannot rule out geometry specific to certain cells, digit features, or solving phases. The later [four-checkpoint study](../study/README.md) extends this comparison.
 
-The next justified analysis would search for coordinates tied to interpretable variables, e.g. candidate entropy, solved-cell count, or digit identity, and test those coordinates on held-out puzzles. Looking for a visually pleasing curve without an independently specified variable is too unconstrained.
+The follow-up study tests coordinates tied to defined quantities, including uncertainty, solve progress, and digit identity. A visually pleasing curve alone is not evidence for any of those interpretations.
 
 ## Artifacts
 

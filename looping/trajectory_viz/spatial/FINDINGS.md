@@ -19,4 +19,4 @@ The phase heatmaps use the angle in the first two shared PCA directions. This an
 - `artifacts_downloaded/spatial/puzzle_*_spatial.png`: per-cell update magnitude and projected phase over iteration.
 - `artifacts_downloaded/spatial/metrics.json`: plotted values and checkpoint paths.
 
-The next grounded test is to regress the shared coordinates against independently meaningful quantities, especially each cell's answer digit, current prediction entropy, correctness, and row/column/box conflict counts. A helix-like interpretation would only become convincing if a coordinate predicts one of those quantities on held-out puzzles.
+The later [geometry study](../study/README.md) tests coordinates against digit identity, prediction entropy, correctness, and row/column/box conflicts on separate puzzles. Predicting one of those quantities is useful, but does not by itself establish a helix.

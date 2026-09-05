@@ -81,7 +81,7 @@ The strongest horizon-specific result is the collapsed-plain unit update at iter
 - natural-helix distance correlation: .261
 - train-selected shortest order: `1-2-9-8-4-3-7-6-5`, transferring at the exact minimum of the test cycle null
 
-Collapsed states at iterations 512 and 1024 have natural-cycle percentiles of 3.78% and 3.85%, and the collapsed update at 1024 has a percentile of 2.99%. The corresponding ideal-distance correlations remain only .08–.27. These are exploratory findings among 96 model × representation × horizon slices, without a multiple-testing correction. The concentration occurs as the collapsed trajectory degrades, does not pool into a below-5% checkpoint result, and does not reproduce in the healthy models. It should be treated as a useful collapse signature to follow up, not as evidence for the main number-helix hypothesis.
+Collapsed states at iterations 512 and 1024 have natural-cycle percentiles of 3.78% and 3.85%, and the collapsed update at 1024 has a percentile of 2.99%. The corresponding ideal-distance correlations remain only .08–.27. These are exploratory findings among 96 combinations of model, representation, and iteration count, without a multiple-testing correction. The pattern occurs as the failing checkpoint loses accuracy, does not give a below-5% result when pooled across iterations, and does not reproduce in the accurate checkpoints. It warrants follow-up but does not support the main number-helix hypothesis.
 
 ## Output-head control
 

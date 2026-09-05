@@ -1,4 +1,4 @@
-# Arm 10: early warning
+# Study 10: Predicting Later Accuracy Loss
 
 ## Hypothesis
 
@@ -46,7 +46,7 @@ The label also asks only about loss of an already correct board. It does not cov
 
 ## Verdict
 
-**Not supported as a transferable early warning.** Early geometry cleanly identifies the known collapsed checkpoint in this sample, but checkpoint identity explains nearly the same held-out separation. Geometry does not survive the checkpoint-conditioned permutation test and fails when the collapsed checkpoint is held out. The evidence supports an early checkpoint difference, not a calibrated puzzle-level warning that generalizes to unseen checkpoints.
+**Not supported as a warning for unseen checkpoints.** Early geometry distinguishes the known failing model, but knowing checkpoint identity gives nearly the same result. The predictor fails when that model is excluded from fitting. This study identifies an early difference between these checkpoints, not a general warning that a particular solved puzzle will become incorrect.
 
 ## Artifacts and reproduction
 

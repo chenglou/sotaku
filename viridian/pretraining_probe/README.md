@@ -2,7 +2,7 @@
 
 This was the cheap infrastructure experiment for deciding whether Viridian can be used as a training runner.
 
-The goal is not to train `sotaku` yet. The goal is to test the cluster properties we would need for pretraining:
+This test checked the infrastructure needed before attempting Sotaku training:
 
 - Can a GPU job run for the requested wall time?
 - Is CUDA visible from Python?
@@ -21,19 +21,19 @@ Use an eval-only runner job:
 "limits": { "max_gens": 1 }
 ```
 
-This avoids the optimizer rollout path and directly runs the training command we provide. As of the latest runs, CPU and L4 runner jobs work, `eval.py` works directly, L4/H100 PyTorch sees CUDA, and a tiny CUDA matmul succeeds.
+This disables Viridian's code-editing agents and directly runs the supplied command. In these tests, CPU and L4 runner jobs worked, `eval.py` worked directly, L4/H100 PyTorch saw CUDA, and a tiny CUDA matrix multiplication succeeded.
 
 ## Test Setup
 
 Use zero agents and one generation. Lock the probe script so Viridian cannot improve the metric by editing the probe if this is later run with optimizer agents enabled.
 
-Start with `l4` for the infrastructure test. A 10 minute GPU window costs about `$0.13` at the public tier price before token and overhead costs:
+The initial `l4` test budget was about `$0.13` for 10 minutes at the published price at the time, before token and overhead costs:
 
 ```text
 600 seconds * $0.00022/sec = $0.132
 ```
 
-If that passes, repeat once on `h100` to test the intended training hardware:
+The corresponding `h100` budget was:
 
 ```text
 600 seconds * $0.00110/sec = $0.660
@@ -65,4 +65,4 @@ This probe is good enough to justify a tiny Sotaku training run because all of t
 
 ## What This Does Not Prove
 
-This does not prove full `sotaku` training is stable on Viridian. It only proves that the runtime can support the mechanics of pretraining. If this passes, the next cheap experiment should train on a tiny fixed Sudoku subset for 10-20 minutes and upload resumable checkpoints the same way.
+This established that the runtime supported training and checkpoint recovery, not that the trained model would solve Sudoku accurately. The follow-ups are recorded in the [small Sotaku test](../sotaku_probe/README.md) and [full training test](../sotaku_serious_probe/README.md).

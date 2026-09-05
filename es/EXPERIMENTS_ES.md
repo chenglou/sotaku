@@ -28,12 +28,12 @@ The first successful fine-tuning runs suggested that high 128-iteration accuracy
 
 | run | best checkpoint before ES | result after selection and ES |
 |---|---|---|
-| e | final 97.1% at 1024 | direct success |
-| h | final 98.1% at 1024 | direct success |
+| e | final 97.1% at 1024 | reached this score without ES |
+| h | final 98.1% at 1024 | reached this score without ES |
 | b | step 45K at 95.5% | ES fine-tuning reached 96.1% on the full set |
 | g | step 40K at 89.7%/128 and 48.8%/1024 | some improvement with ES |
-| d | step 45K at 93.9%/128 and 1.6%/1024 | flat under solved and dense fitness |
-| a | step 40K at 84.4%/128 and 0.2%/1024 | flat |
+| d | step 45K at 93.9%/128 and 1.6%/1024 | no improvement with whole-puzzle or per-cell scoring |
+| a | step 40K at 84.4%/128 and 0.2%/1024 | no improvement |
 | c | no checkpoint above 74.7% at 128 | no suitable starting checkpoint |
 | f | no checkpoint above 0.9% at 128 | no suitable starting checkpoint |
 
@@ -81,7 +81,7 @@ The latest fine-tuning run used the same two-snapshot objective with 32 independ
 | 15, best | 95.9% | 97.5% | 95.8% |
 | 59, final | 94.9% | 96.4% | 94.5% |
 
-The final model did not improve on the starting checkpoint. The first harness recorded the best score but saved only generations 19, 39, 59, and the final model. A deterministic 16-generation replay reproduced every monitoring score and recovered generation 15. `exp_es_settle_independent.py` uses the same two-snapshot comparison, now saves every new best monitoring checkpoint atomically, and records both best and final model paths.
+The final model did not improve on the starting checkpoint. The original runner recorded the best score but saved only generations 19, 39, 59, and the final model. A deterministic 16-generation replay reproduced every monitoring score and recovered generation 15. `exp_es_settle_independent.py` now saves the weights whenever the monitoring score improves, using an atomic write, and records both best and final model paths.
 
 ## When To Switch To ES
 
@@ -100,7 +100,7 @@ The 5K and 10K checkpoints came from an unfinished 50K learning-rate schedule, s
 
 ## From-Scratch ES
 
-The from-scratch program tested several ways to provide a denser or more local signal:
+The from-scratch experiments tested whether more detailed feedback would help:
 
 | experiment | change | result |
 |---|---|---|
@@ -108,12 +108,12 @@ The from-scratch program tested several ways to provide a denser or more local s
 | tiny 52K model | 2000 generations, scoring at iteration 16 | zero solves |
 | scalar cross-entropy | smooth score | moved to uniform prediction, then stopped |
 | population 256 pairs | more samples near the uniform-prediction baseline | zero solves after 1000 generations |
-| cross-entropy at iteration 1 | removes credit assignment across model iterations | pinned at `ln(9)` |
+| cross-entropy at iteration 1 | removes credit assignment across model iterations | stopped near `ln(9)`, the loss for uniform guesses |
 | easy-puzzle curriculum | more givens | same uniform-prediction baseline |
 | per-puzzle voting | vector-valued comparison | votes were nearly random |
-| reward-modulated Hebbian update | local input/output traces | stayed at chance; fine-tuning moved downhill |
+| reward-modulated Hebbian update | local input/output traces | stayed at chance; fine-tuning reduced accuracy |
 
-CDRGE was the largest direct test on the full 796,937-parameter Sudoku model. It estimates a gradient from positive and negative Rademacher perturbations, using the perturbation radius as both finite-difference scale and update size.
+CDRGE was the largest direct test on the full 796,937-parameter Sudoku model. It estimates a gradient by testing both signs of random directions whose components are independently +1 or -1 (Rademacher perturbations). The perturbation radius sets both the finite-difference scale and the weight-update size.
 
 | CDRGE run | generations | final CE at iteration 1 | cells | solved |
 |---|---:|---:|---:|---:|

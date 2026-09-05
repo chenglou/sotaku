@@ -1,7 +1,6 @@
 # RRN (Recurrent Relational Network) Experiments
 
-Original experiments use 100k training steps on easiest difficulty Kaggle puzzles (100k train, 1k test).
-Curriculum experiments use sudoku-extreme dataset (2.7M train, 25K test across difficulty buckets).
+Historical comparison with the looped transformer. Original experiments use 100k training steps on easiest difficulty Kaggle puzzles (100k train, 1k test). Curriculum experiments use sudoku-extreme (2.7M train, 25K test across difficulty buckets). In the Kaggle results, "acc" means cell accuracy; "solved" counts fully correct puzzles. The sudoku-extreme percentages measure fully correct puzzles.
 
 ---
 
@@ -77,7 +76,7 @@ Curriculum experiments use sudoku-extreme dataset (2.7M train, 25K test across d
 
 **Results:** 97.9% acc, 839/1000 solved
 
-**Finding:** Actually hurts (-0.3% acc, -30 puzzles). Message passing already propagates prediction info implicitly through hidden states. Explicit feedback adds noise.
+**Finding:** Explicit prediction feedback hurt (-0.3% cell accuracy, -30 puzzles). The comparison does not establish why.
 
 ---
 
@@ -89,7 +88,7 @@ Curriculum experiments use sudoku-extreme dataset (2.7M train, 25K test across d
 
 **Change:** Only compute loss on final step output.
 
-**Results:** TODO
+**Results:** Not recorded.
 
 ---
 
@@ -101,7 +100,7 @@ Curriculum experiments use sudoku-extreme dataset (2.7M train, 25K test across d
 
 **Change:** Set num_steps=1.
 
-**Results:** TODO
+**Results:** Not recorded.
 
 ---
 
@@ -113,7 +112,7 @@ Curriculum experiments use sudoku-extreme dataset (2.7M train, 25K test across d
 
 **Change:** Try num_steps = 1, 2, 4, 8, 16, 32
 
-**Results:** TODO
+**Results:** Not recorded.
 
 ---
 
@@ -143,12 +142,7 @@ Curriculum experiments use sudoku-extreme dataset (2.7M train, 25K test across d
 - Regular curriculum excels on easy/medium puzzles (88% vs 84% on rating 0)
 - Reverse curriculum slightly better on hardest puzzles (31.5% vs 30.1% on 51+)
 - RRN much weaker than transformer on sudoku-extreme (42.5% vs 76.3%)
-- Architecture determines optimal curriculum strategy
-
-**Why the difference from transformers?**
-- RRN uses explicit graph constraints; may need to "learn the rules" on easy puzzles first
-- Transformer's attention can discover patterns from hard examples; benefits from seeing complex cases early
-- Message passing is more structured; may not transfer hard→easy knowledge as effectively
+- These runs favored different curriculum orders for the two architectures; they do not establish why.
 
 ---
 
@@ -198,18 +192,4 @@ RRN significantly underperforms transformer on hard puzzles despite being compet
 
 ## Key Insights
 
-1. **Graph structure > attention** - Explicit constraint edges outperform learned attention patterns.
-
-2. **Positional encoding redundant** - Graph edges already encode row/col/box relationships.
-
-3. **Prediction feedback unnecessary** - Message passing propagates info implicitly.
-
-4. **Parameter efficient** - 4x fewer params than transformer for comparable results on easy puzzles.
-
-5. **SAM helps both architectures** - Flatter minima generalize better.
-
-6. **bf16 helps less for RRN** - scatter_add is memory-bound, not compute-bound.
-
-7. **Curriculum strategy is architecture-dependent** - RRN prefers easy→hard (+1.3%), transformer prefers hard→easy (+3.4%).
-
-8. **RRN struggles on hard puzzles** - Competitive on easy Kaggle (908/1000) but weak on sudoku-extreme (42.5% vs 76.3%).
+The RRN used fewer parameters and was competitive on easy Kaggle puzzles, but the transformer performed much better on sudoku-extreme. SAM improved both architectures in these early tests. Explicit positional embeddings and prediction feedback did not improve the tested RRN; neither finding implies that graph networks generally outperform attention.

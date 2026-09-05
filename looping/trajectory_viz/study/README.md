@@ -12,10 +12,19 @@ The recurring picture is simpler:
 - The state progressively represents the current answer, candidate-set size, cell position, conflicts, answer margin, and solve progress.
 - Digit identity occupies a compact categorical subspace, but the digits do not have a privileged numeric or cyclic order. This is expected because Sudoku is unchanged by a global relabeling of the nine digits.
 - The accurate models' complete states keep moving, but their directions change slowly at the measured later iterations and their answers remain correct.
-- The collapsed checkpoint also moves smoothly. Its normalized direction keeps drifting until some correct-answer margins cross the output boundary.
-- Most useful coordinates are checkpoint-local. A direction fitted in one checkpoint generally does not remain the same direction in another.
+- The failing checkpoint also moves smoothly. Its state direction keeps changing until an incorrect digit scores above the correct digit in some cells.
+- Most useful coordinates are specific to one checkpoint. A direction fitted in one model generally does not work unchanged in another.
 
-This supports interpreting Sotaku as a smooth, puzzle-dependent computation with shared local features, rather than as traversal of one rigid low-dimensional shape.
+This supports a smooth computation that depends on the puzzle, with some features shared across puzzles, rather than traversal of one rigid low-dimensional shape.
+
+## Reading The Reports
+
+- A **probe** here is a small regression or classifier fitted to the hidden states to predict a quantity, such as current cell accuracy. It does not change the Sudoku model. This differs from the 1K-puzzle monitoring evaluations called probes in older training logs.
+- An **axis** is a direction in hidden-state space. A **subspace** is a collection of such directions. Being able to predict a quantity from those directions does not establish that changing them will improve solving.
+- The **correct-answer margin** is the correct digit's score minus the highest incorrect digit's score. A negative margin means an incorrect digit outranks the correct one. Some separate controls use the top-two predicted scores without consulting the answer key; the reports distinguish them.
+- A **residual** is what remains after subtracting a stated effect. For example, an iteration-controlled regression asks whether hidden states predict anything beyond knowing the iteration number.
+- **Discovery**, **validation**, and **final** refer to separate puzzle sets used to fit the analysis, choose its settings, and evaluate it once. They are not additional Sudoku training stages.
+- Plot labels such as `stable_plain` and `collapsed_plain` identify the selected checkpoints. They do not guarantee that the corresponding training recipes always work or fail.
 
 ## Results
 
@@ -44,4 +53,4 @@ The study does not identify a new training loss or universal root cause by itsel
 
 The study used 60 test puzzles per analysis: 20 for discovery, 20 for validation, and 20 touched once for the final result, with four puzzles from each rating bucket in every split. The checkpoint set contains one accurate original model, one failing original model, one model trained on later iterations, and one combined model. [The protocol](PROTOCOL.md#models) maps these descriptions to the historical plot labels and defines the combined recipe. Conclusions about failure across models need independently trained failing checkpoints before they can be treated as general laws.
 
-Large activation tensors and projection-search caches are intentionally kept out of Git. Each arm includes the code, frozen choices, tests, reports, summary metrics, and plots needed to inspect the reported conclusion.
+Large activation tensors and projection-search caches are intentionally kept out of Git. Each analysis includes code, frozen choices, tests, reports, summary metrics, and plots for inspecting its conclusion.

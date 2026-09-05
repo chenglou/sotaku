@@ -89,7 +89,7 @@ Digit centroids use unit-normalized token vectors and are computed separately on
 
 Across five endpoints and four models, we tested centroids both before and after removing the output head's eight digit-contrast directions. That removal centers the nine output-weight rows and projects states perpendicular to their row space; it does not remove all digit information. Natural order has exact tail fraction below 0.05 in 0 of 40 tests. A fit-selected nonnumeric cycle has tail fraction below 0.05 in all 40 tests. The cycles are model- and endpoint-specific, and an unoriented cycle is equivalent under reversal and cyclic rotation. Removing those directions leaves the t=1024 results almost unchanged, so the model-specific organization is not confined to the output head's direct digit contrasts.
 
-Planarity does not rescue the numeric interpretation. At t=1024, the train-fitted digit plane explains 0.401, 0.740, 0.622, and 0.755 of held-out centroid energy, yet the natural cycle remains nonspecific. The output-head rows themselves are nearly equidistant, with pairwise-distance CV 0.014–0.020, and have natural-order tail fractions 0.675–0.919. This is consistent with exchangeable class geometry rather than a numeric circle.
+Concentration in a plane does not establish numeric order. At t=1024, the train-fitted digit plane explains 0.401, 0.740, 0.622, and 0.755 of held-out centroid energy, yet the natural cycle remains nonspecific. The output-head rows themselves are nearly equidistant, with pairwise-distance CV 0.014–0.020, and have natural-order tail fractions 0.675–0.919. This is consistent with exchangeable class geometry rather than a numeric circle.
 
 Actual prediction changes also reject the natural order: none of 11 endpoint/model rows has a natural adjacency tail fraction below 0.05. A train-selected order generalizes for only two rows, both early `late_state_ce` endpoints. Static digit geometry therefore should not be interpreted as digits winding around the trajectory in time.
 
@@ -99,7 +99,7 @@ All four models reach 100% held-out puzzle accuracy at iteration 128. The stable
 
 Transitions are output-boundary crossings accompanied by a local motion peak. Across models, the pooled wrong→correct median margin moves from -0.284 to -0.229 one iteration before the event to 0.308–0.431 at the new state; incoming update norm rises from 9.78–10.97 to 12.34–15.41. Correct→wrong margins move from 0.110–0.156 to -0.111–-0.221. These event-aligned q10/q90 bands pool correlated cell events and are descriptive, not puzzle-level confidence intervals.
 
-Maximum-class confidence is not correctness confidence. During the collapsed model's deep phase, 90,016 wrong→wrong events have per-puzzle median target margin -1.994 while maximum-class confidence is 0.757. The overall margin median remains positive because 620,693 correct→correct events have median margin 138.7 and confidence 1.0. The negative p10 in the table exposes the failing tail that the median hides.
+Maximum-class confidence is not correctness confidence. During the collapsed model's deep phase, 90,016 wrong→wrong events have per-puzzle median target margin -1.994 while maximum-class confidence is 0.757. The overall margin median remains positive because 620,693 correct→correct events have median margin 138.7 and confidence 1.0. The negative 10th-percentile margin in the table reveals errors that the positive median hides.
 
 Correctness events do have an early association with update angle under the current cellwise circular-shift null: 18 of 23 exploratory phase × transition tests have nominal `p ≤ 0.05`. None survives a strict Bonferroni threshold of `0.05 / 23`, and the null does not match iteration, so this result cannot separate angle from ordinary temporal progress. The collapsed model's deep gains and losses are explicitly not aligned: resultant 0.141 versus null median 0.179, `p=0.690`, for gains; 0.152 versus 0.219, `p=0.907`, for losses.
 
@@ -109,11 +109,9 @@ A held-out logistic probe asks whether the previous update `u[t-1]` predicts cor
 
 This is one balanced 50-puzzle sample and one checkpoint for each model configuration, not a training-seed study. The 25-puzzle held-out bootstrap quantifies puzzle variation within this sample. It does not quantify checkpoint, dataset, or training-run variation.
 
-The periodic models share a fit-selected frequency but allow every cell its own coefficients. A predictive win does not imply a common axis or phase. Random-plane comparisons use 12 planes and shuffle comparisons use 24 repetitions. The same-parameter polynomial baselines can extrapolate badly, and time reversal is not a falsification test for reversible curve families.
+The periodic models share a fit-selected frequency but allow every cell its own coefficients. Better prediction does not imply a common axis or phase. Random-plane comparisons use 12 planes and shuffle comparisons use 24 repetitions. The same-parameter polynomial baselines can extrapolate badly, and time reversal is not a falsification test for reversible curve families.
 
 Event curves pool cells and iterations; event-phase tests use an iteration-unmatched null; exact cycle tail fractions measure specificity among 20,160 orders for one aggregate held-out RDM, not puzzle-sampling uncertainty. The many phase, representation, and endpoint comparisons are exploratory. High phase-step resultant is not used as evidence by itself because near-zero angle changes can also produce a resultant near one.
-
-Within those limits, the consistent interpretation is smooth, compact, phase-dependent recurrent dynamics with strong translation and update-direction sweeps, plus stable model-specific digit organization. The evidence does not support a single shared natural-number helix.
 
 ## Artifacts and reproducibility
 
