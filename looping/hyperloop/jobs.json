@@ -24,7 +24,12 @@
       "20260907": "8c407121b2f9b782a4e7e011e63febac3b964ef2f888f11defb828ff95c4ca5e",
       "20260908": "e7f17f42a0ebb441e971cc90f1b05de51529d4c6e6c31cf92fce618416db4505",
       "20260909": "9dae00817af874deadaf7f4d7dd8c556f0435436b3948f182adcc9a9911055da"
-    }
+    },
+    "all_nine_training_runs_complete": true,
+    "all_eighteen_full_evaluations_complete": true,
+    "puzzle_horizon_predictions_verified": 2700000,
+    "full_results": "results/full_results_20260905.json",
+    "artifact_audit": "results/artifact_audit_20260905.json"
   },
   "jobs": [
     {
@@ -34,10 +39,11 @@
       "call_id": "fc-01M1QN95X484XJ429W4AGC4J4R",
       "container_id": "ta-01M1QN96H9QXK82QTTS81PNVAR",
       "started_at": "2026-09-04 19:10:12-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/baseline_seed20260907",
-      "parameters": 796937
+      "parameters": 796937,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "gated_one",
@@ -46,10 +52,11 @@
       "call_id": "fc-01M1QNAC2V4VG0T1MART5AVQGN",
       "container_id": "ta-01M1QNACBG217FK55XRQFPAG0R",
       "started_at": "2026-09-04 19:10:52-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/gated_one_seed20260907",
-      "parameters": 797327
+      "parameters": 797327,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "gated_four",
@@ -58,10 +65,11 @@
       "call_id": "fc-01M1QNAXG4B5VGG156622E5KT2",
       "container_id": "ta-01M1QNAXWH5DT8MYRX52S5YF8R",
       "started_at": "2026-09-04 19:11:10-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/gated_four_seed20260907",
-      "parameters": 803096
+      "parameters": 803096,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "baseline",
@@ -70,10 +78,11 @@
       "call_id": "fc-01M1QNBDSHE7FGCR67D1RWRCM9",
       "container_id": "ta-01M1QNBE9ZCD2ZGQE53JZXRVNR",
       "started_at": "2026-09-04 19:11:27-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/baseline_seed20260908",
-      "parameters": 796937
+      "parameters": 796937,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "gated_one",
@@ -82,10 +91,11 @@
       "call_id": "fc-01M1QNBX9027DYY38NV4KP12NZ",
       "container_id": "ta-01M1QNBXGX38TYQW0W0BD74G7R",
       "started_at": "2026-09-04 19:11:42-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/gated_one_seed20260908",
-      "parameters": 797327
+      "parameters": 797327,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "gated_four",
@@ -94,10 +104,11 @@
       "call_id": "fc-01M1QNCCDX1VX5RGSTXTBJPC8A",
       "container_id": "ta-01M1QNCCV3YN5ZWNFRZV5DX9QR",
       "started_at": "2026-09-04 19:12:00-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/gated_four_seed20260908",
-      "parameters": 803096
+      "parameters": 803096,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "baseline",
@@ -106,10 +117,11 @@
       "call_id": "fc-01M1QNCW4EH4K8YE1X638G3J62",
       "container_id": "ta-01M1QNCWHCDB0NHF9QNEXEMTHR",
       "started_at": "2026-09-04 19:12:16-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/baseline_seed20260909",
-      "parameters": 796937
+      "parameters": 796937,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "gated_one",
@@ -118,10 +130,11 @@
       "call_id": "fc-01M1QNDB641XQ6YF6G04HDB4X9",
       "container_id": "ta-01M1QNDBECMWWQCQMT3NXQNW5R",
       "started_at": "2026-09-04 19:12:28-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/gated_one_seed20260909",
-      "parameters": 797327
+      "parameters": 797327,
+      "full_evaluations_completed": 2
     },
     {
       "arm": "gated_four",
@@ -130,10 +143,12 @@
       "call_id": "fc-01M1QNDT9JR3QJWM6ZAHDY0YAR",
       "container_id": "ta-01M1QNFMKPJ8XCDV278RV97J4R",
       "started_at": "2026-09-04 19:13:43-07:00",
-      "status": "running",
-      "last_observed_stage": "compilation",
+      "status": "complete",
+      "last_observed_stage": "complete",
       "output_directory": "/outputs/hyperloop_v1_20260905/runs/gated_four_seed20260909",
-      "parameters": 803096
+      "parameters": 803096,
+      "full_evaluations_completed": 2
     }
-  ]
+  ],
+  "completion_verified_at": "2026-09-05T07:26:33.538Z"
 }

@@ -1,0 +1,253 @@
+{
+  "evaluated_puzzle_horizon_predictions": 2700000,
+  "full_evaluations": 18,
+  "records": [
+    {
+      "completed_sha256": "3398ca22dea3c61f58421757d0484e3e256b16c26bd507e6e4b4a6a1c035f7cc",
+      "earliest_best_checkpoint_verified": true,
+      "run": "baseline_seed20260907",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "34eb1045dfbb41eb2c8314a051b248df69c6d65670d20610c65da1a1963141cc",
+          "predictions_sha256": "810ebd8bb3985bd519109133cf5e287c70da2951b4ead45071679ba4b4ba5d6d",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "ea72cd581ebda67776cae7eeb80be2d9d60946b90f02ed145f096fb8ad6f4913"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "34eb1045dfbb41eb2c8314a051b248df69c6d65670d20610c65da1a1963141cc",
+          "predictions_sha256": "810ebd8bb3985bd519109133cf5e287c70da2951b4ead45071679ba4b4ba5d6d",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "b71c7e2d5f8f62d2b13c078e302201c14f2eef7d9d8cfca0fe36871373160a94"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "3ddd9e7bb2c21d428f35638bdd9a634b07a0448ae97b457dc82e3fe6fd30fdcf"
+    },
+    {
+      "completed_sha256": "65e1c4ad8d5fd23120a6fb0b79321f9249f6c44523332def976878840a639137",
+      "earliest_best_checkpoint_verified": true,
+      "run": "baseline_seed20260908",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "298547779ce09e0138b35eaca7996745921e84e16f93e5b808605ed7b9816965",
+          "predictions_sha256": "f69738361f7ef7af9e588b8318be85eaa643616093d8d3bec9b8b1536ef6a548",
+          "torch": "2.10.0+cu128",
+          "updates": 19000,
+          "weights_sha256": "a628a7497b75835cf6d117ddd68042d15fc42d02d864aca12f888aa76a155161"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "8d3dd10a467f0c126823d987656bbc512c08a5a4cfc79211c234c0ce4f17dfab",
+          "predictions_sha256": "cd618cb40a0ce51b0b5b28a0043232e8102cbd78649464872461a02b5df5c9de",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "3c7f631e55edd6f62133f446e28352acc5518fa930b0c180a973910975483d5f"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "0352c36e5747b9fe6f482645242f86200e6b3fc0b2ee3dd33e141874a803cd46"
+    },
+    {
+      "completed_sha256": "ff22734cd85e4ca08b9b09795cace054adfeb24a940f940dd7d560316fe740e3",
+      "earliest_best_checkpoint_verified": true,
+      "run": "baseline_seed20260909",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "825b61bb69b14a13f005dc62c06c089dcf2a85dd7e88a881de162ea566a214e2",
+          "predictions_sha256": "54c004267b9ebe52be619f46090746736ef09dc60f1404c6800635449af8471b",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "5e5dcef14a534f9ada189715c0645a401d070af946d42b151b753a46a9c9d266"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "825b61bb69b14a13f005dc62c06c089dcf2a85dd7e88a881de162ea566a214e2",
+          "predictions_sha256": "54c004267b9ebe52be619f46090746736ef09dc60f1404c6800635449af8471b",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "67171d230d2771aa669b96f7fbca5e3323afc62a76b9876b17d683b1143f5528"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "68e898cbeca9d2488eedea91540c489bb3d7dc22d0638ce956fc9c0c97b7c3c7"
+    },
+    {
+      "completed_sha256": "5d5479858698b2a45776d71d518a62910b3848e2ab15fd7af95229a6f030034c",
+      "earliest_best_checkpoint_verified": true,
+      "run": "gated_four_seed20260907",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "fdfe34540c564e646cfa463ec56140ee6913e828fd3f0af5ee0ffec6ea31a296",
+          "predictions_sha256": "c1333515e87d20d2d8dff7ca8a90d9e1db9503a92452ad0e1236124b9cad9b2e",
+          "torch": "2.10.0+cu128",
+          "updates": 17000,
+          "weights_sha256": "85e14a10f49a6164223eff515e30c1e8ca9bd5127fd4326dd434d8e303506de8"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "f630cb6ac7b3822d1fb6cd68d92706432ff4d5fecc8936f965bbfa99727e9ed1",
+          "predictions_sha256": "c2a40437df5a999c29dd518f486a1972c7355584d47b87eaecf149d1bd68554c",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "9343bc1d525996772d71a4cf481e001c3245b1c758f9342ce1ef8caedcf251ff"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "9d6218cf68d83f462bd463c16e4dac5481fbf4bd39396bf32080aeb077afb339"
+    },
+    {
+      "completed_sha256": "f746b4394a62d8de08c60fe0be3ccb1202e784cc1f1f292ae9b7e78751657f64",
+      "earliest_best_checkpoint_verified": true,
+      "run": "gated_four_seed20260908",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "0eafac6979a0956489103787db83c185ebcb0fe2fd8afb80f93554879b30ffd8",
+          "predictions_sha256": "b0c5726ce23865e89481be5322cd4693b8b39ef7439240b1a47ee928ceff598d",
+          "torch": "2.10.0+cu128",
+          "updates": 19000,
+          "weights_sha256": "b768bbd47ca99e8b6da78939cea416a174a5a79d4811f7d52bc2b5c8719c1383"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "7ff15a4e5193d1b95b5a620c83ab68bc231bceaa7a663429e62a3d1450994ea6",
+          "predictions_sha256": "5d8a79b9dfd744f633e904ce66cc382fde3c8da645d7bc8323bbe049b134ac4a",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "24cc9a90a2a59cd886638dfbc7eeb9083ab9f91b588ae750e1e929d1c9a64406"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "45f5d8bf46e275dea149a1962ccba76f60e4fc7d5bff43004bdf2dcafccdc501"
+    },
+    {
+      "completed_sha256": "cb76c9abd5484c569dcdce6ae41dd10a39aaa2426ba162f55cbc5a8e63cc6dcc",
+      "earliest_best_checkpoint_verified": true,
+      "run": "gated_four_seed20260909",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "4a0bbe296466f8c056d0769e32ca0a95d6e13f6e928a9a5d0ffebe4c7af21cdc",
+          "predictions_sha256": "63795d30b3843ef539f0b672f597bbea2d418a00869b78d5a8862b4a7fb9d49b",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "1a84e6890124e11cc515a27090f6b42f1ac1ac9e8cafaaba81c46986bce4b56d"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "4a0bbe296466f8c056d0769e32ca0a95d6e13f6e928a9a5d0ffebe4c7af21cdc",
+          "predictions_sha256": "63795d30b3843ef539f0b672f597bbea2d418a00869b78d5a8862b4a7fb9d49b",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "99f184088c83d42a86d4d3106b72d8a1a7d64cbfc1650338a78c15d928f85769"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "750c9205c63eedfad1832ea0440ec4719929a9cc0384ec4bcbdf7fb88395026e"
+    },
+    {
+      "completed_sha256": "05ce09b8f09fe2e410f069416c00c85a5374e0cacfb34492455f3ad69b699486",
+      "earliest_best_checkpoint_verified": true,
+      "run": "gated_one_seed20260907",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "c838262396c3b23ca94c75e0fbf5dee396c0570952ca2632ba0d464411bdb316",
+          "predictions_sha256": "4faf8d62a7e77b5792d829505957f6d8794aad4dfd5ad618625b2b5d05858225",
+          "torch": "2.10.0+cu128",
+          "updates": 19000,
+          "weights_sha256": "22d58fec114bfca0010aae4e8f84a3c4e45ef511015c91f50c50d0ce5dfc241a"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "b01030d001ee05a78cdef6b20c9f4f6a0695b93a9b7a70195dea37074d59f4ab",
+          "predictions_sha256": "e5e44ed41543f69d2423df8f4645ec83b85e46990858b0bdb61397d968dddc82",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "fd510b0a0676ba56726813dbfe49ffd4bb7e5302962dcbf6f4b47c2e1d72181e"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "6a1894765959488046f7f9ad888b4380cff0022f9b14a6b92aa1df3af2268614"
+    },
+    {
+      "completed_sha256": "6431de866f3e9cc9b5f88049b7ae9a915496ec3c43cd591fe75aa9a285e9983c",
+      "earliest_best_checkpoint_verified": true,
+      "run": "gated_one_seed20260908",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "fdd9279baf4a9bc91f54661c2c897d5cc685766850ee191db2ea94d85a67d8d5",
+          "predictions_sha256": "64d7f77fd9bfc1108e3a52ea6c2113a045c70fb5bdd252f91054e7022c82ba74",
+          "torch": "2.10.0+cu128",
+          "updates": 17000,
+          "weights_sha256": "ef3f666adc2e183e9f04f95bc5459c06e4da4f3644049c5d42befb189fac958e"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "38f30c0fb1b4184dbc84a012110ffd076552ef1ee9a7415580db8812f92c3e41",
+          "predictions_sha256": "4342125282ed52e7f0d532dfc7a2ac1e504cc3c0c7512a19039eff8465e1c14b",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "0620dee3e149a86189e2437df07857cd137b0dd4b943c334d85c6e94ecb463e6"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "49a61de7f765cb54e7966c86ed2a30a29b12492836e1beb9a8e734045cfd9088"
+    },
+    {
+      "completed_sha256": "0a85f984f10ee6339e8ce8d1719ae844988981b250cfb16590a84ccb84473edf",
+      "earliest_best_checkpoint_verified": true,
+      "run": "gated_one_seed20260909",
+      "selections": {
+        "best_validation": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "d4a57c4e886eaed916c4de2bc97c7c85b538fd1eac49c9995f01f513201b3654",
+          "predictions_sha256": "68e4e7b697705b0c17041334b8da09d31219e88ee41e61b01ae5111dc9883d82",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "a924685bd2153e9a3e75b3417cd63f33bbb939bddd879c81b7b1f3da84450817"
+        },
+        "final": {
+          "fp32_tf32_off_verified": true,
+          "gpu": "NVIDIA H200",
+          "model_state_sha256": "d4a57c4e886eaed916c4de2bc97c7c85b538fd1eac49c9995f01f513201b3654",
+          "predictions_sha256": "68e4e7b697705b0c17041334b8da09d31219e88ee41e61b01ae5111dc9883d82",
+          "torch": "2.10.0+cu128",
+          "updates": 20000,
+          "weights_sha256": "46bc473be0f90cc17bd58da9078da1a54bc6f3d3f07c8dc68f38099d42dbcfcd"
+        }
+      },
+      "source_data_config_and_initialization_verified": true,
+      "training_result_sha256": "fe348066075d8b84b826396f5218952bdda8c193b7596e91b314ef4b64d82953"
+    }
+  ],
+  "score_recomputation_report_sha256": "4f6663d9c3d3f36d9c149be3c8299e5e648805a278d365dd831c5da98b9f2994",
+  "status": "passed",
+  "study_id": "hyperloop_v1_20260905",
+  "training_runs": 9
+}

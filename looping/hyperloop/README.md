@@ -2,6 +2,8 @@
 
 Controlled 9x9 Sudoku experiments, specified before training. The question is whether learned loop-level gates improve the existing v2 recipe, and whether four parallel hidden states help beyond gates on a single state. The released checkpoint and default training path are unchanged.
 
+**Complete:** all nine 20K training runs and all 18 full evaluations. Four states improved mean final 1024 accuracy from 96.392% to 98.888%, but did not eliminate collapse at 4096. See [results and limitations](RESULTS.md); do not launch duplicate jobs.
+
 ## Background
 
 [Hyperloop Transformers](https://arxiv.org/html/2604.21254v2) keeps several residual streams and uses input-dependent read, write, and retention gates around a repeated transformer block. Its language-model experiments use small loop counts and loop-specific parameters. Our shared-gate variant is an adaptation for arbitrary iteration counts, not a reproduction of those experiments.
@@ -77,6 +79,6 @@ Each detached worker trains and then evaluates both saved models. Artifacts live
 
 The preflight passed all three arms from commit `3cb6d01` after all 192 core tests and all 163 research tests passed. Its [saved result](results/preflight.json) records 45.1 minutes including compilation, finite full-batch early/late gradients, exact populated-optimizer recovery, and finite FP32 inference through 1024 iterations. Peak allocated GPU memory was 50.6/55.2/59.5 GiB for baseline/one-state/four-state. The preflight is a correctness check on nearly untrained models, not an accuracy result.
 
-All nine H200 workers were launched separately on September 4, 2026, at 19:10-19:13 PDT. Live logs and environment records verified every arm/seed, full protocol, data/source checksums, and identical starting base weights within each seed group. At launch verification the workers were compiling, with no training scores yet. They automatically evaluate final and selected checkpoints after training. Do not launch duplicates; use the IDs in [jobs.json](jobs.json).
+All nine H200 workers were launched separately on September 4, 2026, at 19:10-19:13 PDT and completed both evaluations that evening. Live logs and environment records verified every arm/seed, full protocol, data/source checksums, and identical starting base weights within each seed group. The downloaded results were independently checked on September 5. See [jobs.json](jobs.json) and the [artifact audit](results/artifact_audit_20260905.json).
 
 Download into a new local directory and analyze with `python -m looping.hyperloop.analyze LOCAL_STUDY_DIRECTORY --data-dir PREPARED_DATA_DIRECTORY --output NEW_REPORT.json`. The analyzer checks pairing, frozen data, checkpoint steps, model and prediction checksums, and recomputes solved counts from individual predictions and known answers. Preparation, compiler warmup, monitoring, and final evaluation are not interchangeable with optimizer-update time.
