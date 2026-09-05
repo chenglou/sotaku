@@ -184,15 +184,15 @@ class MonotonicityTests(unittest.TestCase):
         ordered = monotonicity_metrics(increasing, puzzle_indices, 1)
         reversed_result = monotonicity_metrics(increasing, puzzle_indices, -1)
 
-        self.assertEqual(ordered["adjacent_direction_fraction"], 1.0)
-        self.assertEqual(ordered["all_pairs_direction_fraction"], 1.0)
-        self.assertEqual(reversed_result["all_pairs_direction_fraction"], 0.0)
+        self.assertAlmostEqual(ordered["adjacent_direction_fraction"], 1.0, delta=1e-12)
+        self.assertAlmostEqual(ordered["all_pairs_direction_fraction"], 1.0, delta=1e-12)
+        self.assertAlmostEqual(reversed_result["all_pairs_direction_fraction"], 0.0, delta=1e-12)
 
     def test_constant_paths_count_as_ties(self):
         constant = torch.ones(4, 3)
         metrics = monotonicity_metrics(constant, torch.arange(4), 1)
-        self.assertEqual(metrics["adjacent_direction_fraction"], 0.5)
-        self.assertEqual(metrics["net_direction_fraction"], 0.5)
+        self.assertAlmostEqual(metrics["adjacent_direction_fraction"], 0.5, delta=1e-12)
+        self.assertAlmostEqual(metrics["net_direction_fraction"], 0.5, delta=1e-12)
 
     def test_shuffled_time_control_returns_requested_count(self):
         paths = torch.arange(6, dtype=torch.float64).repeat(4, 1)
