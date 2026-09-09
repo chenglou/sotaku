@@ -1,8 +1,8 @@
 # Hyperloop: 50K Confirmation
 
-Six fresh 50K runs compare the current one-state recipe with four-state Hyperloop. The [completed 20K study](../hyperloop/RESULTS.md) improved 1024-iteration accuracy in all three pairs, but both architectures still had a deep-iteration failure. These runs check whether the improvement survives the full training schedule. The public release and defaults stay unchanged.
+Six fresh 50K runs compared the one-state recipe with four-state Hyperloop after the [20K study](../hyperloop/RESULTS.md). The public release and defaults are unchanged.
 
-**Launched September 5:** all six detached H200 workers started with verified live configurations, source/data hashes, and paired initial weights. The new GPU check passed; 198 core tests and 163 research tests passed. See [job IDs and verification](jobs.json) and the [GPU check](results/preflight.json). Workers were compiling at the last check; results are pending. Do not launch duplicates.
+**Completed September 5:** all six runs and twelve full evaluations finished. Four states improved mean 1024 accuracy from 98.44% to 99.25%, but one final model fell to 29.33% at 4096. The confirmation criteria did not pass. See [results](RESULTS.md), [job records](jobs.json), and the [GPU check](results/preflight.json).
 
 ## Design
 
@@ -40,6 +40,6 @@ modal run --detach looping/hyperloop_50k/modal_run.py --action train --arm gated
 
 Use the file-path launcher above, not `modal run -m`. Module mode mounted another `looping` package under `/root/looping`; Python loaded that copy instead of the explicit `/root/project` upload, and the source-identity check correctly failed before training.
 
-## After Confirmation
+## Follow-Up
 
-If results hold, compare shorter schedules with architecture fixed, then narrower models with schedule fixed. Measure actual training and inference time as well as parameters and accuracy. Test smaller datasets separately from fewer optimizer updates. Those reductions are not launched yet; a high-scoring checkpoint alone does not establish benchmark saturation.
+The next studies widened the ungated baseline to [160 and 192 dimensions at 20K](../width/RESULTS.md), then [confirmed width 160 at 50K](../width_50k/RESULTS.md). Those results do not isolate extra state storage from additional model capacity. Shorter schedules, smaller datasets, and release promotion remain separate decisions.

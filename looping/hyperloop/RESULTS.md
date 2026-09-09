@@ -9,7 +9,7 @@ Completed September 4, 2026; downloaded and independently checked September 5. A
 - Four states did not eliminate long-iteration collapse. One final model fell from 99.216% at 1024 to 76.980% at 4096. Another improved with more iterations, reaching 99.324% at 4096.
 - Both baseline and four-state variants met the predeclared reliability criteria in two of three final runs. The four-state mean at 4096 is much higher partly because one baseline collapsed to 2.856%. Three seeds do not establish a precise success rate.
 
-These results pass the [predeclared comparison](README.md#decision-rules) against both baseline and one gated state. They justify further confirmation, not a claim of guaranteed stability or an immediate default change. The protocol requires separately specified 50K confirmation before changing the release.
+These results pass the [predeclared comparison](README.md#decision-rules) against both baseline and one gated state. The subsequent [50K confirmation](../hyperloop_50k/RESULTS.md) retained a severe long-iteration failure and did not pass its criteria. Neither study changed the release.
 
 ## Final Checkpoints
 

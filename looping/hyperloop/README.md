@@ -4,7 +4,7 @@ Controlled 9x9 Sudoku experiments, specified before training. The question is wh
 
 **Complete:** all nine 20K training runs and all 18 full evaluations. Four states improved mean final 1024 accuracy from 96.392% to 98.888%, but did not eliminate collapse at 4096. See [results and limitations](RESULTS.md); do not launch duplicate jobs.
 
-Follow-up: [fresh paired 50K confirmation](../hyperloop_50k/README.md).
+Follow-up: the [completed 50K confirmation](../hyperloop_50k/RESULTS.md) also improved average 1024 accuracy, but retained a severe failure at 4096.
 
 ## Background
 
@@ -64,7 +64,7 @@ State diagnostics measure magnitude, relative differences between streams, and g
 
 ## Verification And Operation
 
-The setup review found 409 parseable tracked Python files and no references to removed scripts in supported entrypoints. The preceding cleanup had already removed obsolete root scripts and centralized Modal upload exclusions; 181 core tests and 163 separate research tests passed before this study. Historical experiment code and artifacts are retained for reproducibility. New code reuses the existing transformer, sampler, learning-rate schedule, RNG helpers, and atomic checkpoint utilities instead of changing the public trainer.
+The study reuses the existing transformer, sampler, learning-rate schedule, RNG helpers, and atomic checkpoint utilities. Historical code remains unchanged for reproducibility.
 
 CPU tests check baseline outputs, loss and gradients with dropout on/off; gate equations and gradient flow; prefix detachment; inference equivalence; exact interrupted/resumed training; selected-checkpoint recovery; and artifact identity checks. The full-batch H200 preflight tests each arm with a 512-iteration prefix, finite gradients, populated optimizer/RNG restoration, export loading, and FP32 inference. Training refuses a different source hash from the passed preflight. A launcher uploads an explicit source allowlist, not the project directory.
 

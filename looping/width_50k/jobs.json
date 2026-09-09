@@ -1,0 +1,101 @@
+{
+  "study_id": "baseline_width_50k_v1_20260906",
+  "preflight": {
+    "status": "passed",
+    "app_id": "ap-en7oAGNFUQMXoJATt8DfNy",
+    "call_id": "fc-01M1V23JVCY18K6F633DYCQ39J",
+    "started_at": "2026-09-06T02:51:59-07:00",
+    "container_id": "ta-01M1V24GRPY1EQFMB82Y9RZ1RR",
+    "directory": "/outputs/baseline_width_50k_v1_20260906/preflight/9ae8a2d79de143fb97e90892ec15f03f",
+    "local_result": "results/preflight.json"
+  },
+  "jobs": [
+    {
+      "arm": "width160",
+      "seed": 20260910,
+      "app_id": "ap-wPRPs5EN43N9OO0WB5YK63",
+      "call_id": "fc-01M1V27CV3470A2VJ4Q5YVF6JR",
+      "container_id": "ta-01M1V27D6EG59T3ZCK47MBNKSR",
+      "started_at": "2026-09-06T02:54:09-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "parameters": 1241929,
+      "output_directory": "/outputs/baseline_width_50k_v1_20260906/runs/width160_seed20260910",
+      "local_result": "../../runs_modal/baseline_width_50k_v1_20260906/runs/width160_seed20260910/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width160",
+      "seed": 20260911,
+      "app_id": "ap-ILGLqAZhkGz04De1eH22an",
+      "call_id": "fc-01M1V27QSKTF34FTAY99CC4JY9",
+      "container_id": "ta-01M1V27R55MX4KHWKWW1J2SZAR",
+      "started_at": "2026-09-06T02:54:20-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "parameters": 1241929,
+      "output_directory": "/outputs/baseline_width_50k_v1_20260906/runs/width160_seed20260911",
+      "local_result": "../../runs_modal/baseline_width_50k_v1_20260906/runs/width160_seed20260911/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width160",
+      "seed": 20260912,
+      "app_id": "ap-2o6r8k0ocAzMSuBnGyFi24",
+      "call_id": "fc-01M1V27VRY9DMB2GFEZQN7GKAP",
+      "container_id": "ta-01M1V27VZHMQ9R46572RR9T44R",
+      "started_at": "2026-09-06T02:54:23-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "parameters": 1241929,
+      "output_directory": "/outputs/baseline_width_50k_v1_20260906/runs/width160_seed20260912",
+      "local_result": "../../runs_modal/baseline_width_50k_v1_20260906/runs/width160_seed20260912/result.json",
+      "result_record": "results/completed_runs.json"
+    }
+  ],
+  "planned_seeds": [
+    20260910,
+    20260911,
+    20260912
+  ],
+  "arm": "width160",
+  "result_verification": {
+    "checked_at": "2026-09-09",
+    "all_three_training_runs_complete": true,
+    "all_six_full_evaluations_complete": true,
+    "puzzles_per_evaluation": 25000,
+    "iterations": [
+      16,
+      128,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "configs_and_source_hashes_verified": true,
+    "paired_sampling_verified": true,
+    "nonfinite_evaluation_count": 0,
+    "stable_finals": 3,
+    "confirmation_criteria_passed": true,
+    "active_workers": 0,
+    "training_runs_complete": 3,
+    "full_evaluations_complete": 6,
+    "earliest_best_selection_verified": true,
+    "result_record": "results/completed_runs.json"
+  },
+  "launch_verification": {
+    "checked_at": "2026-09-06T09:55:19Z",
+    "all_three_workers_active": true,
+    "all_live_configs_match_protocol": true,
+    "all_source_hashes_match_preflight": true,
+    "all_data_hashes_match_protocol": true,
+    "source_files_per_worker": 57,
+    "core_tests_passed": 210,
+    "research_tests_passed": 163,
+    "new_cuda_preflight_passed": true,
+    "inherited_compiled_full_batch_preflight_verified": true
+  }
+}

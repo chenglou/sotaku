@@ -27,7 +27,93 @@
       "elapsed_seconds": 43.618049749
     }
   ],
-  "verification": {
+  "jobs": [
+    {
+      "arm": "baseline",
+      "seed": 20260910,
+      "app_id": "ap-wvJXwj3CkWTNMPbfzpdPoA",
+      "call_id": "fc-01M1R9SB5GNTXFT3JH6NP85PAC",
+      "container_id": "ta-01M1R9SBK4AWMKZW80RSN8ZCXR",
+      "started_at": "2026-09-05 01:08:34-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/baseline_seed20260910",
+      "parameters": 796937,
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "gated_four",
+      "seed": 20260910,
+      "app_id": "ap-qGUK2KrbVDC07CmNwAgSq6",
+      "call_id": "fc-01M1R9SG479DX6EPF7HHS44400",
+      "container_id": "ta-01M1R9SGFB7P7SEMV6RWGQ76ER",
+      "started_at": "2026-09-05 01:08:39-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/gated_four_seed20260910",
+      "parameters": 803096,
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "baseline",
+      "seed": 20260911,
+      "app_id": "ap-lnfVAFrzLIjrishS8bYx3P",
+      "call_id": "fc-01M1R9SMWVBA6TANK8Q29CXPC5",
+      "container_id": "ta-01M1R9SNCQ572PQVAJMSCNEAER",
+      "started_at": "2026-09-05 01:08:44-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/baseline_seed20260911",
+      "parameters": 796937,
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "gated_four",
+      "seed": 20260911,
+      "app_id": "ap-kdG8lK9gZjTT1BOfgxaUef",
+      "call_id": "fc-01M1R9SSRC70CEZDXMF6GZC8M1",
+      "container_id": "ta-01M1R9ST19ZA3B4Y2XS71QDZBR",
+      "started_at": "2026-09-05 01:08:50-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/gated_four_seed20260911",
+      "parameters": 803096,
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "baseline",
+      "seed": 20260912,
+      "app_id": "ap-S18ULZamivCVGfK3FATCtZ",
+      "call_id": "fc-01M1R9SZBB1Y8QWBR45T0HKY7K",
+      "container_id": "ta-01M1R9VVY5QJRAJCZEB2H4KWYR",
+      "started_at": "2026-09-05 01:09:58-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/baseline_seed20260912",
+      "parameters": 796937,
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "gated_four",
+      "seed": 20260912,
+      "app_id": "ap-oaJp6QhqCnyB6AmqmWnLwm",
+      "call_id": "fc-01M1R9T3HA3NE7JRSVGJD3CE0Z",
+      "container_id": "ta-01M1R9VSYKWWJDAJEXT844ACWR",
+      "started_at": "2026-09-05 01:09:54-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 50000,
+      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/gated_four_seed20260912",
+      "parameters": 803096,
+      "result_record": "results/completed_runs.json"
+    }
+  ],
+  "launch_verification": {
     "all_six_workers_active": true,
     "all_live_configs_match_protocol": true,
     "all_source_hashes_match_preflight": true,
@@ -41,84 +127,15 @@
       "20260912": "082c58d0b9184fcbf77a112255105025c591e3e5e203b4f7edc7f3fb65403077"
     }
   },
-  "jobs": [
-    {
-      "arm": "baseline",
-      "seed": 20260910,
-      "app_id": "ap-wvJXwj3CkWTNMPbfzpdPoA",
-      "call_id": "fc-01M1R9SB5GNTXFT3JH6NP85PAC",
-      "container_id": "ta-01M1R9SBK4AWMKZW80RSN8ZCXR",
-      "started_at": "2026-09-05 01:08:34-07:00",
-      "status": "running",
-      "last_observed_stage": "compiling",
-      "last_observed_update": 0,
-      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/baseline_seed20260910",
-      "parameters": 796937
-    },
-    {
-      "arm": "gated_four",
-      "seed": 20260910,
-      "app_id": "ap-qGUK2KrbVDC07CmNwAgSq6",
-      "call_id": "fc-01M1R9SG479DX6EPF7HHS44400",
-      "container_id": "ta-01M1R9SGFB7P7SEMV6RWGQ76ER",
-      "started_at": "2026-09-05 01:08:39-07:00",
-      "status": "running",
-      "last_observed_stage": "compiling",
-      "last_observed_update": 0,
-      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/gated_four_seed20260910",
-      "parameters": 803096
-    },
-    {
-      "arm": "baseline",
-      "seed": 20260911,
-      "app_id": "ap-lnfVAFrzLIjrishS8bYx3P",
-      "call_id": "fc-01M1R9SMWVBA6TANK8Q29CXPC5",
-      "container_id": "ta-01M1R9SNCQ572PQVAJMSCNEAER",
-      "started_at": "2026-09-05 01:08:44-07:00",
-      "status": "running",
-      "last_observed_stage": "compiling",
-      "last_observed_update": 0,
-      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/baseline_seed20260911",
-      "parameters": 796937
-    },
-    {
-      "arm": "gated_four",
-      "seed": 20260911,
-      "app_id": "ap-kdG8lK9gZjTT1BOfgxaUef",
-      "call_id": "fc-01M1R9SSRC70CEZDXMF6GZC8M1",
-      "container_id": "ta-01M1R9ST19ZA3B4Y2XS71QDZBR",
-      "started_at": "2026-09-05 01:08:50-07:00",
-      "status": "running",
-      "last_observed_stage": "compiling",
-      "last_observed_update": 0,
-      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/gated_four_seed20260911",
-      "parameters": 803096
-    },
-    {
-      "arm": "baseline",
-      "seed": 20260912,
-      "app_id": "ap-S18ULZamivCVGfK3FATCtZ",
-      "call_id": "fc-01M1R9SZBB1Y8QWBR45T0HKY7K",
-      "container_id": "ta-01M1R9VVY5QJRAJCZEB2H4KWYR",
-      "started_at": "2026-09-05 01:09:58-07:00",
-      "status": "running",
-      "last_observed_stage": "compiling",
-      "last_observed_update": 0,
-      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/baseline_seed20260912",
-      "parameters": 796937
-    },
-    {
-      "arm": "gated_four",
-      "seed": 20260912,
-      "app_id": "ap-oaJp6QhqCnyB6AmqmWnLwm",
-      "call_id": "fc-01M1R9T3HA3NE7JRSVGJD3CE0Z",
-      "container_id": "ta-01M1R9VSYKWWJDAJEXT844ACWR",
-      "started_at": "2026-09-05 01:09:54-07:00",
-      "status": "running",
-      "last_observed_stage": "compiling",
-      "last_observed_update": 0,
-      "output_directory": "/outputs/hyperloop_50k_v1_20260905/runs/gated_four_seed20260912",
-      "parameters": 803096
-    }
-  ]
+  "result_verification": {
+    "checked_at": "2026-09-09",
+    "training_runs_complete": 6,
+    "full_evaluations_complete": 12,
+    "puzzles_per_evaluation": 25000,
+    "configs_and_source_hashes_verified": true,
+    "paired_sampling_verified": true,
+    "earliest_best_selection_verified": true,
+    "nonfinite_evaluation_count": 0,
+    "result_record": "results/completed_runs.json"
+  }
 }
