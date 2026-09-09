@@ -1,0 +1,3446 @@
+{
+  "runs": {
+    "baseline_seed20260907": {
+      "late_probe": {
+        "mean": 0.9317777777777777,
+        "minimum": 0.83
+      },
+      "parameters": 796937,
+      "reliable_final": true,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.97156,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4964,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4736,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4737,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4853,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 54,
+            "lost_since_previous": 20,
+            "nonfinite": 0,
+            "solved": 24289,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.94216,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4955,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4462,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4427,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4711,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 3998,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23554,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.78224,
+            "difficulty": {
+              "0": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4560,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3191,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3095,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3716,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19556,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.97112,
+            "difficulty": {
+              "0": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4960,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4737,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4738,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4848,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 18,
+            "lost_since_previous": 29,
+            "nonfinite": 0,
+            "solved": 24278,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.97028,
+            "difficulty": {
+              "0": {
+                "solved": 4993,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4959,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4734,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4729,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4842,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 8,
+            "lost_since_previous": 29,
+            "nonfinite": 0,
+            "solved": 24257,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.9702,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4965,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4719,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4721,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4851,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 706,
+            "lost_since_previous": 5,
+            "nonfinite": 0,
+            "solved": 24255,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.97156,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4964,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4736,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4737,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4853,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 54,
+            "lost_since_previous": 20,
+            "nonfinite": 0,
+            "solved": 24289,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.94216,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4955,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4462,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4427,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4711,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 3998,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23554,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.78224,
+            "difficulty": {
+              "0": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4560,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3191,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3095,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3716,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19556,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.97112,
+            "difficulty": {
+              "0": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4960,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4737,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4738,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4848,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 18,
+            "lost_since_previous": 29,
+            "nonfinite": 0,
+            "solved": 24278,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.97028,
+            "difficulty": {
+              "0": {
+                "solved": 4993,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4959,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4734,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4729,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4842,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 8,
+            "lost_since_previous": 29,
+            "nonfinite": 0,
+            "solved": 24257,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.9702,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4965,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4719,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4721,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4851,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 706,
+            "lost_since_previous": 5,
+            "nonfinite": 0,
+            "solved": 24255,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 45.59163090099855,
+        "compilation": 529.42357422,
+        "monitoring": 231.40606200700108,
+        "training": 7363.002441627036
+      }
+    },
+    "baseline_seed20260908": {
+      "late_probe": {
+        "mean": 0.8922222222222221,
+        "minimum": 0.761
+      },
+      "parameters": 796937,
+      "reliable_final": false,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.94064,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4961,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4439,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4383,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4737,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 5,
+            "lost_since_previous": 42,
+            "nonfinite": 0,
+            "solved": 23516,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.93332,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4963,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4371,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4301,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4698,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 3937,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23333,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77584,
+            "difficulty": {
+              "0": {
+                "solved": 4993,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4539,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3167,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3063,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3634,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19396,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.93204,
+            "difficulty": {
+              "0": {
+                "solved": 4952,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4909,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4393,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4355,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4692,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2,
+            "lost_since_previous": 217,
+            "nonfinite": 0,
+            "solved": 23301,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.07724,
+            "difficulty": {
+              "0": {
+                "solved": 207,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 307,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 491,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 468,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 458,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 5,
+            "lost_since_previous": 21375,
+            "nonfinite": 0,
+            "solved": 1931,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.94212,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4963,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4453,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4392,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4746,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 235,
+            "lost_since_previous": 15,
+            "nonfinite": 0,
+            "solved": 23553,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.94312,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4963,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4471,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4432,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4714,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4,
+            "lost_since_previous": 40,
+            "nonfinite": 0,
+            "solved": 23578,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.93356,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4961,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4379,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4339,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4660,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 3855,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23339,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77936,
+            "difficulty": {
+              "0": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4554,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3173,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3106,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3656,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19484,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.93896,
+            "difficulty": {
+              "0": {
+                "solved": 4989,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4945,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4447,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4406,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4687,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4,
+            "lost_since_previous": 108,
+            "nonfinite": 0,
+            "solved": 23474,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.02856,
+            "difficulty": {
+              "0": {
+                "solved": 47,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 82,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 209,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 201,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 175,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2,
+            "lost_since_previous": 22762,
+            "nonfinite": 0,
+            "solved": 714,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.94456,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4964,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4484,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4446,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4721,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 292,
+            "lost_since_previous": 17,
+            "nonfinite": 0,
+            "solved": 23614,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 66.07058271099822,
+        "compilation": 2004.062676836,
+        "monitoring": 230.12997258600126,
+        "training": 7284.819414371999
+      }
+    },
+    "baseline_seed20260909": {
+      "late_probe": {
+        "mean": 0.922,
+        "minimum": 0.852
+      },
+      "parameters": 796937,
+      "reliable_final": true,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.97708,
+            "difficulty": {
+              "0": {
+                "solved": 4961,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4946,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4830,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4813,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4877,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 148,
+            "lost_since_previous": 122,
+            "nonfinite": 0,
+            "solved": 24427,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.94164,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4978,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4458,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4406,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4700,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4055,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23541,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77944,
+            "difficulty": {
+              "0": {
+                "solved": 4993,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4563,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3179,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3105,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3646,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19486,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.9624,
+            "difficulty": {
+              "0": {
+                "solved": 4823,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4843,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4793,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4787,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4814,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 111,
+            "lost_since_previous": 478,
+            "nonfinite": 0,
+            "solved": 24060,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.9296,
+            "difficulty": {
+              "0": {
+                "solved": 4602,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4667,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4666,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4649,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4656,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 56,
+            "lost_since_previous": 876,
+            "nonfinite": 0,
+            "solved": 23240,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.97604,
+            "difficulty": {
+              "0": {
+                "solved": 4991,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4976,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4786,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4781,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4867,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 893,
+            "lost_since_previous": 33,
+            "nonfinite": 0,
+            "solved": 24401,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.97708,
+            "difficulty": {
+              "0": {
+                "solved": 4961,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4946,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4830,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4813,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4877,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 148,
+            "lost_since_previous": 122,
+            "nonfinite": 0,
+            "solved": 24427,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.94164,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4978,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4458,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4406,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4700,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4055,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23541,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77944,
+            "difficulty": {
+              "0": {
+                "solved": 4993,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4563,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3179,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3105,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3646,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19486,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.9624,
+            "difficulty": {
+              "0": {
+                "solved": 4823,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4843,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4793,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4787,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4814,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 111,
+            "lost_since_previous": 478,
+            "nonfinite": 0,
+            "solved": 24060,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.9296,
+            "difficulty": {
+              "0": {
+                "solved": 4602,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4667,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4666,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4649,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4656,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 56,
+            "lost_since_previous": 876,
+            "nonfinite": 0,
+            "solved": 23240,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.97604,
+            "difficulty": {
+              "0": {
+                "solved": 4991,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4976,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4786,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4781,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4867,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 893,
+            "lost_since_previous": 33,
+            "nonfinite": 0,
+            "solved": 24401,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 79.57548832999942,
+        "compilation": 779.617501832,
+        "monitoring": 262.356871193997,
+        "training": 7432.040817770999
+      }
+    },
+    "gated_four_seed20260907": {
+      "late_probe": {
+        "mean": 0.9807777777777777,
+        "minimum": 0.966
+      },
+      "parameters": 803096,
+      "reliable_final": false,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.99192,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4922,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4927,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4955,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 130,
+            "lost_since_previous": 1,
+            "nonfinite": 0,
+            "solved": 24798,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.95044,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4983,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4528,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4511,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4739,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4627,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23761,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.76536,
+            "difficulty": {
+              "0": {
+                "solved": 4992,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4482,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3069,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3044,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3547,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19134,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.9826,
+            "difficulty": {
+              "0": {
+                "solved": 4814,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4974,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4914,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4923,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4940,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 35,
+            "lost_since_previous": 268,
+            "nonfinite": 0,
+            "solved": 24565,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.79412,
+            "difficulty": {
+              "0": {
+                "solved": 2625,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4202,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4297,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4477,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4252,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 18,
+            "lost_since_previous": 4730,
+            "nonfinite": 0,
+            "solved": 19853,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.98676,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4875,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4872,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4928,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 908,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 24669,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.99216,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4935,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4918,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4956,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 142,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 24804,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.95412,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4984,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4575,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4536,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4758,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4531,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23853,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77288,
+            "difficulty": {
+              "0": {
+                "solved": 4993,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4526,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3128,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3058,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3617,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19322,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.98272,
+            "difficulty": {
+              "0": {
+                "solved": 4830,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4971,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4917,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4915,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4935,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 37,
+            "lost_since_previous": 273,
+            "nonfinite": 0,
+            "solved": 24568,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.7698,
+            "difficulty": {
+              "0": {
+                "solved": 2491,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4084,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4193,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4392,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4085,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 13,
+            "lost_since_previous": 5336,
+            "nonfinite": 0,
+            "solved": 19245,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.98648,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4884,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4851,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4933,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 809,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 24662,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 74.73855314800039,
+        "compilation": 843.3797366,
+        "monitoring": 299.36348721600416,
+        "training": 8813.799933070883
+      }
+    },
+    "gated_four_seed20260908": {
+      "late_probe": {
+        "mean": 0.9828888888888889,
+        "minimum": 0.968
+      },
+      "parameters": 803096,
+      "reliable_final": true,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.99148,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4914,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4922,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4955,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 121,
+            "lost_since_previous": 1,
+            "nonfinite": 0,
+            "solved": 24787,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.9552,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4985,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4557,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4564,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4775,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4578,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23880,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77208,
+            "difficulty": {
+              "0": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4528,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3142,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3051,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3586,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19302,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.99304,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4933,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4940,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4957,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 42,
+            "lost_since_previous": 3,
+            "nonfinite": 0,
+            "solved": 24826,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.99396,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4945,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4948,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4960,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 25,
+            "lost_since_previous": 2,
+            "nonfinite": 0,
+            "solved": 24849,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.98668,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4870,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4878,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4925,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 787,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 24667,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.99096,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4920,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4913,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4945,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 114,
+            "lost_since_previous": 1,
+            "nonfinite": 0,
+            "solved": 24774,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.95596,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4988,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4576,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4571,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4765,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4573,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23899,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77304,
+            "difficulty": {
+              "0": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4532,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3131,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3058,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3611,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19326,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.99232,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4935,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4927,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4950,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 37,
+            "lost_since_previous": 3,
+            "nonfinite": 0,
+            "solved": 24808,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.99324,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4945,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4935,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4955,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 26,
+            "lost_since_previous": 3,
+            "nonfinite": 0,
+            "solved": 24831,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.98644,
+            "difficulty": {
+              "0": {
+                "solved": 4999,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4866,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4871,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4930,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 762,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 24661,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 80.83631307599785,
+        "compilation": 986.746879629,
+        "monitoring": 297.376107288997,
+        "training": 8786.248712192024
+      }
+    },
+    "gated_four_seed20260909": {
+      "late_probe": {
+        "mean": 0.9594444444444444,
+        "minimum": 0.905
+      },
+      "parameters": 803096,
+      "reliable_final": true,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.98352,
+            "difficulty": {
+              "0": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4984,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4854,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4845,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4908,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 42,
+            "lost_since_previous": 10,
+            "nonfinite": 0,
+            "solved": 24588,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.95472,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4983,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4554,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4545,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4786,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4362,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23868,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.78024,
+            "difficulty": {
+              "0": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4543,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3210,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3114,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3645,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19506,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.98092,
+            "difficulty": {
+              "0": {
+                "solved": 4984,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4972,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4847,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4829,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4891,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 5,
+            "lost_since_previous": 70,
+            "nonfinite": 0,
+            "solved": 24523,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.9518,
+            "difficulty": {
+              "0": {
+                "solved": 4835,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4831,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4684,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4700,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4745,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 0,
+            "lost_since_previous": 728,
+            "nonfinite": 0,
+            "solved": 23795,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.98224,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4988,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4834,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4825,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4909,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 690,
+            "lost_since_previous": 2,
+            "nonfinite": 0,
+            "solved": 24556,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.98352,
+            "difficulty": {
+              "0": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4984,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4854,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4845,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4908,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 42,
+            "lost_since_previous": 10,
+            "nonfinite": 0,
+            "solved": 24588,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.95472,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4983,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4554,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4545,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4786,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4362,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 23868,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.78024,
+            "difficulty": {
+              "0": {
+                "solved": 4994,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4543,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3210,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3114,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3645,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19506,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.98092,
+            "difficulty": {
+              "0": {
+                "solved": 4984,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4972,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4847,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4829,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4891,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 5,
+            "lost_since_previous": 70,
+            "nonfinite": 0,
+            "solved": 24523,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.9518,
+            "difficulty": {
+              "0": {
+                "solved": 4835,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4831,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4684,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4700,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4745,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 0,
+            "lost_since_previous": 728,
+            "nonfinite": 0,
+            "solved": 23795,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.98224,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4988,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 4834,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 4825,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4909,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 690,
+            "lost_since_previous": 2,
+            "nonfinite": 0,
+            "solved": 24556,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 53.35735087300213,
+        "compilation": 571.801495787,
+        "monitoring": 260.6692666369979,
+        "training": 8685.256910078926
+      }
+    },
+    "gated_one_seed20260907": {
+      "late_probe": {
+        "mean": 0.8458888888888889,
+        "minimum": 0.814
+      },
+      "parameters": 797327,
+      "reliable_final": false,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.86056,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4940,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3666,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3629,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4281,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 8,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21514,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.85756,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4933,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3637,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3612,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4259,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2006,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21439,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77732,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4573,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3128,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3067,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3669,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19433,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.8606,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4940,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3666,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3629,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4282,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 1,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21515,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.86076,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4940,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3668,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3629,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4284,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 4,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21519,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.86024,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4939,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3663,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3628,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4278,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 67,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21506,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.8548,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4947,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3620,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3584,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4223,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 6,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21370,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.85276,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4938,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3606,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3573,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4206,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 1888,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21319,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77724,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4581,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3136,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3050,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3668,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19431,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.85508,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4947,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3624,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3586,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4224,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 7,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21377,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.85512,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4947,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3625,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3586,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4224,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 1,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21378,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.85456,
+            "difficulty": {
+              "0": {
+                "solved": 4996,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4946,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3618,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3584,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4220,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 45,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21364,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 92.67976570599876,
+        "compilation": 868.921043221,
+        "monitoring": 294.4510812429969,
+        "training": 8124.313417203011
+      }
+    },
+    "gated_one_seed20260908": {
+      "late_probe": {
+        "mean": 0.863111111111111,
+        "minimum": 0.823
+      },
+      "parameters": 797327,
+      "reliable_final": false,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.89064,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4972,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3925,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3885,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4484,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 52,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22266,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.88008,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4960,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3836,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3804,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4402,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2574,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22002,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.77712,
+            "difficulty": {
+              "0": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4555,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3148,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3042,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3686,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19428,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.89236,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4973,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3937,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3898,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4501,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 43,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22309,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.89404,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4973,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3948,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3911,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4519,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 42,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22351,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.88856,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4971,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3908,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3867,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4468,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 212,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22214,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.89104,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4977,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3927,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3897,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4475,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 39,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22276,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.882,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4968,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3850,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3827,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4405,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2451,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22050,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.78396,
+            "difficulty": {
+              "0": {
+                "solved": 4997,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4584,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3191,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3113,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3714,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19599,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.8922,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4978,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3938,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3900,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4489,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 29,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22305,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.8934,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4978,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3951,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3910,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4496,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 30,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22335,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.88948,
+            "difficulty": {
+              "0": {
+                "solved": 5000,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4977,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3913,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3884,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4463,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 187,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22237,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 41.12444045099687,
+        "compilation": 597.757005471,
+        "monitoring": 241.80503614799886,
+        "training": 7864.641199483966
+      }
+    },
+    "gated_one_seed20260909": {
+      "late_probe": {
+        "mean": 0.858111111111111,
+        "minimum": 0.824
+      },
+      "parameters": 797327,
+      "reliable_final": false,
+      "selections": {
+        "best_validation": {
+          "1024": {
+            "accuracy": 0.88052,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4968,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3809,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3789,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4449,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 34,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22013,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.87448,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4962,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3764,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3737,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4401,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2258,
+            "lost_since_previous": 1,
+            "nonfinite": 0,
+            "solved": 21862,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.7842,
+            "difficulty": {
+              "0": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4629,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3167,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3100,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3714,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19605,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.88144,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4969,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3815,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3796,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4458,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 23,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22036,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.88188,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4969,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3819,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3800,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4461,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 11,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22047,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.87916,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4966,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3800,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3777,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4438,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 117,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21979,
+            "total": 25000
+          }
+        },
+        "final": {
+          "1024": {
+            "accuracy": 0.88052,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4968,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3809,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3789,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4449,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 34,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22013,
+            "total": 25000
+          },
+          "128": {
+            "accuracy": 0.87448,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4962,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3764,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3737,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4401,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 2258,
+            "lost_since_previous": 1,
+            "nonfinite": 0,
+            "solved": 21862,
+            "total": 25000
+          },
+          "16": {
+            "accuracy": 0.7842,
+            "difficulty": {
+              "0": {
+                "solved": 4995,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4629,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3167,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3100,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 3714,
+                "total": 5000
+              }
+            },
+            "nonfinite": 0,
+            "solved": 19605,
+            "total": 25000
+          },
+          "2048": {
+            "accuracy": 0.88144,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4969,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3815,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3796,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4458,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 23,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22036,
+            "total": 25000
+          },
+          "4096": {
+            "accuracy": 0.88188,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4969,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3819,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3800,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4461,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 11,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 22047,
+            "total": 25000
+          },
+          "512": {
+            "accuracy": 0.87916,
+            "difficulty": {
+              "0": {
+                "solved": 4998,
+                "total": 5000
+              },
+              "1-2": {
+                "solved": 4966,
+                "total": 5000
+              },
+              "11-50": {
+                "solved": 3800,
+                "total": 5000
+              },
+              "3-10": {
+                "solved": 3777,
+                "total": 5000
+              },
+              "51+": {
+                "solved": 4438,
+                "total": 5000
+              }
+            },
+            "gained_since_previous": 117,
+            "lost_since_previous": 0,
+            "nonfinite": 0,
+            "solved": 21979,
+            "total": 25000
+          }
+        }
+      },
+      "status": "complete",
+      "timings_seconds": {
+        "checkpoint": 37.556575915999474,
+        "compilation": 594.8500987030001,
+        "monitoring": 242.13165086600134,
+        "training": 7964.297280914058
+      }
+    }
+  },
+  "study_id": "hyperloop_v1_20260905",
+  "versus_baseline": {
+    "mean_differences": {
+      "1024": 0.02496000000000002,
+      "4096": 0.26213333333333333
+    },
+    "paired_differences": {
+      "1024": [
+        0.020600000000000063,
+        0.047839999999999994,
+        0.006440000000000001
+      ],
+      "4096": [
+        -0.20048,
+        0.96468,
+        0.022199999999999998
+      ]
+    },
+    "reference": "baseline",
+    "routes": {
+      "accuracy_route": true,
+      "stability_route": true
+    },
+    "status": "promising"
+  },
+  "versus_one_stream": {
+    "mean_differences": {
+      "1024": 0.11342666666666663,
+      "4096": 0.02814666666666669
+    },
+    "paired_differences": {
+      "1024": [
+        0.13736000000000004,
+        0.0999199999999999,
+        0.10299999999999998
+      ],
+      "4096": [
+        -0.08531999999999995,
+        0.09984000000000004,
+        0.06991999999999998
+      ]
+    },
+    "reference": "gated_one",
+    "routes": {
+      "accuracy_route": true,
+      "stability_route": false
+    },
+    "status": "promising"
+  }
+}

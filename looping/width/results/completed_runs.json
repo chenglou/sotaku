@@ -1,0 +1,1406 @@
+{
+  "study_id": "baseline_width_v1_20260905",
+  "verified_at": "2026-09-09",
+  "protocol_sha256": "1430342774e01aa746bb04311b3955fcee41ce4ced393db7c67184dd4fbde96e",
+  "accuracy_units": "fraction",
+  "evaluation": {
+    "iterations": [
+      16,
+      128,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "benchmark": "release/benchmark_25k.json",
+    "batch_size": 256,
+    "precision": "fp32",
+    "compiled": false,
+    "tf32_matmul": false,
+    "primary_checkpoint": "final",
+    "secondary_checkpoint": "best_validation",
+    "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+    "track_solutions_every_iteration": true
+  },
+  "verification": "Saved result metadata, source hashes, paired sampling, earliest-best selection and solved counts checked. Individual prediction arrays were not re-scored in this cleanup.",
+  "runs": [
+    {
+      "status": "complete",
+      "updates": 20000,
+      "parameters": 1241929,
+      "base_initial_state_sha256": "b713984d335bb286b25417a7945bec9302d58e3e6b65af6dddc873acda265f43",
+      "sample_digest": "fd64d40d9ab6d4c10155c0ca05e6d1df31a44896b4d4ded6bd7071728c9a8670",
+      "horizon_counts": {
+        "0": 16034,
+        "32": 811,
+        "64": 758,
+        "128": 777,
+        "256": 812,
+        "512": 808
+      },
+      "work_counts": {
+        "gradient_free_iterations": 795488,
+        "supervised_iterations": 320000
+      },
+      "best_validation": {
+        "accuracy": 0.985,
+        "metric": "1024",
+        "updates": 19000
+      },
+      "timings_seconds": {
+        "checkpoint": 39.0147492730016,
+        "compilation": 517.4357706589999,
+        "monitoring": 298.7910954850008,
+        "training": 10653.944754422993
+      },
+      "finished_at": "2026-09-06T01:33:06.453729+00:00",
+      "arm": "width160",
+      "seed": 20260907,
+      "volume_directory": "baseline_width_v1_20260905/runs/width160_seed20260907",
+      "raw_training_sha256": "d5b28ae35efe556d7fb9fe2e6632523e079952d419ff414862627429fdb35752",
+      "raw_completed_sha256": "044e5017feee8454b6955dd60f1113a99dac8222ed212ff3cba5403d58af5a59",
+      "monitoring_1024": [
+        {
+          "updates": 1000,
+          "accuracy": 0
+        },
+        {
+          "updates": 2000,
+          "accuracy": 0.001
+        },
+        {
+          "updates": 3000,
+          "accuracy": 0.233
+        },
+        {
+          "updates": 4000,
+          "accuracy": 0.7
+        },
+        {
+          "updates": 5000,
+          "accuracy": 0.55
+        },
+        {
+          "updates": 6000,
+          "accuracy": 0.741
+        },
+        {
+          "updates": 7000,
+          "accuracy": 0.429
+        },
+        {
+          "updates": 8000,
+          "accuracy": 0.809
+        },
+        {
+          "updates": 9000,
+          "accuracy": 0.619
+        },
+        {
+          "updates": 10000,
+          "accuracy": 0.283
+        },
+        {
+          "updates": 11000,
+          "accuracy": 0.375
+        },
+        {
+          "updates": 12000,
+          "accuracy": 0.944
+        },
+        {
+          "updates": 13000,
+          "accuracy": 0.97
+        },
+        {
+          "updates": 14000,
+          "accuracy": 0.975
+        },
+        {
+          "updates": 15000,
+          "accuracy": 0.974
+        },
+        {
+          "updates": 16000,
+          "accuracy": 0.977
+        },
+        {
+          "updates": 17000,
+          "accuracy": 0.975
+        },
+        {
+          "updates": 18000,
+          "accuracy": 0.982
+        },
+        {
+          "updates": 19000,
+          "accuracy": 0.985
+        },
+        {
+          "updates": 20000,
+          "accuracy": 0.985
+        }
+      ],
+      "evaluations": {
+        "best_validation": {
+          "updates": 19000,
+          "weights_sha256": "5a672d7c23bc19e07ebf4a872ee8e8aa32fa5128a6d90f43bbcf94a89ee7d1e7",
+          "predictions_sha256": "59364224aa7c1e0a3c85e1b27c6dc89c0d39daad81defbab4a8e5b1ee61e4428",
+          "elapsed_seconds": 1329.5546275899997,
+          "scores": {
+            "16": {
+              "accuracy": 0.79532,
+              "solved": 19883,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95552,
+              "solved": 23888,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.98364,
+              "solved": 24591,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.987,
+              "solved": 24675,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.98668,
+              "solved": 24667,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.98612,
+              "solved": 24653,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        },
+        "final": {
+          "updates": 20000,
+          "weights_sha256": "811669053b4a2ac61155e7f82c44eaf987c991c0efc5f94b27fcdb0fe1de855b",
+          "predictions_sha256": "c47b5a4c71f7b04370e1596b68ab16574d5149721edc4416056a8c75ecb47d40",
+          "elapsed_seconds": 1330.123656701,
+          "scores": {
+            "16": {
+              "accuracy": 0.79724,
+              "solved": 19931,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95632,
+              "solved": 23908,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.9836,
+              "solved": 24590,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.98632,
+              "solved": 24658,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.98688,
+              "solved": 24672,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.98644,
+              "solved": 24661,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        }
+      },
+      "late_monitoring_1024": {
+        "start": 12000,
+        "count": 9,
+        "mean": 0.974111111111111,
+        "minimum": 0.944
+      },
+      "stable_final": true,
+      "paired_final_difference": {
+        "1024": 0.014759999999999995,
+        "2048": 0.015759999999999996,
+        "4096": 0.016159999999999952
+      }
+    },
+    {
+      "status": "complete",
+      "updates": 20000,
+      "parameters": 1241929,
+      "base_initial_state_sha256": "6713fea1ec7a8b5f6222d5e5b8c7311ed530cc5a16cd8e0628d08ba1e951e00c",
+      "sample_digest": "c3716e1c76df71357cba37babbd0b2a29f8f9d9e34866c680f7715c19da5772d",
+      "horizon_counts": {
+        "0": 16046,
+        "32": 828,
+        "64": 748,
+        "128": 808,
+        "256": 811,
+        "512": 759
+      },
+      "work_counts": {
+        "gradient_free_iterations": 774016,
+        "supervised_iterations": 320000
+      },
+      "best_validation": {
+        "accuracy": 0.975,
+        "metric": "1024",
+        "updates": 19000
+      },
+      "timings_seconds": {
+        "checkpoint": 58.882920323999315,
+        "compilation": 539.7291007719999,
+        "monitoring": 296.3357066090009,
+        "training": 10446.512851498943
+      },
+      "finished_at": "2026-09-06T01:30:24.922864+00:00",
+      "arm": "width160",
+      "seed": 20260908,
+      "volume_directory": "baseline_width_v1_20260905/runs/width160_seed20260908",
+      "raw_training_sha256": "5b87214eaddc38474a82e1604e787e5ae6ee2305d929acb9001a9e0155c94f64",
+      "raw_completed_sha256": "8d1fe0ac16c51eea68a0dd2b26be8594b50c1309218ae7520b3fa33d87f4c2a8",
+      "monitoring_1024": [
+        {
+          "updates": 1000,
+          "accuracy": 0
+        },
+        {
+          "updates": 2000,
+          "accuracy": 0
+        },
+        {
+          "updates": 3000,
+          "accuracy": 0.432
+        },
+        {
+          "updates": 4000,
+          "accuracy": 0.684
+        },
+        {
+          "updates": 5000,
+          "accuracy": 0
+        },
+        {
+          "updates": 6000,
+          "accuracy": 0.67
+        },
+        {
+          "updates": 7000,
+          "accuracy": 0.7
+        },
+        {
+          "updates": 8000,
+          "accuracy": 0.001
+        },
+        {
+          "updates": 9000,
+          "accuracy": 0.638
+        },
+        {
+          "updates": 10000,
+          "accuracy": 0.859
+        },
+        {
+          "updates": 11000,
+          "accuracy": 0.914
+        },
+        {
+          "updates": 12000,
+          "accuracy": 0.931
+        },
+        {
+          "updates": 13000,
+          "accuracy": 0.944
+        },
+        {
+          "updates": 14000,
+          "accuracy": 0.938
+        },
+        {
+          "updates": 15000,
+          "accuracy": 0.962
+        },
+        {
+          "updates": 16000,
+          "accuracy": 0.939
+        },
+        {
+          "updates": 17000,
+          "accuracy": 0.967
+        },
+        {
+          "updates": 18000,
+          "accuracy": 0.972
+        },
+        {
+          "updates": 19000,
+          "accuracy": 0.975
+        },
+        {
+          "updates": 20000,
+          "accuracy": 0.973
+        }
+      ],
+      "evaluations": {
+        "best_validation": {
+          "updates": 19000,
+          "weights_sha256": "ae35e136faab504746e88ab2040bbefd07e8dd9e99bb8461e25c3632e731664d",
+          "predictions_sha256": "8b98a9c854ee04ae7f46ec99e602de4a3898535c795afbcffef5509320f2e1dd",
+          "elapsed_seconds": 1317.096777846,
+          "scores": {
+            "16": {
+              "accuracy": 0.7972,
+              "solved": 19930,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95584,
+              "solved": 23896,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.9774,
+              "solved": 24435,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.9712,
+              "solved": 24280,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.95692,
+              "solved": 23923,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.93944,
+              "solved": 23486,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        },
+        "final": {
+          "updates": 20000,
+          "weights_sha256": "c015e4158b7a026d7ad2912fa6842de0f61d42ccaee414c2ac4d96dde008d16c",
+          "predictions_sha256": "966b35742868a61267a79c6d607f51893b1a9bc362b59e6f48faec4f95478a91",
+          "elapsed_seconds": 1317.1126637530015,
+          "scores": {
+            "16": {
+              "accuracy": 0.79964,
+              "solved": 19991,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.9566,
+              "solved": 23915,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.97748,
+              "solved": 24437,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.9744,
+              "solved": 24360,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.96608,
+              "solved": 24152,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.95196,
+              "solved": 23799,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        }
+      },
+      "late_monitoring_1024": {
+        "start": 12000,
+        "count": 9,
+        "mean": 0.9556666666666667,
+        "minimum": 0.931
+      },
+      "stable_final": true,
+      "paired_final_difference": {
+        "1024": 0.031280000000000086,
+        "2048": 0.027120000000000033,
+        "4096": 0.9234
+      }
+    },
+    {
+      "status": "complete",
+      "updates": 20000,
+      "parameters": 1241929,
+      "base_initial_state_sha256": "f7c980ab3a076ca56e88e042c42712db852e903daf2738cfddbc06818657d587",
+      "sample_digest": "83b455274cb24973c3c4c07a3c9c976f8afe3610de261121e9fc984b80dc5408",
+      "horizon_counts": {
+        "0": 16062,
+        "32": 751,
+        "64": 775,
+        "128": 834,
+        "256": 769,
+        "512": 809
+      },
+      "work_counts": {
+        "gradient_free_iterations": 791456,
+        "supervised_iterations": 320000
+      },
+      "best_validation": {
+        "accuracy": 0.953,
+        "metric": "1024",
+        "updates": 18000
+      },
+      "timings_seconds": {
+        "checkpoint": 69.09881352599905,
+        "compilation": 1674.039826277,
+        "monitoring": 296.98827566099726,
+        "training": 10564.446056810973
+      },
+      "finished_at": "2026-09-06T01:51:53.460278+00:00",
+      "arm": "width160",
+      "seed": 20260909,
+      "volume_directory": "baseline_width_v1_20260905/runs/width160_seed20260909",
+      "raw_training_sha256": "9edcca42aac80eff09599bebab5eda2a40ddc718af323dd026768f6648e2a446",
+      "raw_completed_sha256": "36b5c93c5586d3eb6c89c8449ddcd14a47fdafb30aedac36c81a6a9f76445de0",
+      "monitoring_1024": [
+        {
+          "updates": 1000,
+          "accuracy": 0
+        },
+        {
+          "updates": 2000,
+          "accuracy": 0
+        },
+        {
+          "updates": 3000,
+          "accuracy": 0.502
+        },
+        {
+          "updates": 4000,
+          "accuracy": 0.671
+        },
+        {
+          "updates": 5000,
+          "accuracy": 0.102
+        },
+        {
+          "updates": 6000,
+          "accuracy": 0.704
+        },
+        {
+          "updates": 7000,
+          "accuracy": 0.7
+        },
+        {
+          "updates": 8000,
+          "accuracy": 0.686
+        },
+        {
+          "updates": 9000,
+          "accuracy": 0.834
+        },
+        {
+          "updates": 10000,
+          "accuracy": 0.803
+        },
+        {
+          "updates": 11000,
+          "accuracy": 0.799
+        },
+        {
+          "updates": 12000,
+          "accuracy": 0.898
+        },
+        {
+          "updates": 13000,
+          "accuracy": 0.935
+        },
+        {
+          "updates": 14000,
+          "accuracy": 0.913
+        },
+        {
+          "updates": 15000,
+          "accuracy": 0.929
+        },
+        {
+          "updates": 16000,
+          "accuracy": 0.939
+        },
+        {
+          "updates": 17000,
+          "accuracy": 0.949
+        },
+        {
+          "updates": 18000,
+          "accuracy": 0.953
+        },
+        {
+          "updates": 19000,
+          "accuracy": 0.941
+        },
+        {
+          "updates": 20000,
+          "accuracy": 0.946
+        }
+      ],
+      "evaluations": {
+        "best_validation": {
+          "updates": 18000,
+          "weights_sha256": "fb7016310b5c0b4967320c59a258ccb06d59c7f1f346e4b3cceb9639b989ebe7",
+          "predictions_sha256": "ce6fe1f13f278e137160e3366cef4adb090998511af3e78339a571960d6b032a",
+          "elapsed_seconds": 1314.9980859000007,
+          "scores": {
+            "16": {
+              "accuracy": 0.78944,
+              "solved": 19736,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.94864,
+              "solved": 23716,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.96124,
+              "solved": 24031,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.9608,
+              "solved": 24020,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.95964,
+              "solved": 23991,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.95444,
+              "solved": 23861,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        },
+        "final": {
+          "updates": 20000,
+          "weights_sha256": "3361e09bd2c9857959ed1e348fa19b87845d6ef4a225760b556f5dc2f80b81b0",
+          "predictions_sha256": "76242baad4a3a66abca27ca8f35b31d93168deee2c592acde4f50b843617a74c",
+          "elapsed_seconds": 1317.2640322629995,
+          "scores": {
+            "16": {
+              "accuracy": 0.79644,
+              "solved": 19911,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95016,
+              "solved": 23754,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.96072,
+              "solved": 24018,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.95976,
+              "solved": 23994,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.95852,
+              "solved": 23963,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.95676,
+              "solved": 23919,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        }
+      },
+      "late_monitoring_1024": {
+        "start": 12000,
+        "count": 9,
+        "mean": 0.9336666666666666,
+        "minimum": 0.898
+      },
+      "stable_final": true,
+      "paired_final_difference": {
+        "1024": -0.017320000000000002,
+        "2048": -0.0038799999999999946,
+        "4096": 0.027160000000000073
+      }
+    },
+    {
+      "status": "complete",
+      "updates": 20000,
+      "parameters": 1785225,
+      "base_initial_state_sha256": "9ee0e6f40e1a41a8effffcf524cd1add42721b411b9ce336792640035b716a2a",
+      "sample_digest": "fd64d40d9ab6d4c10155c0ca05e6d1df31a44896b4d4ded6bd7071728c9a8670",
+      "horizon_counts": {
+        "0": 16034,
+        "32": 811,
+        "64": 758,
+        "128": 777,
+        "256": 812,
+        "512": 808
+      },
+      "work_counts": {
+        "gradient_free_iterations": 795488,
+        "supervised_iterations": 320000
+      },
+      "best_validation": {
+        "accuracy": 0.98,
+        "metric": "1024",
+        "updates": 19000
+      },
+      "timings_seconds": {
+        "checkpoint": 52.090282359999264,
+        "compilation": 500.936716568,
+        "monitoring": 336.3910380909995,
+        "training": 11003.457572708932
+      },
+      "finished_at": "2026-09-06T02:17:04.554725+00:00",
+      "arm": "width192",
+      "seed": 20260907,
+      "volume_directory": "baseline_width_v1_20260905/runs/width192_seed20260907",
+      "raw_training_sha256": "600f890740fce6f35981aa64357d6b5c2b7a2dcd4cf57a31d53e7cff13ed1019",
+      "raw_completed_sha256": "ca9c1b2603e68fa09429e87a87f73a1490a3aaee6c202c3682651c6cd89b563e",
+      "monitoring_1024": [
+        {
+          "updates": 1000,
+          "accuracy": 0
+        },
+        {
+          "updates": 2000,
+          "accuracy": 0
+        },
+        {
+          "updates": 3000,
+          "accuracy": 0.431
+        },
+        {
+          "updates": 4000,
+          "accuracy": 0.666
+        },
+        {
+          "updates": 5000,
+          "accuracy": 0.706
+        },
+        {
+          "updates": 6000,
+          "accuracy": 0.718
+        },
+        {
+          "updates": 7000,
+          "accuracy": 0.839
+        },
+        {
+          "updates": 8000,
+          "accuracy": 0.788
+        },
+        {
+          "updates": 9000,
+          "accuracy": 0.88
+        },
+        {
+          "updates": 10000,
+          "accuracy": 0.045
+        },
+        {
+          "updates": 11000,
+          "accuracy": 0.904
+        },
+        {
+          "updates": 12000,
+          "accuracy": 0.922
+        },
+        {
+          "updates": 13000,
+          "accuracy": 0.939
+        },
+        {
+          "updates": 14000,
+          "accuracy": 0.926
+        },
+        {
+          "updates": 15000,
+          "accuracy": 0.963
+        },
+        {
+          "updates": 16000,
+          "accuracy": 0.976
+        },
+        {
+          "updates": 17000,
+          "accuracy": 0.975
+        },
+        {
+          "updates": 18000,
+          "accuracy": 0.975
+        },
+        {
+          "updates": 19000,
+          "accuracy": 0.98
+        },
+        {
+          "updates": 20000,
+          "accuracy": 0.98
+        }
+      ],
+      "evaluations": {
+        "best_validation": {
+          "updates": 19000,
+          "weights_sha256": "3674af2336fb7ff4fe8b03936902f67ee82d8ccacd80d149235f3fc6221e4b82",
+          "predictions_sha256": "714372f8c6bef0d68f6198bea806c2a07f35cebc54153e37d57094e66e11f23f",
+          "elapsed_seconds": 1484.152161042999,
+          "scores": {
+            "16": {
+              "accuracy": 0.8076,
+              "solved": 20190,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.96212,
+              "solved": 24053,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.98152,
+              "solved": 24538,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.98216,
+              "solved": 24554,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.98216,
+              "solved": 24554,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.7438,
+              "solved": 18595,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        },
+        "final": {
+          "updates": 20000,
+          "weights_sha256": "b738003485352c38818f1fe05ea4d61717e80a1835c5afe415798f0be077a442",
+          "predictions_sha256": "e40bcccd68ad433717911ea7a07c6ee404f23d267d9defaece8ff633274c4035",
+          "elapsed_seconds": 1484.2629962409992,
+          "scores": {
+            "16": {
+              "accuracy": 0.80916,
+              "solved": 20229,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.96308,
+              "solved": 24077,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.98104,
+              "solved": 24526,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.9816,
+              "solved": 24540,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.95312,
+              "solved": 23828,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.13364,
+              "solved": 3341,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        }
+      },
+      "late_monitoring_1024": {
+        "start": 12000,
+        "count": 9,
+        "mean": 0.9595555555555555,
+        "minimum": 0.922
+      },
+      "stable_final": false,
+      "paired_final_difference": {
+        "1024": 0.010040000000000049,
+        "2048": -0.018000000000000016,
+        "4096": -0.83664
+      }
+    },
+    {
+      "status": "complete",
+      "updates": 20000,
+      "parameters": 1785225,
+      "base_initial_state_sha256": "da22f8840c14c0e4be297345a77dea807e709a6de9c7e6100f006b74902b3897",
+      "sample_digest": "c3716e1c76df71357cba37babbd0b2a29f8f9d9e34866c680f7715c19da5772d",
+      "horizon_counts": {
+        "0": 16046,
+        "32": 828,
+        "64": 748,
+        "128": 808,
+        "256": 811,
+        "512": 759
+      },
+      "work_counts": {
+        "gradient_free_iterations": 774016,
+        "supervised_iterations": 320000
+      },
+      "best_validation": {
+        "accuracy": 0.979,
+        "metric": "1024",
+        "updates": 19000
+      },
+      "timings_seconds": {
+        "checkpoint": 71.03052120899974,
+        "compilation": 1713.174007139,
+        "monitoring": 337.0479818199992,
+        "training": 11006.403645846027
+      },
+      "finished_at": "2026-09-06T02:38:07.503672+00:00",
+      "arm": "width192",
+      "seed": 20260908,
+      "volume_directory": "baseline_width_v1_20260905/runs/width192_seed20260908",
+      "raw_training_sha256": "511f40fb2e15ac38508fb3fa91572ab1eb9c793f48737791f483d0ac99e15191",
+      "raw_completed_sha256": "ce0f59d077869223ab89878958b3d9c754fd2804db7ef44481c8d3b43675e616",
+      "monitoring_1024": [
+        {
+          "updates": 1000,
+          "accuracy": 0
+        },
+        {
+          "updates": 2000,
+          "accuracy": 0
+        },
+        {
+          "updates": 3000,
+          "accuracy": 0.427
+        },
+        {
+          "updates": 4000,
+          "accuracy": 0.443
+        },
+        {
+          "updates": 5000,
+          "accuracy": 0.673
+        },
+        {
+          "updates": 6000,
+          "accuracy": 0.758
+        },
+        {
+          "updates": 7000,
+          "accuracy": 0.75
+        },
+        {
+          "updates": 8000,
+          "accuracy": 0.718
+        },
+        {
+          "updates": 9000,
+          "accuracy": 0.489
+        },
+        {
+          "updates": 10000,
+          "accuracy": 0.889
+        },
+        {
+          "updates": 11000,
+          "accuracy": 0.778
+        },
+        {
+          "updates": 12000,
+          "accuracy": 0.921
+        },
+        {
+          "updates": 13000,
+          "accuracy": 0.97
+        },
+        {
+          "updates": 14000,
+          "accuracy": 0.929
+        },
+        {
+          "updates": 15000,
+          "accuracy": 0.962
+        },
+        {
+          "updates": 16000,
+          "accuracy": 0.962
+        },
+        {
+          "updates": 17000,
+          "accuracy": 0.977
+        },
+        {
+          "updates": 18000,
+          "accuracy": 0.974
+        },
+        {
+          "updates": 19000,
+          "accuracy": 0.979
+        },
+        {
+          "updates": 20000,
+          "accuracy": 0.969
+        }
+      ],
+      "evaluations": {
+        "best_validation": {
+          "updates": 19000,
+          "weights_sha256": "e923151ba0e6e17e40ecd4acf274c0d67b22152ff49df727e72158758a9c7713",
+          "predictions_sha256": "589fbccb16854dd8b39aa1851005547dec87d1e7d0f66662a3e6532b4d319ebd",
+          "elapsed_seconds": 1483.1421906589985,
+          "scores": {
+            "16": {
+              "accuracy": 0.79984,
+              "solved": 19996,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95752,
+              "solved": 23938,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.98084,
+              "solved": 24521,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.98044,
+              "solved": 24511,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.96004,
+              "solved": 24001,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.82912,
+              "solved": 20728,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        },
+        "final": {
+          "updates": 20000,
+          "weights_sha256": "047c49a464c93b30eb29822f0382f6c8bb7621ab1bb112efed8baa8e2ab63699",
+          "predictions_sha256": "9f30fb2b34670a76e138012c6cf6041bc04d61afb7b493b85042860f29cf958a",
+          "elapsed_seconds": 1482.4704492250003,
+          "scores": {
+            "16": {
+              "accuracy": 0.80008,
+              "solved": 20002,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95764,
+              "solved": 23941,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.98076,
+              "solved": 24519,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.9806,
+              "solved": 24515,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.97124,
+              "solved": 24281,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.88044,
+              "solved": 22011,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        }
+      },
+      "late_monitoring_1024": {
+        "start": 12000,
+        "count": 9,
+        "mean": 0.9603333333333334,
+        "minimum": 0.921
+      },
+      "stable_final": false,
+      "paired_final_difference": {
+        "1024": 0.03748000000000007,
+        "2048": 0.032279999999999975,
+        "4096": 0.85188
+      }
+    },
+    {
+      "status": "complete",
+      "updates": 20000,
+      "parameters": 1785225,
+      "base_initial_state_sha256": "a75b43284da3034f479ec18077068de9a345bdedb4889892a75e4fd25aac0a77",
+      "sample_digest": "83b455274cb24973c3c4c07a3c9c976f8afe3610de261121e9fc984b80dc5408",
+      "horizon_counts": {
+        "0": 16062,
+        "32": 751,
+        "64": 775,
+        "128": 834,
+        "256": 769,
+        "512": 809
+      },
+      "work_counts": {
+        "gradient_free_iterations": 791456,
+        "supervised_iterations": 320000
+      },
+      "best_validation": {
+        "accuracy": 0.986,
+        "metric": "1024",
+        "updates": 17000
+      },
+      "timings_seconds": {
+        "checkpoint": 63.582805941997776,
+        "compilation": 1971.690861118,
+        "monitoring": 337.2147109419998,
+        "training": 11116.253018560095
+      },
+      "finished_at": "2026-09-06T02:44:07.150340+00:00",
+      "arm": "width192",
+      "seed": 20260909,
+      "volume_directory": "baseline_width_v1_20260905/runs/width192_seed20260909",
+      "raw_training_sha256": "89bb000aa314874e3d96dc7399dd7a04f665e058305e43226aca98c5241d9573",
+      "raw_completed_sha256": "a464905302f481bd5722aa8a38922190073778f115e6ebb2da038beba2141957",
+      "monitoring_1024": [
+        {
+          "updates": 1000,
+          "accuracy": 0
+        },
+        {
+          "updates": 2000,
+          "accuracy": 0
+        },
+        {
+          "updates": 3000,
+          "accuracy": 0.424
+        },
+        {
+          "updates": 4000,
+          "accuracy": 0.59
+        },
+        {
+          "updates": 5000,
+          "accuracy": 0.361
+        },
+        {
+          "updates": 6000,
+          "accuracy": 0.72
+        },
+        {
+          "updates": 7000,
+          "accuracy": 0.766
+        },
+        {
+          "updates": 8000,
+          "accuracy": 0.8
+        },
+        {
+          "updates": 9000,
+          "accuracy": 0.716
+        },
+        {
+          "updates": 10000,
+          "accuracy": 0.858
+        },
+        {
+          "updates": 11000,
+          "accuracy": 0.318
+        },
+        {
+          "updates": 12000,
+          "accuracy": 0.912
+        },
+        {
+          "updates": 13000,
+          "accuracy": 0.924
+        },
+        {
+          "updates": 14000,
+          "accuracy": 0.943
+        },
+        {
+          "updates": 15000,
+          "accuracy": 0.968
+        },
+        {
+          "updates": 16000,
+          "accuracy": 0.981
+        },
+        {
+          "updates": 17000,
+          "accuracy": 0.986
+        },
+        {
+          "updates": 18000,
+          "accuracy": 0.984
+        },
+        {
+          "updates": 19000,
+          "accuracy": 0.986
+        },
+        {
+          "updates": 20000,
+          "accuracy": 0.983
+        }
+      ],
+      "evaluations": {
+        "best_validation": {
+          "updates": 17000,
+          "weights_sha256": "7d597b711e14bd365a79f69c674a3129fc9a81e42a32cf8d5737d80a0909ab9d",
+          "predictions_sha256": "532e1741a2509414ec260b9e23b59de44da53958366f608527540207e037634f",
+          "elapsed_seconds": 1486.7420905279978,
+          "scores": {
+            "16": {
+              "accuracy": 0.7936,
+              "solved": 19840,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.9556,
+              "solved": 23890,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.9808,
+              "solved": 24520,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.98368,
+              "solved": 24592,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.98392,
+              "solved": 24598,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.98252,
+              "solved": 24563,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        },
+        "final": {
+          "updates": 20000,
+          "weights_sha256": "5306d779137ae45f5e2714e84975a5ee55885b4986fc3148b10f0e88c84702cc",
+          "predictions_sha256": "4a0d8e0f49bc0b6f70ae1970f21562e353326384f33d31189d9f25035edf98f5",
+          "elapsed_seconds": 1486.5581919470005,
+          "scores": {
+            "16": {
+              "accuracy": 0.80024,
+              "solved": 20006,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "128": {
+              "accuracy": 0.95772,
+              "solved": 23943,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "512": {
+              "accuracy": 0.98172,
+              "solved": 24543,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "1024": {
+              "accuracy": 0.98444,
+              "solved": 24611,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "2048": {
+              "accuracy": 0.98532,
+              "solved": 24633,
+              "total": 25000,
+              "nonfinite": 0
+            },
+            "4096": {
+              "accuracy": 0.98452,
+              "solved": 24613,
+              "total": 25000,
+              "nonfinite": 0
+            }
+          }
+        }
+      },
+      "late_monitoring_1024": {
+        "start": 12000,
+        "count": 9,
+        "mean": 0.963,
+        "minimum": 0.912
+      },
+      "stable_final": true,
+      "paired_final_difference": {
+        "1024": 0.007360000000000033,
+        "2048": 0.02291999999999994,
+        "4096": 0.05491999999999997
+      }
+    }
+  ],
+  "source_sha256": {
+    "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+    "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+    "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+    "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+    "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+    "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+    "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+    "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+    "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+    "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+    "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+    "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+    "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+    "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+    "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+    "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+    "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+    "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+    "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+    "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+    "looping/width/__init__.py": "2c4538457a8d9152657a6abdef90b72c196b8212c7a0ffbfb0d9f5efa4571cf9",
+    "looping/width/common.py": "b3575f14eb5c247dc13f58e94a607a1e0bf252d7c9dab2e49887aa4bfcf981a1",
+    "looping/width/evaluate.py": "938b911e497b1dcf6fcbd49b007d787ee6d1cae64da35b03d3367704bd8b2d09",
+    "looping/width/modal_run.py": "351cc866e105b306d7e05ca3a13eeb0759fef3d801d2eafe9fdabdee872f3764",
+    "looping/width/model.py": "3939cf86e53e9087a27534d1d530b43afc67af9b0b57becb77f2fd459dc46d1c",
+    "looping/width/preflight.py": "f10110263c96207ba59163ce7ce3b72e98eaca1f4828f6974d1e14f279754d0d",
+    "looping/width/protocol.json": "1430342774e01aa746bb04311b3955fcee41ce4ced393db7c67184dd4fbde96e",
+    "looping/width/reference.json": "c8aca31222f1fafb53990a1cc194f0c9dbe3ded051516ec3dbfb62e2d36fbed6",
+    "looping/width/test_width.py": "819d85685ef1c54ab2a66a3ef0c5f6d332e9ce5a0ae670a26693726c633e7b55",
+    "looping/width/train.py": "804ec6e8e1047a38129fb6ceee5b2f38c01ad05b5856247043cff45b9d49ea8c",
+    "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+    "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+    "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+    "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+    "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+    "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+  },
+  "means": {
+    "width160": {
+      "final_accuracy": {
+        "1024": 0.9734933333333333,
+        "2048": 0.9704933333333333,
+        "4096": 0.9650533333333333
+      },
+      "stable_finals": 3,
+      "training_seconds": 10554.967887577637
+    },
+    "width192": {
+      "final_accuracy": {
+        "1024": 0.9822133333333334,
+        "2048": 0.9698933333333333,
+        "4096": 0.6662
+      },
+      "stable_finals": 1,
+      "training_seconds": 11042.038079038351
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "study_id": "baseline_width_v1_20260905",
+  "preflights": [
+    {
+      "arm": "width160",
+      "app_id": "ap-WNQGwUpo4yppiWihrpX1WY",
+      "call_id": "fc-01M1SST3M3MM8GP0DN73D6E0VH",
+      "container_id": "ta-01M1SST40ZJ2Q6SR5XX4QHR9VR",
+      "directory": "/outputs/baseline_width_v1_20260905/preflight/width160/60b3b8b138184a578a864db6f0283ca7",
+      "status": "passed",
+      "local_result": "results/preflight_width160.json"
+    },
+    {
+      "arm": "width192",
+      "app_id": "ap-od1f6CuuCxC2Lk76zZjTw9",
+      "call_id": "fc-01M1SSTAPRDVNV4JJ9VCYQJ37H",
+      "container_id": "ta-01M1SSTAZ95B8TJXJRV8FYVE1R",
+      "directory": "/outputs/baseline_width_v1_20260905/preflight/width192/0ed4e145bbba4ad4aee15a63083c967a",
+      "status": "passed",
+      "local_result": "results/preflight_width192.json"
+    }
+  ],
+  "jobs": [
+    {
+      "arm": "width160",
+      "seed": 20260907,
+      "app_id": "ap-3lo23aoUrSrXQFRzpNFREo",
+      "call_id": "fc-01M1STJAYTFP29Z7YVAZK93W3M",
+      "container_id": "ta-01M1STJBE6NV0M91PCTHSWKQNR",
+      "started_at": "2026-09-05T15:21:04-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 20000,
+      "parameters": 1241929,
+      "output_directory": "/outputs/baseline_width_v1_20260905/runs/width160_seed20260907",
+      "local_result": "../../runs_modal/baseline_width_v1_20260905/runs/width160_seed20260907/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width160",
+      "seed": 20260908,
+      "app_id": "ap-OSZ2okDw19SbQt1Nq59FHu",
+      "call_id": "fc-01M1STJHZ13XREFXBW2HMBKZFW",
+      "container_id": "ta-01M1STJJGDHRAAR5ZWJXN7T95R",
+      "started_at": "2026-09-05T15:21:11-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 20000,
+      "parameters": 1241929,
+      "output_directory": "/outputs/baseline_width_v1_20260905/runs/width160_seed20260908",
+      "local_result": "../../runs_modal/baseline_width_v1_20260905/runs/width160_seed20260908/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width160",
+      "seed": 20260909,
+      "app_id": "ap-mMtVUcjYLGh2vpsC7GWySj",
+      "call_id": "fc-01M1STJRQRQD2DCSXNFBWB51CC",
+      "container_id": "ta-01M1STJS3T8SJF89P0P3A3RJ9R",
+      "started_at": "2026-09-05T15:21:19-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 20000,
+      "parameters": 1241929,
+      "output_directory": "/outputs/baseline_width_v1_20260905/runs/width160_seed20260909",
+      "local_result": "../../runs_modal/baseline_width_v1_20260905/runs/width160_seed20260909/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width192",
+      "seed": 20260907,
+      "app_id": "ap-Of3Kuv8zohVPqhyTrbFjFU",
+      "call_id": "fc-01M1SWQ014M5KM9VRQMXE17798",
+      "container_id": "ta-01M1SWQ0EXDJMWMNRA2JWZW7JR",
+      "started_at": "2026-09-05T15:58:34-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 20000,
+      "parameters": 1785225,
+      "output_directory": "/outputs/baseline_width_v1_20260905/runs/width192_seed20260907",
+      "local_result": "../../runs_modal/baseline_width_v1_20260905/runs/width192_seed20260907/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width192",
+      "seed": 20260908,
+      "app_id": "ap-Of33ruVG0E8NAl0JFWxxzD",
+      "call_id": "fc-01M1SWQEJHGNF8CF38NZD9T5KN",
+      "container_id": "ta-01M1SWQEXP9VDG3KTA0Y9QXMFR",
+      "started_at": "2026-09-05T15:58:50-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 20000,
+      "parameters": 1785225,
+      "output_directory": "/outputs/baseline_width_v1_20260905/runs/width192_seed20260908",
+      "local_result": "../../runs_modal/baseline_width_v1_20260905/runs/width192_seed20260908/result.json",
+      "result_record": "results/completed_runs.json"
+    },
+    {
+      "arm": "width192",
+      "seed": 20260909,
+      "app_id": "ap-rC4kBTEh2hmRj3fLlU3PME",
+      "call_id": "fc-01M1SWQGS77YS7SAFCXBGE85NH",
+      "container_id": "ta-01M1SWQH8PQA56R82SXRQ8T43R",
+      "started_at": "2026-09-05T15:58:53-07:00",
+      "status": "complete",
+      "last_observed_stage": "training_and_full_evaluations_complete",
+      "last_observed_update": 20000,
+      "parameters": 1785225,
+      "output_directory": "/outputs/baseline_width_v1_20260905/runs/width192_seed20260909",
+      "local_result": "../../runs_modal/baseline_width_v1_20260905/runs/width192_seed20260909/result.json",
+      "result_record": "results/completed_runs.json"
+    }
+  ],
+  "result_verification": {
+    "checked_at": "2026-09-09",
+    "all_six_training_runs_complete": true,
+    "all_twelve_full_evaluations_complete": true,
+    "puzzles_per_evaluation": 25000,
+    "iterations": [
+      16,
+      128,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "configs_and_source_hashes_verified": true,
+    "paired_sampling_verified": true,
+    "nonfinite_evaluation_count": 0,
+    "active_workers": 0,
+    "training_runs_complete": 6,
+    "full_evaluations_complete": 12,
+    "earliest_best_selection_verified": true,
+    "result_record": "results/completed_runs.json"
+  },
+  "launch_verification": {
+    "checked_at": "2026-09-05T22:59:59Z",
+    "all_six_workers_active": true,
+    "all_live_configs_match_protocol": true,
+    "all_source_hashes_match_preflight": true,
+    "all_data_hashes_match_protocol": true,
+    "source_files_per_worker": 36,
+    "core_tests_passed": 205,
+    "both_full_batch_compiled_preflights_passed": true
+  }
+}

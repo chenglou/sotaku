@@ -1,0 +1,2991 @@
+{
+  "study_id": "hyperloop_50k_v1_20260905",
+  "description": "All three completed width128 50K controls, fixed before width160 confirmation. Scores are fractions.",
+  "runs": {
+    "20260910": {
+      "status": "complete",
+      "updates": 50000,
+      "parameters": 796937,
+      "base_initial_state_sha256": "9151f0ae2450fd39b435cf1e945d3019d93be0694300168e93f16c6b6e8e147d",
+      "sample_digest": "b276c70d0c835aafb8d1f137f24ebf75fd5e4e652110cd09652c373e7b9a6f9d",
+      "horizon_counts": {
+        "0": 40007,
+        "32": 2025,
+        "64": 1968,
+        "128": 1995,
+        "256": 1991,
+        "512": 2014
+      },
+      "work_counts": {
+        "gradient_free_iterations": 1986976,
+        "supervised_iterations": 800000
+      },
+      "data_sha256": {
+        "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+        "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+      },
+      "source_sha256": {
+        "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+        "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+        "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+        "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+        "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+        "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+        "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+        "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+        "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+        "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+        "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+        "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+        "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+        "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+        "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+        "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+        "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+        "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+        "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+        "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+        "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+        "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+        "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+        "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+        "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+        "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+        "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+        "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+        "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+        "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+        "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+        "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+        "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+        "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+        "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+        "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+        "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+      },
+      "timings_seconds": {
+        "checkpoint": 95.86048564000862,
+        "compilation": 549.722641404,
+        "monitoring": 533.2845154819937,
+        "training": 18396.361856712203
+      },
+      "best_validation": {
+        "accuracy": 0.984,
+        "metric": "1024",
+        "updates": 39000
+      },
+      "config": {
+        "arm": "baseline",
+        "protocol": {
+          "arms": {
+            "baseline": 0,
+            "gated_four": 4
+          },
+          "burnin_iterations": [
+            32,
+            64,
+            128,
+            256,
+            512
+          ],
+          "burnin_probability": 0.2,
+          "data_directory": "/outputs/weight_tying_v1_20260902/data",
+          "data_files": {
+            "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+            "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+            "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+          },
+          "decision": {
+            "accuracy_route": {
+              "improved_1024_pairs": 2,
+              "minimum_mean_1024_gain": 0.005,
+              "minimum_mean_4096_gain": 0
+            },
+            "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+            "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+            "reliability": {
+              "maximum_1024_to_4096_drop": 0.05,
+              "minimum_final_1024": 0.9,
+              "minimum_final_4096": 0.85
+            },
+            "require_all_runs_complete_and_finite": true,
+            "stability_route": {
+              "improved_4096_pairs": 2,
+              "minimum_mean_1024_gain": -0.005,
+              "minimum_mean_4096_gain": 0.05
+            }
+          },
+          "evaluation": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "compiled": false,
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true
+          },
+          "model": {
+            "blocks": 4,
+            "dropout": 0.1,
+            "gate_epsilon": 0.000001,
+            "gate_scale": 0.01,
+            "retention_bias": -8,
+            "width": 128
+          },
+          "preflight": {
+            "additional_cuda_batch_size": 8,
+            "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+            "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+          },
+          "seeds": [
+            20260910,
+            20260911,
+            20260912
+          ],
+          "study_id": "hyperloop_50k_v1_20260905",
+          "training": {
+            "adam_betas": [
+              0.9,
+              0.95
+            ],
+            "batch_size": 2048,
+            "late_floor_start": 30000,
+            "learning_rate": 0.002,
+            "minimum_lr_ratio": 0.01,
+            "phases": [
+              [
+                0,
+                10000,
+                51
+              ],
+              [
+                10000,
+                20000,
+                11
+              ],
+              [
+                20000,
+                30000,
+                1
+              ],
+              [
+                30000,
+                50000,
+                0
+              ]
+            ],
+            "probe_every": 1000,
+            "probe_iterations": [
+              16,
+              128,
+              512,
+              1024
+            ],
+            "steps": 50000,
+            "train_rows": 2700000,
+            "warmup_steps": 1400,
+            "weight_decay": 0.01
+          },
+          "window_length": 16
+        },
+        "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+        "seed": 20260910,
+        "smoke": false
+      },
+      "evaluations": {
+        "best_validation": {
+          "elapsed_seconds": 1032.0740171049983,
+          "identity": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "checkpoint_selection": "best_validation",
+            "compiled": false,
+            "config": {
+              "arm": "baseline",
+              "protocol": {
+                "arms": {
+                  "baseline": 0,
+                  "gated_four": 4
+                },
+                "burnin_iterations": [
+                  32,
+                  64,
+                  128,
+                  256,
+                  512
+                ],
+                "burnin_probability": 0.2,
+                "data_directory": "/outputs/weight_tying_v1_20260902/data",
+                "data_files": {
+                  "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+                  "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+                  "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+                },
+                "decision": {
+                  "accuracy_route": {
+                    "improved_1024_pairs": 2,
+                    "minimum_mean_1024_gain": 0.005,
+                    "minimum_mean_4096_gain": 0
+                  },
+                  "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+                  "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+                  "reliability": {
+                    "maximum_1024_to_4096_drop": 0.05,
+                    "minimum_final_1024": 0.9,
+                    "minimum_final_4096": 0.85
+                  },
+                  "require_all_runs_complete_and_finite": true,
+                  "stability_route": {
+                    "improved_4096_pairs": 2,
+                    "minimum_mean_1024_gain": -0.005,
+                    "minimum_mean_4096_gain": 0.05
+                  }
+                },
+                "evaluation": {
+                  "batch_size": 256,
+                  "benchmark": "release/benchmark_25k.json",
+                  "compiled": false,
+                  "iterations": [
+                    16,
+                    128,
+                    512,
+                    1024,
+                    2048,
+                    4096
+                  ],
+                  "precision": "fp32",
+                  "primary_checkpoint": "final",
+                  "secondary_checkpoint": "best_validation",
+                  "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+                  "tf32_matmul": false,
+                  "track_solutions_every_iteration": true
+                },
+                "model": {
+                  "blocks": 4,
+                  "dropout": 0.1,
+                  "gate_epsilon": 0.000001,
+                  "gate_scale": 0.01,
+                  "retention_bias": -8,
+                  "width": 128
+                },
+                "preflight": {
+                  "additional_cuda_batch_size": 8,
+                  "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+                  "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+                },
+                "seeds": [
+                  20260910,
+                  20260911,
+                  20260912
+                ],
+                "study_id": "hyperloop_50k_v1_20260905",
+                "training": {
+                  "adam_betas": [
+                    0.9,
+                    0.95
+                  ],
+                  "batch_size": 2048,
+                  "late_floor_start": 30000,
+                  "learning_rate": 0.002,
+                  "minimum_lr_ratio": 0.01,
+                  "phases": [
+                    [
+                      0,
+                      10000,
+                      51
+                    ],
+                    [
+                      10000,
+                      20000,
+                      11
+                    ],
+                    [
+                      20000,
+                      30000,
+                      1
+                    ],
+                    [
+                      30000,
+                      50000,
+                      0
+                    ]
+                  ],
+                  "probe_every": 1000,
+                  "probe_iterations": [
+                    16,
+                    128,
+                    512,
+                    1024
+                  ],
+                  "steps": 50000,
+                  "train_rows": 2700000,
+                  "warmup_steps": 1400,
+                  "weight_decay": 0.01
+                },
+                "window_length": 16
+              },
+              "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "seed": 20260910,
+              "smoke": false
+            },
+            "data_sha256": {
+              "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+            },
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "source_sha256": {
+              "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+              "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+              "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+              "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+              "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+              "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+              "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+              "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+              "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+              "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+              "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+              "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+              "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+              "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+              "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+              "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+              "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+              "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+              "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+              "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+              "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+              "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+              "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+              "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+              "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+              "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+              "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+              "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+              "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+              "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+              "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+              "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+              "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+              "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+              "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+              "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+            },
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true,
+            "updates": 39000,
+            "weights_sha256": "ae2b20c073461b29bf02cf386e447dea107d98f7bcd4709fc1191f70f16f52a8"
+          },
+          "predictions_sha256": "a2a3c6166349dd70ebfa16abac8936e002d507c61cdc826339af1c39872ce3f1",
+          "scores": {
+            "16": {
+              "accuracy": 0.79932,
+              "difficulty": {
+                "0": {
+                  "solved": 4998,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4614,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 3308,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 3245,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 3818,
+                  "total": 5000
+                }
+              },
+              "nonfinite": 0,
+              "solved": 19983,
+              "total": 25000
+            },
+            "128": {
+              "accuracy": 0.95536,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4972,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4594,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4533,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4786,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 3901,
+              "lost_since_previous": 0,
+              "nonfinite": 0,
+              "solved": 23884,
+              "total": 25000
+            },
+            "512": {
+              "accuracy": 0.98084,
+              "difficulty": {
+                "0": {
+                  "solved": 4992,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4957,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4858,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4811,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4903,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 696,
+              "lost_since_previous": 59,
+              "nonfinite": 0,
+              "solved": 24521,
+              "total": 25000
+            },
+            "1024": {
+              "accuracy": 0.97988,
+              "difficulty": {
+                "0": {
+                  "solved": 4981,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4947,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4857,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4815,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4897,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 78,
+              "lost_since_previous": 102,
+              "nonfinite": 0,
+              "solved": 24497,
+              "total": 25000
+            },
+            "2048": {
+              "accuracy": 0.97712,
+              "difficulty": {
+                "0": {
+                  "solved": 4971,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4928,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4834,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4798,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4897,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 46,
+              "lost_since_previous": 115,
+              "nonfinite": 0,
+              "solved": 24428,
+              "total": 25000
+            },
+            "4096": {
+              "accuracy": 0.972,
+              "difficulty": {
+                "0": {
+                  "solved": 4935,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4914,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4804,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4780,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4867,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 32,
+              "lost_since_previous": 160,
+              "nonfinite": 0,
+              "solved": 24300,
+              "total": 25000
+            }
+          },
+          "state_diagnostics_first_batch": {
+            "16": {
+              "state_rms": 15.051825669227508
+            },
+            "128": {
+              "state_rms": 35.4999047214757
+            },
+            "512": {
+              "state_rms": 200.3786430489158
+            },
+            "1024": {
+              "state_rms": 434.99866711351217
+            },
+            "2048": {
+              "state_rms": 908.4488097616625
+            },
+            "4096": {
+              "state_rms": 1858.8874862148714
+            }
+          }
+        },
+        "final": {
+          "elapsed_seconds": 1031.8481261489978,
+          "identity": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "checkpoint_selection": "final",
+            "compiled": false,
+            "config": {
+              "arm": "baseline",
+              "protocol": {
+                "arms": {
+                  "baseline": 0,
+                  "gated_four": 4
+                },
+                "burnin_iterations": [
+                  32,
+                  64,
+                  128,
+                  256,
+                  512
+                ],
+                "burnin_probability": 0.2,
+                "data_directory": "/outputs/weight_tying_v1_20260902/data",
+                "data_files": {
+                  "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+                  "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+                  "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+                },
+                "decision": {
+                  "accuracy_route": {
+                    "improved_1024_pairs": 2,
+                    "minimum_mean_1024_gain": 0.005,
+                    "minimum_mean_4096_gain": 0
+                  },
+                  "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+                  "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+                  "reliability": {
+                    "maximum_1024_to_4096_drop": 0.05,
+                    "minimum_final_1024": 0.9,
+                    "minimum_final_4096": 0.85
+                  },
+                  "require_all_runs_complete_and_finite": true,
+                  "stability_route": {
+                    "improved_4096_pairs": 2,
+                    "minimum_mean_1024_gain": -0.005,
+                    "minimum_mean_4096_gain": 0.05
+                  }
+                },
+                "evaluation": {
+                  "batch_size": 256,
+                  "benchmark": "release/benchmark_25k.json",
+                  "compiled": false,
+                  "iterations": [
+                    16,
+                    128,
+                    512,
+                    1024,
+                    2048,
+                    4096
+                  ],
+                  "precision": "fp32",
+                  "primary_checkpoint": "final",
+                  "secondary_checkpoint": "best_validation",
+                  "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+                  "tf32_matmul": false,
+                  "track_solutions_every_iteration": true
+                },
+                "model": {
+                  "blocks": 4,
+                  "dropout": 0.1,
+                  "gate_epsilon": 0.000001,
+                  "gate_scale": 0.01,
+                  "retention_bias": -8,
+                  "width": 128
+                },
+                "preflight": {
+                  "additional_cuda_batch_size": 8,
+                  "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+                  "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+                },
+                "seeds": [
+                  20260910,
+                  20260911,
+                  20260912
+                ],
+                "study_id": "hyperloop_50k_v1_20260905",
+                "training": {
+                  "adam_betas": [
+                    0.9,
+                    0.95
+                  ],
+                  "batch_size": 2048,
+                  "late_floor_start": 30000,
+                  "learning_rate": 0.002,
+                  "minimum_lr_ratio": 0.01,
+                  "phases": [
+                    [
+                      0,
+                      10000,
+                      51
+                    ],
+                    [
+                      10000,
+                      20000,
+                      11
+                    ],
+                    [
+                      20000,
+                      30000,
+                      1
+                    ],
+                    [
+                      30000,
+                      50000,
+                      0
+                    ]
+                  ],
+                  "probe_every": 1000,
+                  "probe_iterations": [
+                    16,
+                    128,
+                    512,
+                    1024
+                  ],
+                  "steps": 50000,
+                  "train_rows": 2700000,
+                  "warmup_steps": 1400,
+                  "weight_decay": 0.01
+                },
+                "window_length": 16
+              },
+              "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "seed": 20260910,
+              "smoke": false
+            },
+            "data_sha256": {
+              "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+            },
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "source_sha256": {
+              "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+              "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+              "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+              "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+              "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+              "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+              "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+              "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+              "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+              "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+              "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+              "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+              "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+              "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+              "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+              "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+              "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+              "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+              "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+              "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+              "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+              "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+              "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+              "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+              "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+              "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+              "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+              "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+              "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+              "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+              "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+              "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+              "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+              "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+              "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+              "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+            },
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true,
+            "updates": 50000,
+            "weights_sha256": "6d6ec13c3f608d67b4ffd71f1b8869d5fbe86dd9c883d889fd6b3fc56a87286d"
+          },
+          "predictions_sha256": "b326fe1705391278837cb756def4e47d1fd2d924209191fbfe830e4eeece5dcf",
+          "scores": {
+            "16": {
+              "accuracy": 0.81076,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4673,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 3397,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 3299,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 3901,
+                  "total": 5000
+                }
+              },
+              "nonfinite": 0,
+              "solved": 20269,
+              "total": 25000
+            },
+            "128": {
+              "accuracy": 0.9606,
+              "difficulty": {
+                "0": {
+                  "solved": 5000,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4981,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4639,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4599,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4796,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 3746,
+              "lost_since_previous": 0,
+              "nonfinite": 0,
+              "solved": 24015,
+              "total": 25000
+            },
+            "512": {
+              "accuracy": 0.9828,
+              "difficulty": {
+                "0": {
+                  "solved": 4994,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4982,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4860,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4822,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4912,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 578,
+              "lost_since_previous": 23,
+              "nonfinite": 0,
+              "solved": 24570,
+              "total": 25000
+            },
+            "1024": {
+              "accuracy": 0.98244,
+              "difficulty": {
+                "0": {
+                  "solved": 4991,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4974,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4855,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4836,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4905,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 34,
+              "lost_since_previous": 43,
+              "nonfinite": 0,
+              "solved": 24561,
+              "total": 25000
+            },
+            "2048": {
+              "accuracy": 0.9772,
+              "difficulty": {
+                "0": {
+                  "solved": 4956,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4938,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4828,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4820,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4888,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 14,
+              "lost_since_previous": 145,
+              "nonfinite": 0,
+              "solved": 24430,
+              "total": 25000
+            },
+            "4096": {
+              "accuracy": 0.91688,
+              "difficulty": {
+                "0": {
+                  "solved": 4373,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4674,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4603,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4623,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4649,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 9,
+              "lost_since_previous": 1517,
+              "nonfinite": 0,
+              "solved": 22922,
+              "total": 25000
+            }
+          },
+          "state_diagnostics_first_batch": {
+            "16": {
+              "state_rms": 13.415181617832495
+            },
+            "128": {
+              "state_rms": 22.51373737290931
+            },
+            "512": {
+              "state_rms": 93.68899866226423
+            },
+            "1024": {
+              "state_rms": 199.6138966782985
+            },
+            "2048": {
+              "state_rms": 415.26925931832307
+            },
+            "4096": {
+              "state_rms": 849.378629968457
+            }
+          }
+        }
+      }
+    },
+    "20260911": {
+      "status": "complete",
+      "updates": 50000,
+      "parameters": 796937,
+      "base_initial_state_sha256": "c30aa279adaa9f65a764779cabc5afb73706087014f1a5754bdde239f97724ef",
+      "sample_digest": "376791a0225d0dc3e81fc4f78715c5a62da0f8f959883c8eba1499f3e9dd0cb9",
+      "horizon_counts": {
+        "0": 40075,
+        "32": 1998,
+        "64": 1987,
+        "128": 2002,
+        "256": 1939,
+        "512": 1999
+      },
+      "work_counts": {
+        "gradient_free_iterations": 1967232,
+        "supervised_iterations": 800000
+      },
+      "data_sha256": {
+        "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+        "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+      },
+      "source_sha256": {
+        "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+        "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+        "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+        "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+        "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+        "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+        "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+        "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+        "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+        "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+        "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+        "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+        "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+        "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+        "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+        "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+        "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+        "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+        "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+        "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+        "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+        "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+        "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+        "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+        "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+        "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+        "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+        "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+        "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+        "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+        "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+        "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+        "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+        "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+        "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+        "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+        "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+      },
+      "timings_seconds": {
+        "checkpoint": 145.39918951199354,
+        "compilation": 548.606081386,
+        "monitoring": 528.3991500789928,
+        "training": 18309.181023623005
+      },
+      "best_validation": {
+        "accuracy": 0.982,
+        "metric": "1024",
+        "updates": 47000
+      },
+      "config": {
+        "arm": "baseline",
+        "protocol": {
+          "arms": {
+            "baseline": 0,
+            "gated_four": 4
+          },
+          "burnin_iterations": [
+            32,
+            64,
+            128,
+            256,
+            512
+          ],
+          "burnin_probability": 0.2,
+          "data_directory": "/outputs/weight_tying_v1_20260902/data",
+          "data_files": {
+            "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+            "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+            "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+          },
+          "decision": {
+            "accuracy_route": {
+              "improved_1024_pairs": 2,
+              "minimum_mean_1024_gain": 0.005,
+              "minimum_mean_4096_gain": 0
+            },
+            "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+            "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+            "reliability": {
+              "maximum_1024_to_4096_drop": 0.05,
+              "minimum_final_1024": 0.9,
+              "minimum_final_4096": 0.85
+            },
+            "require_all_runs_complete_and_finite": true,
+            "stability_route": {
+              "improved_4096_pairs": 2,
+              "minimum_mean_1024_gain": -0.005,
+              "minimum_mean_4096_gain": 0.05
+            }
+          },
+          "evaluation": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "compiled": false,
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true
+          },
+          "model": {
+            "blocks": 4,
+            "dropout": 0.1,
+            "gate_epsilon": 0.000001,
+            "gate_scale": 0.01,
+            "retention_bias": -8,
+            "width": 128
+          },
+          "preflight": {
+            "additional_cuda_batch_size": 8,
+            "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+            "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+          },
+          "seeds": [
+            20260910,
+            20260911,
+            20260912
+          ],
+          "study_id": "hyperloop_50k_v1_20260905",
+          "training": {
+            "adam_betas": [
+              0.9,
+              0.95
+            ],
+            "batch_size": 2048,
+            "late_floor_start": 30000,
+            "learning_rate": 0.002,
+            "minimum_lr_ratio": 0.01,
+            "phases": [
+              [
+                0,
+                10000,
+                51
+              ],
+              [
+                10000,
+                20000,
+                11
+              ],
+              [
+                20000,
+                30000,
+                1
+              ],
+              [
+                30000,
+                50000,
+                0
+              ]
+            ],
+            "probe_every": 1000,
+            "probe_iterations": [
+              16,
+              128,
+              512,
+              1024
+            ],
+            "steps": 50000,
+            "train_rows": 2700000,
+            "warmup_steps": 1400,
+            "weight_decay": 0.01
+          },
+          "window_length": 16
+        },
+        "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+        "seed": 20260911,
+        "smoke": false
+      },
+      "evaluations": {
+        "best_validation": {
+          "elapsed_seconds": 1021.2692711589989,
+          "identity": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "checkpoint_selection": "best_validation",
+            "compiled": false,
+            "config": {
+              "arm": "baseline",
+              "protocol": {
+                "arms": {
+                  "baseline": 0,
+                  "gated_four": 4
+                },
+                "burnin_iterations": [
+                  32,
+                  64,
+                  128,
+                  256,
+                  512
+                ],
+                "burnin_probability": 0.2,
+                "data_directory": "/outputs/weight_tying_v1_20260902/data",
+                "data_files": {
+                  "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+                  "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+                  "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+                },
+                "decision": {
+                  "accuracy_route": {
+                    "improved_1024_pairs": 2,
+                    "minimum_mean_1024_gain": 0.005,
+                    "minimum_mean_4096_gain": 0
+                  },
+                  "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+                  "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+                  "reliability": {
+                    "maximum_1024_to_4096_drop": 0.05,
+                    "minimum_final_1024": 0.9,
+                    "minimum_final_4096": 0.85
+                  },
+                  "require_all_runs_complete_and_finite": true,
+                  "stability_route": {
+                    "improved_4096_pairs": 2,
+                    "minimum_mean_1024_gain": -0.005,
+                    "minimum_mean_4096_gain": 0.05
+                  }
+                },
+                "evaluation": {
+                  "batch_size": 256,
+                  "benchmark": "release/benchmark_25k.json",
+                  "compiled": false,
+                  "iterations": [
+                    16,
+                    128,
+                    512,
+                    1024,
+                    2048,
+                    4096
+                  ],
+                  "precision": "fp32",
+                  "primary_checkpoint": "final",
+                  "secondary_checkpoint": "best_validation",
+                  "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+                  "tf32_matmul": false,
+                  "track_solutions_every_iteration": true
+                },
+                "model": {
+                  "blocks": 4,
+                  "dropout": 0.1,
+                  "gate_epsilon": 0.000001,
+                  "gate_scale": 0.01,
+                  "retention_bias": -8,
+                  "width": 128
+                },
+                "preflight": {
+                  "additional_cuda_batch_size": 8,
+                  "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+                  "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+                },
+                "seeds": [
+                  20260910,
+                  20260911,
+                  20260912
+                ],
+                "study_id": "hyperloop_50k_v1_20260905",
+                "training": {
+                  "adam_betas": [
+                    0.9,
+                    0.95
+                  ],
+                  "batch_size": 2048,
+                  "late_floor_start": 30000,
+                  "learning_rate": 0.002,
+                  "minimum_lr_ratio": 0.01,
+                  "phases": [
+                    [
+                      0,
+                      10000,
+                      51
+                    ],
+                    [
+                      10000,
+                      20000,
+                      11
+                    ],
+                    [
+                      20000,
+                      30000,
+                      1
+                    ],
+                    [
+                      30000,
+                      50000,
+                      0
+                    ]
+                  ],
+                  "probe_every": 1000,
+                  "probe_iterations": [
+                    16,
+                    128,
+                    512,
+                    1024
+                  ],
+                  "steps": 50000,
+                  "train_rows": 2700000,
+                  "warmup_steps": 1400,
+                  "weight_decay": 0.01
+                },
+                "window_length": 16
+              },
+              "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "seed": 20260911,
+              "smoke": false
+            },
+            "data_sha256": {
+              "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+            },
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "source_sha256": {
+              "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+              "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+              "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+              "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+              "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+              "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+              "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+              "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+              "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+              "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+              "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+              "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+              "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+              "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+              "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+              "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+              "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+              "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+              "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+              "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+              "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+              "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+              "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+              "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+              "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+              "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+              "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+              "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+              "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+              "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+              "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+              "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+              "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+              "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+              "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+              "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+            },
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true,
+            "updates": 47000,
+            "weights_sha256": "69438198a6bebf8f5ceb67dc2389e5d7a547ad4635d347e2b6c352f49a17b4c9"
+          },
+          "predictions_sha256": "05e0ee5201a652e0bb7ad2bfc4664053948f442dc24a766a406d0d9ba46679ec",
+          "scores": {
+            "16": {
+              "accuracy": 0.81096,
+              "difficulty": {
+                "0": {
+                  "solved": 4997,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4673,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 3385,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 3332,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 3887,
+                  "total": 5000
+                }
+              },
+              "nonfinite": 0,
+              "solved": 20274,
+              "total": 25000
+            },
+            "128": {
+              "accuracy": 0.96208,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4984,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4635,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4608,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4826,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 3778,
+              "lost_since_previous": 0,
+              "nonfinite": 0,
+              "solved": 24052,
+              "total": 25000
+            },
+            "512": {
+              "accuracy": 0.98184,
+              "difficulty": {
+                "0": {
+                  "solved": 4995,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4986,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4850,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4814,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4901,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 517,
+              "lost_since_previous": 23,
+              "nonfinite": 0,
+              "solved": 24546,
+              "total": 25000
+            },
+            "1024": {
+              "accuracy": 0.97844,
+              "difficulty": {
+                "0": {
+                  "solved": 4976,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4967,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4839,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4801,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4878,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 31,
+              "lost_since_previous": 116,
+              "nonfinite": 0,
+              "solved": 24461,
+              "total": 25000
+            },
+            "2048": {
+              "accuracy": 0.97324,
+              "difficulty": {
+                "0": {
+                  "solved": 4969,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4953,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4795,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4765,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4849,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 11,
+              "lost_since_previous": 141,
+              "nonfinite": 0,
+              "solved": 24331,
+              "total": 25000
+            },
+            "4096": {
+              "accuracy": 0.97044,
+              "difficulty": {
+                "0": {
+                  "solved": 4961,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4936,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4780,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4747,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4837,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 16,
+              "lost_since_previous": 86,
+              "nonfinite": 0,
+              "solved": 24261,
+              "total": 25000
+            }
+          },
+          "state_diagnostics_first_batch": {
+            "16": {
+              "state_rms": 15.244121119799054
+            },
+            "128": {
+              "state_rms": 27.535364034327806
+            },
+            "512": {
+              "state_rms": 121.51713230999687
+            },
+            "1024": {
+              "state_rms": 270.02625688745394
+            },
+            "2048": {
+              "state_rms": 586.1607104425781
+            },
+            "4096": {
+              "state_rms": 1242.4011141984006
+            }
+          }
+        },
+        "final": {
+          "elapsed_seconds": 1021.471174405,
+          "identity": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "checkpoint_selection": "final",
+            "compiled": false,
+            "config": {
+              "arm": "baseline",
+              "protocol": {
+                "arms": {
+                  "baseline": 0,
+                  "gated_four": 4
+                },
+                "burnin_iterations": [
+                  32,
+                  64,
+                  128,
+                  256,
+                  512
+                ],
+                "burnin_probability": 0.2,
+                "data_directory": "/outputs/weight_tying_v1_20260902/data",
+                "data_files": {
+                  "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+                  "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+                  "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+                },
+                "decision": {
+                  "accuracy_route": {
+                    "improved_1024_pairs": 2,
+                    "minimum_mean_1024_gain": 0.005,
+                    "minimum_mean_4096_gain": 0
+                  },
+                  "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+                  "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+                  "reliability": {
+                    "maximum_1024_to_4096_drop": 0.05,
+                    "minimum_final_1024": 0.9,
+                    "minimum_final_4096": 0.85
+                  },
+                  "require_all_runs_complete_and_finite": true,
+                  "stability_route": {
+                    "improved_4096_pairs": 2,
+                    "minimum_mean_1024_gain": -0.005,
+                    "minimum_mean_4096_gain": 0.05
+                  }
+                },
+                "evaluation": {
+                  "batch_size": 256,
+                  "benchmark": "release/benchmark_25k.json",
+                  "compiled": false,
+                  "iterations": [
+                    16,
+                    128,
+                    512,
+                    1024,
+                    2048,
+                    4096
+                  ],
+                  "precision": "fp32",
+                  "primary_checkpoint": "final",
+                  "secondary_checkpoint": "best_validation",
+                  "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+                  "tf32_matmul": false,
+                  "track_solutions_every_iteration": true
+                },
+                "model": {
+                  "blocks": 4,
+                  "dropout": 0.1,
+                  "gate_epsilon": 0.000001,
+                  "gate_scale": 0.01,
+                  "retention_bias": -8,
+                  "width": 128
+                },
+                "preflight": {
+                  "additional_cuda_batch_size": 8,
+                  "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+                  "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+                },
+                "seeds": [
+                  20260910,
+                  20260911,
+                  20260912
+                ],
+                "study_id": "hyperloop_50k_v1_20260905",
+                "training": {
+                  "adam_betas": [
+                    0.9,
+                    0.95
+                  ],
+                  "batch_size": 2048,
+                  "late_floor_start": 30000,
+                  "learning_rate": 0.002,
+                  "minimum_lr_ratio": 0.01,
+                  "phases": [
+                    [
+                      0,
+                      10000,
+                      51
+                    ],
+                    [
+                      10000,
+                      20000,
+                      11
+                    ],
+                    [
+                      20000,
+                      30000,
+                      1
+                    ],
+                    [
+                      30000,
+                      50000,
+                      0
+                    ]
+                  ],
+                  "probe_every": 1000,
+                  "probe_iterations": [
+                    16,
+                    128,
+                    512,
+                    1024
+                  ],
+                  "steps": 50000,
+                  "train_rows": 2700000,
+                  "warmup_steps": 1400,
+                  "weight_decay": 0.01
+                },
+                "window_length": 16
+              },
+              "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "seed": 20260911,
+              "smoke": false
+            },
+            "data_sha256": {
+              "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+            },
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "source_sha256": {
+              "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+              "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+              "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+              "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+              "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+              "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+              "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+              "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+              "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+              "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+              "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+              "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+              "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+              "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+              "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+              "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+              "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+              "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+              "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+              "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+              "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+              "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+              "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+              "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+              "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+              "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+              "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+              "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+              "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+              "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+              "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+              "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+              "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+              "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+              "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+              "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+            },
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true,
+            "updates": 50000,
+            "weights_sha256": "8e68b2255c7781ca46c1d43e616fc06a763414b1fe5aa133fdecb12d7f662ef7"
+          },
+          "predictions_sha256": "2802a74faa527ca6b0bac4ae9859d3e4f2dac5d2f8949d659fbee353fe76f4f0",
+          "scores": {
+            "16": {
+              "accuracy": 0.8118,
+              "difficulty": {
+                "0": {
+                  "solved": 4998,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4708,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 3394,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 3301,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 3894,
+                  "total": 5000
+                }
+              },
+              "nonfinite": 0,
+              "solved": 20295,
+              "total": 25000
+            },
+            "128": {
+              "accuracy": 0.96276,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4986,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4639,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4604,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4841,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 3774,
+              "lost_since_previous": 0,
+              "nonfinite": 0,
+              "solved": 24069,
+              "total": 25000
+            },
+            "512": {
+              "accuracy": 0.98224,
+              "difficulty": {
+                "0": {
+                  "solved": 4994,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4981,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4845,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4822,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4914,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 512,
+              "lost_since_previous": 25,
+              "nonfinite": 0,
+              "solved": 24556,
+              "total": 25000
+            },
+            "1024": {
+              "accuracy": 0.97848,
+              "difficulty": {
+                "0": {
+                  "solved": 4976,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4955,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4829,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4810,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4892,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 45,
+              "lost_since_previous": 139,
+              "nonfinite": 0,
+              "solved": 24462,
+              "total": 25000
+            },
+            "2048": {
+              "accuracy": 0.97432,
+              "difficulty": {
+                "0": {
+                  "solved": 4968,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4943,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4799,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4784,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4864,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 20,
+              "lost_since_previous": 124,
+              "nonfinite": 0,
+              "solved": 24358,
+              "total": 25000
+            },
+            "4096": {
+              "accuracy": 0.97236,
+              "difficulty": {
+                "0": {
+                  "solved": 4961,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4942,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4785,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4765,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4856,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 22,
+              "lost_since_previous": 71,
+              "nonfinite": 0,
+              "solved": 24309,
+              "total": 25000
+            }
+          },
+          "state_diagnostics_first_batch": {
+            "16": {
+              "state_rms": 15.312992167156091
+            },
+            "128": {
+              "state_rms": 27.18119676307623
+            },
+            "512": {
+              "state_rms": 117.06662275127374
+            },
+            "1024": {
+              "state_rms": 259.4155938218773
+            },
+            "2048": {
+              "state_rms": 562.0824035170905
+            },
+            "4096": {
+              "state_rms": 1189.2369821670495
+            }
+          }
+        }
+      }
+    },
+    "20260912": {
+      "status": "complete",
+      "updates": 50000,
+      "parameters": 796937,
+      "base_initial_state_sha256": "082c58d0b9184fcbf77a112255105025c591e3e5e203b4f7edc7f3fb65403077",
+      "sample_digest": "f53116fbd43703a733af0c54df016ddbe89646a12a7e32b858c99b6b692fed6e",
+      "horizon_counts": {
+        "0": 40119,
+        "32": 2045,
+        "64": 1959,
+        "128": 1905,
+        "256": 1971,
+        "512": 2001
+      },
+      "work_counts": {
+        "gradient_free_iterations": 1963744,
+        "supervised_iterations": 800000
+      },
+      "data_sha256": {
+        "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+        "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+      },
+      "source_sha256": {
+        "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+        "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+        "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+        "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+        "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+        "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+        "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+        "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+        "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+        "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+        "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+        "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+        "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+        "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+        "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+        "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+        "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+        "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+        "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+        "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+        "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+        "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+        "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+        "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+        "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+        "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+        "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+        "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+        "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+        "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+        "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+        "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+        "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+        "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+        "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+        "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+        "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+      },
+      "timings_seconds": {
+        "checkpoint": 119.75079318800272,
+        "compilation": 505.02221639400005,
+        "monitoring": 532.0506244990063,
+        "training": 18297.456599125107
+      },
+      "best_validation": {
+        "accuracy": 0.99,
+        "metric": "1024",
+        "updates": 44000
+      },
+      "config": {
+        "arm": "baseline",
+        "protocol": {
+          "arms": {
+            "baseline": 0,
+            "gated_four": 4
+          },
+          "burnin_iterations": [
+            32,
+            64,
+            128,
+            256,
+            512
+          ],
+          "burnin_probability": 0.2,
+          "data_directory": "/outputs/weight_tying_v1_20260902/data",
+          "data_files": {
+            "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+            "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+            "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+          },
+          "decision": {
+            "accuracy_route": {
+              "improved_1024_pairs": 2,
+              "minimum_mean_1024_gain": 0.005,
+              "minimum_mean_4096_gain": 0
+            },
+            "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+            "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+            "reliability": {
+              "maximum_1024_to_4096_drop": 0.05,
+              "minimum_final_1024": 0.9,
+              "minimum_final_4096": 0.85
+            },
+            "require_all_runs_complete_and_finite": true,
+            "stability_route": {
+              "improved_4096_pairs": 2,
+              "minimum_mean_1024_gain": -0.005,
+              "minimum_mean_4096_gain": 0.05
+            }
+          },
+          "evaluation": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "compiled": false,
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true
+          },
+          "model": {
+            "blocks": 4,
+            "dropout": 0.1,
+            "gate_epsilon": 0.000001,
+            "gate_scale": 0.01,
+            "retention_bias": -8,
+            "width": 128
+          },
+          "preflight": {
+            "additional_cuda_batch_size": 8,
+            "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+            "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+          },
+          "seeds": [
+            20260910,
+            20260911,
+            20260912
+          ],
+          "study_id": "hyperloop_50k_v1_20260905",
+          "training": {
+            "adam_betas": [
+              0.9,
+              0.95
+            ],
+            "batch_size": 2048,
+            "late_floor_start": 30000,
+            "learning_rate": 0.002,
+            "minimum_lr_ratio": 0.01,
+            "phases": [
+              [
+                0,
+                10000,
+                51
+              ],
+              [
+                10000,
+                20000,
+                11
+              ],
+              [
+                20000,
+                30000,
+                1
+              ],
+              [
+                30000,
+                50000,
+                0
+              ]
+            ],
+            "probe_every": 1000,
+            "probe_iterations": [
+              16,
+              128,
+              512,
+              1024
+            ],
+            "steps": 50000,
+            "train_rows": 2700000,
+            "warmup_steps": 1400,
+            "weight_decay": 0.01
+          },
+          "window_length": 16
+        },
+        "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+        "seed": 20260912,
+        "smoke": false
+      },
+      "evaluations": {
+        "best_validation": {
+          "elapsed_seconds": 1026.4296155910001,
+          "identity": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "checkpoint_selection": "best_validation",
+            "compiled": false,
+            "config": {
+              "arm": "baseline",
+              "protocol": {
+                "arms": {
+                  "baseline": 0,
+                  "gated_four": 4
+                },
+                "burnin_iterations": [
+                  32,
+                  64,
+                  128,
+                  256,
+                  512
+                ],
+                "burnin_probability": 0.2,
+                "data_directory": "/outputs/weight_tying_v1_20260902/data",
+                "data_files": {
+                  "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+                  "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+                  "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+                },
+                "decision": {
+                  "accuracy_route": {
+                    "improved_1024_pairs": 2,
+                    "minimum_mean_1024_gain": 0.005,
+                    "minimum_mean_4096_gain": 0
+                  },
+                  "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+                  "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+                  "reliability": {
+                    "maximum_1024_to_4096_drop": 0.05,
+                    "minimum_final_1024": 0.9,
+                    "minimum_final_4096": 0.85
+                  },
+                  "require_all_runs_complete_and_finite": true,
+                  "stability_route": {
+                    "improved_4096_pairs": 2,
+                    "minimum_mean_1024_gain": -0.005,
+                    "minimum_mean_4096_gain": 0.05
+                  }
+                },
+                "evaluation": {
+                  "batch_size": 256,
+                  "benchmark": "release/benchmark_25k.json",
+                  "compiled": false,
+                  "iterations": [
+                    16,
+                    128,
+                    512,
+                    1024,
+                    2048,
+                    4096
+                  ],
+                  "precision": "fp32",
+                  "primary_checkpoint": "final",
+                  "secondary_checkpoint": "best_validation",
+                  "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+                  "tf32_matmul": false,
+                  "track_solutions_every_iteration": true
+                },
+                "model": {
+                  "blocks": 4,
+                  "dropout": 0.1,
+                  "gate_epsilon": 0.000001,
+                  "gate_scale": 0.01,
+                  "retention_bias": -8,
+                  "width": 128
+                },
+                "preflight": {
+                  "additional_cuda_batch_size": 8,
+                  "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+                  "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+                },
+                "seeds": [
+                  20260910,
+                  20260911,
+                  20260912
+                ],
+                "study_id": "hyperloop_50k_v1_20260905",
+                "training": {
+                  "adam_betas": [
+                    0.9,
+                    0.95
+                  ],
+                  "batch_size": 2048,
+                  "late_floor_start": 30000,
+                  "learning_rate": 0.002,
+                  "minimum_lr_ratio": 0.01,
+                  "phases": [
+                    [
+                      0,
+                      10000,
+                      51
+                    ],
+                    [
+                      10000,
+                      20000,
+                      11
+                    ],
+                    [
+                      20000,
+                      30000,
+                      1
+                    ],
+                    [
+                      30000,
+                      50000,
+                      0
+                    ]
+                  ],
+                  "probe_every": 1000,
+                  "probe_iterations": [
+                    16,
+                    128,
+                    512,
+                    1024
+                  ],
+                  "steps": 50000,
+                  "train_rows": 2700000,
+                  "warmup_steps": 1400,
+                  "weight_decay": 0.01
+                },
+                "window_length": 16
+              },
+              "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "seed": 20260912,
+              "smoke": false
+            },
+            "data_sha256": {
+              "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+            },
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "source_sha256": {
+              "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+              "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+              "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+              "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+              "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+              "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+              "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+              "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+              "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+              "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+              "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+              "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+              "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+              "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+              "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+              "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+              "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+              "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+              "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+              "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+              "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+              "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+              "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+              "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+              "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+              "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+              "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+              "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+              "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+              "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+              "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+              "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+              "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+              "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+              "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+              "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+            },
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true,
+            "updates": 44000,
+            "weights_sha256": "b36a2b62cadb5269a6ae9ae72f656cf2013c4c3610cec48cc6e657b5b88d9424"
+          },
+          "predictions_sha256": "2aa6630d7aeea170320bcfa5a49a3acdfe021675923f962b645453792c091093",
+          "scores": {
+            "16": {
+              "accuracy": 0.8026,
+              "difficulty": {
+                "0": {
+                  "solved": 4997,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4639,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 3363,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 3232,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 3834,
+                  "total": 5000
+                }
+              },
+              "nonfinite": 0,
+              "solved": 20065,
+              "total": 25000
+            },
+            "128": {
+              "accuracy": 0.96252,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4983,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4636,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4619,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4826,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 3999,
+              "lost_since_previous": 1,
+              "nonfinite": 0,
+              "solved": 24063,
+              "total": 25000
+            },
+            "512": {
+              "accuracy": 0.9878,
+              "difficulty": {
+                "0": {
+                  "solved": 4997,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4989,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4902,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4883,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4924,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 636,
+              "lost_since_previous": 4,
+              "nonfinite": 0,
+              "solved": 24695,
+              "total": 25000
+            },
+            "1024": {
+              "accuracy": 0.99128,
+              "difficulty": {
+                "0": {
+                  "solved": 4994,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4992,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4934,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4925,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4937,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 93,
+              "lost_since_previous": 6,
+              "nonfinite": 0,
+              "solved": 24782,
+              "total": 25000
+            },
+            "2048": {
+              "accuracy": 0.99264,
+              "difficulty": {
+                "0": {
+                  "solved": 4992,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4992,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4950,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4937,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4945,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 39,
+              "lost_since_previous": 5,
+              "nonfinite": 0,
+              "solved": 24816,
+              "total": 25000
+            },
+            "4096": {
+              "accuracy": 0.99372,
+              "difficulty": {
+                "0": {
+                  "solved": 4991,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4992,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4961,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4947,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4952,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 28,
+              "lost_since_previous": 1,
+              "nonfinite": 0,
+              "solved": 24843,
+              "total": 25000
+            }
+          },
+          "state_diagnostics_first_batch": {
+            "16": {
+              "state_rms": 15.242043762298321
+            },
+            "128": {
+              "state_rms": 81.21194803950078
+            },
+            "512": {
+              "state_rms": 365.19173843676583
+            },
+            "1024": {
+              "state_rms": 748.0816732502359
+            },
+            "2048": {
+              "state_rms": 1515.5292316818757
+            },
+            "4096": {
+              "state_rms": 3053.462394798693
+            }
+          }
+        },
+        "final": {
+          "elapsed_seconds": 1029.159482105999,
+          "identity": {
+            "batch_size": 256,
+            "benchmark": "release/benchmark_25k.json",
+            "checkpoint_selection": "final",
+            "compiled": false,
+            "config": {
+              "arm": "baseline",
+              "protocol": {
+                "arms": {
+                  "baseline": 0,
+                  "gated_four": 4
+                },
+                "burnin_iterations": [
+                  32,
+                  64,
+                  128,
+                  256,
+                  512
+                ],
+                "burnin_probability": 0.2,
+                "data_directory": "/outputs/weight_tying_v1_20260902/data",
+                "data_files": {
+                  "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+                  "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+                  "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d"
+                },
+                "decision": {
+                  "accuracy_route": {
+                    "improved_1024_pairs": 2,
+                    "minimum_mean_1024_gain": 0.005,
+                    "minimum_mean_4096_gain": 0
+                  },
+                  "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria.",
+                  "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+                  "reliability": {
+                    "maximum_1024_to_4096_drop": 0.05,
+                    "minimum_final_1024": 0.9,
+                    "minimum_final_4096": 0.85
+                  },
+                  "require_all_runs_complete_and_finite": true,
+                  "stability_route": {
+                    "improved_4096_pairs": 2,
+                    "minimum_mean_1024_gain": -0.005,
+                    "minimum_mean_4096_gain": 0.05
+                  }
+                },
+                "evaluation": {
+                  "batch_size": 256,
+                  "benchmark": "release/benchmark_25k.json",
+                  "compiled": false,
+                  "iterations": [
+                    16,
+                    128,
+                    512,
+                    1024,
+                    2048,
+                    4096
+                  ],
+                  "precision": "fp32",
+                  "primary_checkpoint": "final",
+                  "secondary_checkpoint": "best_validation",
+                  "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+                  "tf32_matmul": false,
+                  "track_solutions_every_iteration": true
+                },
+                "model": {
+                  "blocks": 4,
+                  "dropout": 0.1,
+                  "gate_epsilon": 0.000001,
+                  "gate_scale": 0.01,
+                  "retention_bias": -8,
+                  "width": 128
+                },
+                "preflight": {
+                  "additional_cuda_batch_size": 8,
+                  "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+                  "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1"
+                },
+                "seeds": [
+                  20260910,
+                  20260911,
+                  20260912
+                ],
+                "study_id": "hyperloop_50k_v1_20260905",
+                "training": {
+                  "adam_betas": [
+                    0.9,
+                    0.95
+                  ],
+                  "batch_size": 2048,
+                  "late_floor_start": 30000,
+                  "learning_rate": 0.002,
+                  "minimum_lr_ratio": 0.01,
+                  "phases": [
+                    [
+                      0,
+                      10000,
+                      51
+                    ],
+                    [
+                      10000,
+                      20000,
+                      11
+                    ],
+                    [
+                      20000,
+                      30000,
+                      1
+                    ],
+                    [
+                      30000,
+                      50000,
+                      0
+                    ]
+                  ],
+                  "probe_every": 1000,
+                  "probe_iterations": [
+                    16,
+                    128,
+                    512,
+                    1024
+                  ],
+                  "steps": 50000,
+                  "train_rows": 2700000,
+                  "warmup_steps": 1400,
+                  "weight_decay": 0.01
+                },
+                "window_length": 16
+              },
+              "protocol_sha256": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "seed": 20260912,
+              "smoke": false
+            },
+            "data_sha256": {
+              "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+            },
+            "iterations": [
+              16,
+              128,
+              512,
+              1024,
+              2048,
+              4096
+            ],
+            "precision": "fp32",
+            "primary_checkpoint": "final",
+            "secondary_checkpoint": "best_validation",
+            "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+            "source_sha256": {
+              "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+              "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+              "inference.py": "b5c5cb0f760429d9d2fa732763119205f6a8bf7dbc7e76ec27881650856e2679",
+              "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+              "looping/exp_stay_solved.py": "7d0e2d68d6f3070ef9a7ab6e100d1e768ba396fa2a6247799d8bc5b9a6dadc33",
+              "looping/hyperloop/analyze.py": "fb0f061f595779e3bf329b3f808f13100fac8078ed1ca55db5f1bd1a80d95283",
+              "looping/hyperloop/common.py": "02b16cca5a986d685edefaebcc4ff699df7042ffd4e2b9b814a43cf5759688ea",
+              "looping/hyperloop/evaluate.py": "06460b34df167a44e93bde2fec36cc3efa8a7718f03eb1c839ff538ff926ef72",
+              "looping/hyperloop/modal_run.py": "ec9ad3eb5828adcc13955c14b2c2ed50aa6c3ff7dcefe9d10c56bcbe320487bb",
+              "looping/hyperloop/model.py": "4581cbb944302791ce322e867c3303b4fb864f79dc4d75af809477ea7cda7fbd",
+              "looping/hyperloop/protocol.json": "78c0650d654233b4ffed3f5de4b9cfeedb0ddac7321e2d63f00214e6e978ba8d",
+              "looping/hyperloop/results/preflight.json": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+              "looping/hyperloop/test_hyperloop.py": "70f68c621e46f9cdd2952f9baaaf71de81724407fff8429b8944314d7e8988eb",
+              "looping/hyperloop/train.py": "6390d6b6b6edee038c1a753c39671dfa08849ae7dcc2240092068068bc7fbca4",
+              "looping/hyperloop_50k/__init__.py": "5d0aaf29c925167867046a2697c9d9d196127a03f45163b61ace9513ebdd0d5f",
+              "looping/hyperloop_50k/analyze.py": "402097ecd9640bc0ac0766c1be3bf53f41e0746896b06dc631c5de6b3e15a27a",
+              "looping/hyperloop_50k/common.py": "fe56fce82e52fd2d1363fdd81a9900d16e8e5c35da8a26498e00403d9c2c549d",
+              "looping/hyperloop_50k/evaluate.py": "295981368736ea7cbe6c7d3ac6acb30bcb1ff8da44fb12951954ebec91935b37",
+              "looping/hyperloop_50k/modal_run.py": "5abf62d0763b130c55f5c86a2a9dc16b58fd2624ae987ca789b0b1c56b27e1f7",
+              "looping/hyperloop_50k/preflight.py": "9efe302374c8a4d55105828d22ac3a724e4a6978a2c557f772e05cdc842107be",
+              "looping/hyperloop_50k/protocol.json": "4b0ec9319bd698e1c29a90c2a30da41da4478373e610ee689bc84695345bfaed",
+              "looping/hyperloop_50k/test_confirmation.py": "19ed4439595525e5b33d072c329571110412bce485eb6b5cdbe19b637549bc28",
+              "looping/hyperloop_50k/train.py": "e65a786d4a6be383bc6647fea690591452c20799c82a5a09b1837bdd7d5f7695",
+              "looping/weight_tying/common.py": "c39ead0295fa1398d5992fc228eb330fc8d9d71aa13b7f93fefa8f9ddda4d718",
+              "looping/weight_tying/data.py": "1aeb7b64c6000476eeb7dd7eb77fdc398772bc9df715c2384bea03dac88d49b9",
+              "looping/weight_tying/evaluate.py": "94fafbfaadd97e013bab37e1b4b022e56d3a0def1d491a3db55e97113741898b",
+              "looping/weight_tying/modal_run.py": "efafbce9917294a61fbc535c32dfaef1f3a15d65ad5be8e92222ca20d9be7a53",
+              "looping/weight_tying/model.py": "c2f211aa6956274f131e16cf2f39bc9db5b1e6717e970042c4728c0e8a054388",
+              "looping/weight_tying/protocol.json": "371dff96f7221b923b96b4e3f9c172ef9a89e1454c5385f8556e123033fb9a03",
+              "looping/weight_tying/test_study.py": "b1ee907a3854c706e1393de024e002438432137bee934c8acb69757238b5f156",
+              "looping/weight_tying/train.py": "fe96485b7ac7ba3633204586c0d21aa07878d2bfc58ec5186f0988dcd9e2881e",
+              "looping/window_selection/common.py": "595416bfbd8af48f59603169c59d5513ad0e68ef87ef0633515f1353597de7be",
+              "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+              "release/benchmark_25k.json": "eb1aea870362f331fd4d5fc4b8171c940a7c144c4a627788f57c98e9d68fcc45",
+              "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+              "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+              "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+            },
+            "tf32_matmul": false,
+            "track_solutions_every_iteration": true,
+            "updates": 50000,
+            "weights_sha256": "46739764aa7ade5ffb039dc1554165ea24f28a204f2beebd306da28238d3fd91"
+          },
+          "predictions_sha256": "51f249cb60039e5071e2990de18264fc86fea7891e52fa1a5163527389a893cf",
+          "scores": {
+            "16": {
+              "accuracy": 0.80764,
+              "difficulty": {
+                "0": {
+                  "solved": 4996,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4652,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 3392,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 3290,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 3861,
+                  "total": 5000
+                }
+              },
+              "nonfinite": 0,
+              "solved": 20191,
+              "total": 25000
+            },
+            "128": {
+              "accuracy": 0.96432,
+              "difficulty": {
+                "0": {
+                  "solved": 5000,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4986,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4666,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4631,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4825,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 3917,
+              "lost_since_previous": 0,
+              "nonfinite": 0,
+              "solved": 24108,
+              "total": 25000
+            },
+            "512": {
+              "accuracy": 0.98884,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4989,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4907,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4890,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4936,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 614,
+              "lost_since_previous": 1,
+              "nonfinite": 0,
+              "solved": 24721,
+              "total": 25000
+            },
+            "1024": {
+              "accuracy": 0.99228,
+              "difficulty": {
+                "0": {
+                  "solved": 4999,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4989,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4942,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4931,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4946,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 87,
+              "lost_since_previous": 1,
+              "nonfinite": 0,
+              "solved": 24807,
+              "total": 25000
+            },
+            "2048": {
+              "accuracy": 0.99368,
+              "difficulty": {
+                "0": {
+                  "solved": 4998,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4989,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4955,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4947,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4953,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 37,
+              "lost_since_previous": 2,
+              "nonfinite": 0,
+              "solved": 24842,
+              "total": 25000
+            },
+            "4096": {
+              "accuracy": 0.99436,
+              "difficulty": {
+                "0": {
+                  "solved": 4996,
+                  "total": 5000
+                },
+                "1-2": {
+                  "solved": 4989,
+                  "total": 5000
+                },
+                "11-50": {
+                  "solved": 4961,
+                  "total": 5000
+                },
+                "3-10": {
+                  "solved": 4955,
+                  "total": 5000
+                },
+                "51+": {
+                  "solved": 4958,
+                  "total": 5000
+                }
+              },
+              "gained_since_previous": 19,
+              "lost_since_previous": 2,
+              "nonfinite": 0,
+              "solved": 24859,
+              "total": 25000
+            }
+          },
+          "state_diagnostics_first_batch": {
+            "16": {
+              "state_rms": 14.829138454688998
+            },
+            "128": {
+              "state_rms": 79.28278088226018
+            },
+            "512": {
+              "state_rms": 351.43784503942953
+            },
+            "1024": {
+              "state_rms": 720.4561604669932
+            },
+            "2048": {
+              "state_rms": 1461.8644839950503
+            },
+            "4096": {
+              "state_rms": 2948.74374560102
+            }
+          }
+        }
+      }
+    }
+  }
+}

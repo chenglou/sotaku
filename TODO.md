@@ -2,7 +2,7 @@
 
 - Investigate epiplexity as a way to understand the training and loss dynamics of the current recommended model.
 - Investigate influence functions to see whether we can identify the most important training examples and reduce data requirements.
-- Publish the July model artifacts: the 96.8% ES model rewarded for correct answers matching at iterations 1920 and 2048, the best model trained on later iterations, and the model with a second supervised window and consistency loss added late in training. Then prune superseded study checkpoints from the Modal volume.
+- Publish the remaining July research artifacts: the 96.8% ES model rewarded for correct answers matching at iterations 1920 and 2048, and the model with a second supervised window and consistency loss added late in training. The recommended model trained on later iterations is already published as v2.0.0. Preserve reproduction records before pruning superseded study checkpoints from the Modal volume.
 
 ## Next Experiments
 

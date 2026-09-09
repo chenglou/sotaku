@@ -1,0 +1,122 @@
+{
+  "study_id": "hyperloop_50k_v1_20260905",
+  "seeds": [
+    20260910,
+    20260911,
+    20260912
+  ],
+  "arms": {
+    "baseline": 0,
+    "gated_four": 4
+  },
+  "model": {
+    "width": 128,
+    "blocks": 4,
+    "dropout": 0.1,
+    "gate_scale": 0.01,
+    "retention_bias": -8,
+    "gate_epsilon": 0.000001
+  },
+  "burnin_iterations": [
+    32,
+    64,
+    128,
+    256,
+    512
+  ],
+  "burnin_probability": 0.2,
+  "window_length": 16,
+  "data_directory": "/outputs/weight_tying_v1_20260902/data",
+  "data_files": {
+    "train.npz": "3dea6d4229ae71ad5fc6dd580604d4e3529eec0c42b62600f2270fe67d16a875",
+    "validation.npz": "790ce3d7f95eb506a73b22f2d261b2a3698c68ac1da93529dd9d7aca07ef5a8d",
+    "development.npz": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153"
+  },
+  "training": {
+    "steps": 50000,
+    "train_rows": 2700000,
+    "batch_size": 2048,
+    "learning_rate": 0.002,
+    "minimum_lr_ratio": 0.01,
+    "warmup_steps": 1400,
+    "adam_betas": [
+      0.9,
+      0.95
+    ],
+    "weight_decay": 0.01,
+    "phases": [
+      [
+        0,
+        10000,
+        51
+      ],
+      [
+        10000,
+        20000,
+        11
+      ],
+      [
+        20000,
+        30000,
+        1
+      ],
+      [
+        30000,
+        50000,
+        0
+      ]
+    ],
+    "probe_every": 1000,
+    "late_floor_start": 30000,
+    "probe_iterations": [
+      16,
+      128,
+      512,
+      1024
+    ]
+  },
+  "evaluation": {
+    "iterations": [
+      16,
+      128,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "benchmark": "release/benchmark_25k.json",
+    "batch_size": 256,
+    "precision": "fp32",
+    "compiled": false,
+    "tf32_matmul": false,
+    "primary_checkpoint": "final",
+    "secondary_checkpoint": "best_validation",
+    "selection": "1024 accuracy on fixed 1K monitoring sample; earliest maximum",
+    "track_solutions_every_iteration": true
+  },
+  "decision": {
+    "primary_comparison": "gated_four minus baseline, paired by seed, final checkpoints",
+    "accuracy_route": {
+      "minimum_mean_1024_gain": 0.005,
+      "minimum_mean_4096_gain": 0,
+      "improved_1024_pairs": 2
+    },
+    "stability_route": {
+      "minimum_mean_1024_gain": -0.005,
+      "minimum_mean_4096_gain": 0.05,
+      "improved_4096_pairs": 2
+    },
+    "reliability": {
+      "minimum_final_1024": 0.9,
+      "minimum_final_4096": 0.85,
+      "maximum_1024_to_4096_drop": 0.05
+    },
+    "require_all_runs_complete_and_finite": true,
+    "confirmation": "Report all three fresh pairs. No automatic release change; a release recommendation also requires all three gated_four finals to meet reliability criteria."
+  },
+  "preflight": {
+    "inherited_full_batch_report": "looping/hyperloop/results/preflight.json",
+    "inherited_full_batch_sha256": "3ecb96748598482db64eeeeaac61597a6a7ee8056ae91efc8b2b391c7db1ffe1",
+    "additional_cuda_batch_size": 8
+  }
+}

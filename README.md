@@ -156,6 +156,8 @@ The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row
 - [Recurrent-state geometry](looping/trajectory_viz/study/README.md): visualization study, controls, and limitations.
 - [Weight-sharing study](looping/weight_tying/RESULTS.md): 18 paired training runs comparing shared and independent stages, with separate compute and parameter comparisons and a new 10K-puzzle test set.
 - [Training-window selection](looping/window_selection/RESULTS.md): nine matched 20K runs; confidence selection did not improve results, while always choosing the latest window traded a lower ceiling for greater long-iteration stability.
+- [Hyperloop study](looping/hyperloop/RESULTS.md) and [50K confirmation](looping/hyperloop_50k/RESULTS.md): four gated states improve average 1024-iteration accuracy, but do not eliminate long-iteration collapse.
+- [Baseline width](looping/width/README.md): controlled 20K comparisons of widths 160 and 192 against the existing width-128 runs, followed by a [width-160 50K confirmation](looping/width_50k/README.md).
 - [Release verification](V2_RELEASE_AUDIT.md): artifact provenance and release checks.
 - [Numerical sensitivity](release/PRECISION_RESULTS.md) and [burn-in dropout](looping/BURNIN_DROPOUT.md): fixed-checkpoint checks and matched continuation experiments.
 
