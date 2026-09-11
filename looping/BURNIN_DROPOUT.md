@@ -1,6 +1,6 @@
 # Burn-in Dropout Comparison
 
-Protocol recorded 2026-09-02 before launching the runs. The released candidate is unchanged by this experiment.
+Protocol recorded 2026-09-02 before launching the runs.
 
 ## Question
 
@@ -10,7 +10,7 @@ The current later-iteration training recipe leaves dropout enabled during the in
 
 - Branch the step-39000 checkpoints from random seeds `20260724` and `20260730`. Their historical 1024-iteration monitoring scores were 97.7% and 96.8% on 1K puzzles.
 - For each source, compare burn-in dropout on versus off through step 43000: exactly 4,000 new optimizer updates. Keep the original 50K cosine schedule, optimizer, batch size 2048, 2.7M training pool, and all saved RNG states. Dropout remains enabled in the supervised 16-iteration window.
-- Keep later-iteration training on 20% of batches, initial gradient-free iteration counts 32/64/128/256/512, and cross-entropy only. No RMSNorm, second training window, consistency or margin loss, ES, or inference damping.
+- Keep later-iteration training on 20% of batches, initial gradient-free iteration counts 32/64/128/256/512, and cross-entropy loss.
 - The new runs use separate directories and verify the exact source checksums. The checked-in harness contains those hashes and verifies the step, seed, optimizer, and RNG fields.
 - Verify matched sampling by comparing a rolling SHA-256 of every ordered puzzle batch and sampled initial iteration count. The digest is saved with each resumable checkpoint. A mismatch invalidates the claim of a matched-data comparison and must be investigated before interpreting the pair. Disabling dropout consumes fewer CUDA random numbers, so later supervised dropout masks differ. These are matched starting points, not bit-identical noise realizations. Compilation and GPU arithmetic can introduce further differences.
 

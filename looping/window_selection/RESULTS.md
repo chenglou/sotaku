@@ -1,8 +1,8 @@
 # Training-Window Selection Results
 
-All nine runs finished 20K optimizer updates, followed by all 18 planned full-set evaluations. The results below use 25,000 frozen benchmark puzzles, ordinary eager FP32 inference, and no damping, search, or answer selection. The [protocol](README.md) was fixed before launch; final checkpoints are primary, not whichever checkpoint scored highest afterward.
+All nine runs finished 20K optimizer updates, followed by all 18 planned full-set evaluations. The results below use 25,000 frozen benchmark puzzles and eager FP32 inference. The [protocol](README.md) was fixed before launch; final checkpoints are the primary comparison, with selected checkpoints reported separately.
 
-**Confidence selection did not improve training.** Always choosing the latest window produced more consistent long-iteration behavior, but none of those models matched the strongest randomly selected runs. The public recommendation and released checkpoint are unchanged. No 50K follow-up was launched.
+**Confidence selection did not improve training.** Always choosing the latest window produced more consistent long-iteration behavior, but none of those models matched the strongest randomly selected runs. No 50K follow-up was launched.
 
 ## Final Checkpoints
 

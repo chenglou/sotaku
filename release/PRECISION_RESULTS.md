@@ -1,6 +1,6 @@
 # Numerical Precision Results
 
-Checked 2026-09-02. These comparisons change execution settings, not weights, training, or puzzle selection. The [protocol](PRECISION_PROTOCOL.md) defines the fixed samples and the full-set follow-up. All runs use PyTorch 2.10.0+cu128 on H200, without damping or early stopping.
+Checked 2026-09-02. These comparisons vary execution settings while holding weights and puzzles fixed. The [protocol](PRECISION_PROTOCOL.md) defines the fixed samples and the full-set follow-up. All runs use PyTorch 2.10.0+cu128 on H200 and score the model's prediction at each specified iteration count.
 
 ## Full 25K Benchmark
 

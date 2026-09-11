@@ -1,6 +1,6 @@
 # Hyperloop: 50K Results
 
-All six runs completed exactly 50K updates and both full 25K-puzzle evaluations on September 5, 2026. Four gated states improved average accuracy at 1024 but did not pass the confirmation criteria because mean accuracy at 4096 declined and one final model collapsed. The released checkpoint and defaults are unchanged.
+All six runs completed exactly 50K updates and both full 25K-puzzle evaluations on September 5, 2026. Four gated states improved average accuracy at 1024 but did not pass the confirmation criteria because mean accuracy at 4096 declined and one final model collapsed.
 
 ## Final Checkpoints
 

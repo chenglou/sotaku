@@ -1,6 +1,6 @@
 # Baseline Width Results
 
-All six wider models completed exactly 20K updates, with final and selected checkpoints evaluated on all 25K puzzles. Retrieved September 6, 2026. Configurations, source hashes, and exact puzzle/depth sampling match the recorded protocol and paired width-128 controls. All evaluations used ordinary FP32 inference, without damping, search, or ES; none reported nonfinite values.
+All six wider models completed exactly 20K updates, with final and selected checkpoints evaluated on all 25K puzzles. Retrieved September 6, 2026. Configurations, source hashes, and exact puzzle/depth sampling match the recorded protocol and paired width-128 controls. All evaluations used FP32 inference; none reported nonfinite values.
 
 ## Final Checkpoints
 

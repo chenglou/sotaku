@@ -2,7 +2,7 @@
 
 Test whether modestly widening the baseline improves accuracy and long-iteration stability. Six fresh 20K runs use widths 160 and 192, three seeds each. Compare against all three completed width-128 controls from the [20K Hyperloop study](../hyperloop/RESULTS.md), with the same seeds 20260907-20260909. [Job records](jobs.json) track the detached workers.
 
-**Completed, verified September 6:** all six runs finished 20K updates and both full 25K-puzzle evaluations. Width 160 improved average accuracy and all three final models met the stability criterion; width 192 scored higher at 1024 but still had a severe collapse at 4096. See [results](RESULTS.md) and the subsequent [50K width-160 confirmation](../width_50k/RESULTS.md). Defaults remain unchanged.
+**Completed, verified September 6:** all six runs finished 20K updates and both full 25K-puzzle evaluations. Width 160 improved average accuracy and all three final models met the stability criterion; width 192 scored higher at 1024 but still had a severe collapse at 4096. See [results](RESULTS.md) and the subsequent [50K width-160 confirmation](../width_50k/RESULTS.md).
 
 The single recurrent state increases from 128 to 160 or 192 numbers per cell. Keep four transformer blocks, four attention heads, dropout 0.1, and the feedforward width at four times the hidden width. This also increases parameters and arithmetic; it does not isolate extra working memory from greater model capacity. Positional encoding uses the same construction, with frequencies determined by head width.
 
@@ -20,7 +20,7 @@ Final checkpoints are primary. Evaluate final and selected checkpoints on all 25
 
 Report all three seeds for each width, paired score differences, final means, the 1024 monitoring mean/minimum from step 12K onward, and actual training/evaluation time. Count failures explicitly. A stable final model must reach at least 90% at 1024, at least 85% at 4096, and lose no more than five percentage points between them.
 
-A width is promising if it improves mean 1024 accuracy by at least 0.5 percentage points without lowering mean 4096 accuracy, with at least two improved pairs; or improves mean 4096 by at least five points while losing at most 0.5 points at 1024, with at least two improved pairs. Report parameter and compute costs alongside accuracy. These are screening runs, not an automatic release change; confirm a promising width at 50K separately.
+A width is promising if it improves mean 1024 accuracy by at least 0.5 percentage points without lowering mean 4096 accuracy, with at least two improved pairs; or improves mean 4096 by at least five points while losing at most 0.5 points at 1024, with at least two improved pairs. Report parameter and compute costs alongside accuracy, then confirm a promising width at 50K.
 
 ## Verification
 

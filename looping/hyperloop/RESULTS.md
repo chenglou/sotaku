@@ -1,6 +1,6 @@
 # Hyperloop Results
 
-Completed September 4, 2026; downloaded and independently checked September 5. All nine exact-20K training runs and all 18 full evaluations completed without numerical failures. No replacement jobs were launched. The v2 checkpoint and public defaults are unchanged.
+Completed September 4, 2026; downloaded and independently checked September 5. All nine exact-20K training runs and all 18 full evaluations completed without numerical failures. No replacement jobs were launched.
 
 ## Conclusions
 
@@ -9,11 +9,11 @@ Completed September 4, 2026; downloaded and independently checked September 5. A
 - Four states did not eliminate long-iteration collapse. One final model fell from 99.216% at 1024 to 76.980% at 4096. Another improved with more iterations, reaching 99.324% at 4096.
 - Both baseline and four-state variants met the predeclared reliability criteria in two of three final runs. The four-state mean at 4096 is much higher partly because one baseline collapsed to 2.856%. Three seeds do not establish a precise success rate.
 
-These results pass the [predeclared comparison](README.md#decision-rules) against both baseline and one gated state. The subsequent [50K confirmation](../hyperloop_50k/RESULTS.md) retained a severe long-iteration failure and did not pass its criteria. Neither study changed the release.
+These results pass the [predeclared comparison](README.md#decision-rules) against both baseline and one gated state. The subsequent [50K confirmation](../hyperloop_50k/RESULTS.md) retained a severe long-iteration failure and did not pass its criteria.
 
 ## Final Checkpoints
 
-Exact-puzzle accuracy on the same frozen 25K sudoku-extreme development benchmark, using ordinary eager FP32 inference with TF32 matmul disabled. All models below received exactly 20K optimizer updates. No damping, answer selection, search, ES, or auxiliary loss was used.
+Exact-puzzle accuracy on the same frozen 25K sudoku-extreme development benchmark, using eager FP32 inference with TF32 matmul disabled. All models below received exactly 20K optimizer updates.
 
 | Variant | Seed | 1024 iterations | 2048 iterations | 4096 iterations |
 |---|---:|---:|---:|---:|
@@ -55,4 +55,4 @@ The [artifact audit](results/artifact_audit_20260905.json) and full report verif
 
 Mean optimizer-update time on H200 was approximately 123 minutes for baseline, 133 minutes for one gated state, and 146 minutes for four gated states. Four states added about 19% training time despite adding less than 1% parameters. These times exclude compilation, monitoring, checkpoint writes, and full evaluation. The preflight measured peak allocations of 50.6/55.2/59.5 GiB; those are preflight measurements, not a full-run memory profile.
 
-Durable artifacts are on `sudoku-outputs` under `/hyperloop_v1_20260905/runs/`. [jobs.json](jobs.json) records the original job IDs. Downloaded artifacts are under `runs_modal/hyperloop_v1_20260905/`; historical studies were not modified. Do not relaunch completed jobs.
+Durable artifacts are on `sudoku-outputs` under `/hyperloop_v1_20260905/runs/`. [jobs.json](jobs.json) records the original job IDs. Downloaded artifacts are under `runs_modal/hyperloop_v1_20260905/`.

@@ -1,12 +1,12 @@
 # Selecting Training Windows
 
-Protocol fixed before the runs. This tests the [suggestion to choose training iterations by confidence](https://x.com/LordoftheMounts/status/2095379923452203074), not search or answer selection at inference. The released model and inference defaults are unchanged.
+Protocol fixed before the runs. This tests the [suggestion to choose supervised training windows by the model's confidence](https://x.com/LordoftheMounts/status/2095379923452203074).
 
 **Completed:** all nine 20K runs and 18 full evaluations. Confidence selection failed the predeclared comparison; always choosing the latest window was more stable at long iteration counts but had a lower ceiling than the strongest random runs. See [results and limitations](RESULTS.md).
 
 ## Comparison
 
-Nine fresh runs: random, highest-confidence, and latest-window selection, each with seeds `20260904`, `20260905`, and `20260906`. Every run uses the same four-block, 796,937-parameter model, 20K optimizer updates, batch size 2048, and 2.7M-puzzle training pool. The learning rate and curriculum match the existing 20K recipe. Cross-entropy is averaged across 16 iterations. There is no auxiliary loss, added normalization, ES, or inference damping.
+Nine fresh runs: random, highest-confidence, and latest-window selection, each with seeds `20260904`, `20260905`, and `20260906`. Every run uses the same four-block, 796,937-parameter model, 20K optimizer updates, batch size 2048, and 2.7M-puzzle training pool. The learning rate and curriculum match the existing 20K recipe. Cross-entropy is averaged across 16 iterations.
 
 On 80% of batches, train iterations 1-16 as usual. On the other 20%, all three variants scan to iteration 528 without gradients and consider the five windows starting after iterations 32, 64, 128, 256, and 512. For example, start 128 means loss on iterations 129-144. Choose one window for the entire batch, matching the current trainer's selection granularity:
 

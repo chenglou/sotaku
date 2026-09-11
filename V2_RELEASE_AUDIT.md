@@ -4,7 +4,7 @@ Initial audit: 2026-09-02 at `42d5739`, on `codex/viridian-diagnostics`. The wor
 
 ## Recommendation
 
-For v2, train on later iterations and use ordinary FP32 inference. The architecture remains the same 796,937-parameter looped transformer. The recipe changes which recurrent states receive the ordinary cross-entropy loss; it adds no recurrent normalization, auxiliary loss, ES, or inference damping. Additional supervised windows and margin penalties remain research material.
+For v2, train on later iterations and use FP32 inference. The model is a 796,937-parameter looped transformer. Training applies cross-entropy to a 16-iteration window, beginning at a later recurrent state on 20% of batches.
 
 The release engineering defects identified below have been addressed. Numerical-sensitivity checks and four matched dropout continuations are complete. The published reference weights are unchanged.
 
@@ -25,7 +25,7 @@ The GPU smoke fixture uses five copies of an almost-filled board. It verifies op
 
 ## Fresh Benchmark
 
-Same frozen 25K puzzles, PyTorch 2.10.0+cu128, H200, eager execution, batch size 256, ordinary undamped recurrence:
+Same frozen 25K puzzles, PyTorch 2.10.0+cu128, H200, eager execution, batch size 256:
 
 | Checkpoint | 128 | 1024 | 2048 | 4096 |
 |---|---:|---:|---:|---:|
@@ -74,9 +74,9 @@ Call these results the repository's balanced development benchmark, not an untou
 
 ## Preserved Research
 
-The combined experiment trained on later iterations, then added a second supervised window and minimum-margin penalty at step 39K. Its checkpoint remains documented in [the looping notes](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty). Its historical full profile is 96.256 / 99.000 / 98.456 / 82.172%, without damping. Its weights are `looping/model_loop_stay_late_switch_margin_floor5_from39k.pt`, SHA-256 `b5aa3cda9a770153b977e6df32cb9fb80ba076cedb251d4ac26e2ad1e3c70b77`, from random seed `20260724` through step `49999`. That selected run is not sufficient evidence of a reliably superior recipe.
+The combined experiment trained on later iterations, then added a second supervised window and minimum-margin penalty at step 39K. Its checkpoint remains documented in [the looping notes](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty). Its historical full profile is 96.256 / 99.000 / 98.456 / 82.172%. Its weights are `looping/model_loop_stay_late_switch_margin_floor5_from39k.pt`, SHA-256 `b5aa3cda9a770153b977e6df32cb9fb80ba076cedb251d4ac26e2ad1e3c70b77`, from random seed `20260724` through step `49999`. That selected run is not sufficient evidence of a reliably superior recipe.
 
-The geometry study did not establish a universal shape. It also did not prove that none exists: it used one checkpoint per regime, 20 final puzzles, and unaligned hidden coordinates for some transfer tests. Prefer controlled interventions to stronger conclusions from PCA appearance. Re-introducing the original puzzle on every loop would revisit an older design choice; the current model embeds it only once.
+The geometry study did not establish a universal shape. It used one checkpoint per regime, 20 final puzzles, and unaligned hidden coordinates for some transfer tests, which limits conclusions about geometry across models.
 
 ## Publication
 

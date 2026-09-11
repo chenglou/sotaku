@@ -47,7 +47,7 @@ This supports a smooth computation that depends on the puzzle, with some feature
 
 For future diagnostics, useful measurements are the weakest correct-answer margin, normalized-state movement, relative acceleration, the fraction of solved puzzles that remain solved, and prediction changes. An attractive PCA path, small raw updates, smoothness alone, or proximity to a hidden-state fixed point did not reliably distinguish accurate checkpoints in this study.
 
-The study does not identify a new training loss or universal root cause by itself. It motivates testing training that preserves correct predictions or directly supervises later iterations. Damping and ES fine-tuning remain separate interventions, not explanations of what the geometry study established.
+These observations motivate testing training that preserves correct predictions or directly supervises later iterations.
 
 ## Scope
 

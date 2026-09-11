@@ -1,12 +1,12 @@
 # Sotaku v2
 
-An 800K-parameter looped transformer that solves **99.12%** of our 25,000-puzzle Sudoku benchmark. Train on later iterations, then use ordinary FP32 inference: no extra loss, recurrent normalization, ES fine-tuning, or inference damping.
+An 800K-parameter looped transformer that solves **99.12%** of our 25,000-puzzle Sudoku benchmark. Train on later iterations, then use FP32 inference.
 
 ## Model And Training
 
 The model has 796,937 parameters and four shared transformer blocks. Training uses ordinary cross-entropy over 16 iterations. On 20% of batches, it first runs 32, 64, 128, 256, or 512 iterations without gradients, then trains on the next 16. The other 80% use iterations 1-16.
 
-The released final checkpoint used 50,000 optimizer steps, batch size 2048, a 2.7M-puzzle training pool, and random seed `20260730`. The architecture and cross-entropy loss are unchanged. The repository defaults to 20K steps for development and provides the 50K reference preset.
+The released final checkpoint used 50,000 optimizer steps, batch size 2048, a 2.7M-puzzle training pool, and random seed `20260730`. The repository defaults to 20K steps for development and provides the 50K reference preset.
 
 ## Results
 

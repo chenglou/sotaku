@@ -4,16 +4,16 @@ Sotaku v2 solves **99.12%** of a 25,000-puzzle Sudoku benchmark with an **800K-p
 
 ## Current Status
 
-- **Recommended default:** training on later iterations, with the same architecture, cross-entropy loss, and ordinary inference
+- **Recommended default:** training on later iterations with cross-entropy loss and FP32 inference
 - **Benchmark:** [frozen 25K-puzzle sample](release/benchmark_25k.json) from the `sapientinc/sudoku-extreme` test split
-- **Recommended checkpoint result:** **99.12%** at 1024 and **98.63%** at 4096 with FP32 inference, without inference-time damping
+- **Recommended checkpoint result:** **99.12%** at 1024 and **98.63%** at 4096 with FP32 inference
 - **Checkpoint:** [v2.0.0 weights, model manifest, and validation records](https://github.com/chenglou/sotaku/releases/tag/v2.0.0)
 - **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
 - **Training setup:** 2.7M-puzzle pool, BS=2048, LR=2e-3, 16 supervised iterations, 50K optimizer steps, cosine decay, reverse curriculum
 
-Sotaku's 796,937-parameter looped transformer is trained through 16 differentiable iterations at a time but can continue improving for more than 1,000 iterations at inference. The recommended recipe leaves the model and loss unchanged. On 20% of batches, it first runs without gradients to iteration 32, 64, 128, 256, or 512, detaches that state, and applies the usual 16-iteration averaged cross-entropy from there. The other 80% of batches use the ordinary iterations 1-16. Training therefore reaches iteration 528, with gradients spanning only the final 16 iterations of each sampled trajectory.
+Sotaku's 796,937-parameter looped transformer is trained through 16 differentiable iterations at a time but can continue improving for more than 1,000 iterations at inference. On 20% of batches, it first runs without gradients to iteration 32, 64, 128, 256, or 512, detaches that state, and applies the usual 16-iteration averaged cross-entropy from there. The other 80% of batches use the ordinary iterations 1-16. Training therefore reaches iteration 528, with gradients spanning only the final 16 iterations of each sampled trajectory.
 
-Training on later iterations is the main recipe for its simplicity and reliability across tested seeds. Additional supervised windows and margin penalties remain [research experiments](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty), not part of the recommended recipe. Their results and reproduction commands are preserved in the experiment notes.
+Experiments with additional supervised windows and margin penalties are documented in the [training-method comparisons](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty).
 
 ### Training And Data Budget
 
@@ -134,7 +134,7 @@ CI runs both suites. Research study directories run in separate processes becaus
 
 ## Results
 
-The v2 checkpoint was evaluated on 2026-09-02 using the frozen 25K-puzzle benchmark, eager FP32 execution on H200, and batch size 256. It uses no recheck, margin or consistency loss, added recurrent normalization, ES, or inference damping.
+The v2 checkpoint was evaluated on 2026-09-02 using the frozen 25K-puzzle benchmark, eager FP32 execution on H200, and batch size 256.
 
 | Inference iterations | Solved puzzles | Accuracy |
 |---:|---:|---:|
@@ -143,7 +143,7 @@ The v2 checkpoint was evaluated on 2026-09-02 using the frozen 25K-puzzle benchm
 | 2048 | 24,762 / 25,000 | 99.05% |
 | 4096 | 24,658 / 25,000 | 98.63% |
 
-Precision and compilation can substantially change very long trajectories. FP32 with TF32 matmul disabled is the default; compilation is optional and not required for these results. The observed full evaluation took about 16.5 minutes on H200. [Numerical checks](release/PRECISION_RESULTS.md) document other execution settings, and [research notes](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty) preserve experiments with extra losses.
+The full evaluation took about 16.5 minutes on H200. Other precision and compilation settings can substantially change very long trajectories; see the [numerical checks](release/PRECISION_RESULTS.md).
 
 The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row, column, or box constraint embedding, just 2D RoPE in attention. Full scaling tables, stability analysis, interventions, and ablations live in [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md) and [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
 
@@ -171,4 +171,4 @@ Older Kaggle and pre-`sudoku-extreme` experiments are preserved for reference, b
 - `muon/EXPERIMENTS_MUON.md` - Muon optimizer experiments
 - `rrn/RRN_EXPERIMENTS.md` - RRN experiments
 
-Obsolete root-level CSV helpers, duplicate evaluators and failure analyzers, and the hard-coded iteration-scaling plot were removed after v2. Their original source remains in [the v2.0.0 tag](https://github.com/chenglou/sotaku/tree/v2.0.0). Use `solve.py`, `iters.eval_more_iters` (including `--track-solutions`), and `modal_eval.py` for the supported inference and evaluation workflows.
+Earlier helper scripts are available in [the v2.0.0 tag](https://github.com/chenglou/sotaku/tree/v2.0.0).

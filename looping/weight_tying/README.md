@@ -1,6 +1,6 @@
 # Weight-Tying Study
 
-Preregistered on 2026-09-02, after the v2 release. This study tests whether sharing transformer weights changes what training discovers, separately from parameter storage and arithmetic cost. The released model and public defaults are unchanged.
+Preregistered on 2026-09-02, after the v2 release. This study tests whether sharing transformer weights changes what training discovers, separately from parameter storage and arithmetic cost.
 
 **Completed:** all 18 training runs and 36 full evaluations. [Results and plots](RESULTS.md) show a trade-off: shared weights solve more sudoku-extreme puzzles under this recipe, while independent same-width stages often retain correct predictions better on the new, easier set. [Operational status](STATUS.md) records verification and artifact locations.
 
@@ -10,7 +10,7 @@ Each model performs four transformer blocks per iteration and shares the input e
 
 The same-width pair has equal nominal transformer matmul FLOPs, depth, puzzle batches, and optimizer updates, not equal parameter count. Compiler-selected recomputation can change actual executed work. Optimizer work and memory traffic also differ, so report measured time alongside the FLOP estimates. The parameter-matched pair differs in width, positional representation, and compute; it is not an isolated weight-sharing intervention. Report both comparisons, not one as a substitute for the other.
 
-There are two training regimes, three architectures, and three paired random seeds: 18 runs. All use the existing 20K schedule, batch size 2048, AdamW, dropout 0.1, and 16-iteration averaged cross-entropy. `early` trains iterations 1-16. `late` uses the v2 recipe: on 20% of batches, advance 32/64/128/256/512 iterations without gradients before supervising the next 16. No auxiliary losses, added recurrent normalization, ES, or inference damping are used.
+There are two training regimes, three architectures, and three paired random seeds: 18 runs. All use the existing 20K schedule, batch size 2048, AdamW, dropout 0.1, and 16-iteration averaged cross-entropy. `early` trains iterations 1-16. `late` uses the v2 recipe: on 20% of batches, advance 32/64/128/256/512 iterations without gradients before supervising the next 16.
 
 An untied finite stack has no stage 17. Its primary early-training comparison ends at iteration 16. Repeating that stack beyond iteration 16 is explicitly reported as a diagnostic, not as additional independently trained layers. The late-training comparison necessarily repeats the 16-stage bank; it tests period-1 versus period-16 weight sharing, not a completely untied 528-stage network. Never label the latter comparison fully untied.
 

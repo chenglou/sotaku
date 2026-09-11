@@ -1,6 +1,6 @@
 # Study Status
 
-**Complete, September 3, 2026:** all 18 exact-20K training runs and all 36 full evaluations. No numerical failures or training-worker restarts. Do not launch replacement jobs. [Results and plots](RESULTS.md) give the conclusions; the v2 checkpoint and public defaults are unchanged.
+**Complete, September 3, 2026:** all 18 exact-20K training runs and all 36 full evaluations. No numerical failures or training-worker restarts. [Results and plots](RESULTS.md) give the conclusions.
 
 Research branch: `codex/weight-tying-study`. Protocol committed in `29c276d` before training or test-set evaluation. Durable artifacts are on `sudoku-outputs` under `weight_tying_v1_20260902/`.
 

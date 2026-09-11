@@ -1,6 +1,6 @@
 # Hyperloop: 50K Confirmation
 
-Six fresh 50K runs compared the one-state recipe with four-state Hyperloop after the [20K study](../hyperloop/RESULTS.md). The public release and defaults are unchanged.
+Six fresh 50K runs compared the one-state recipe with four-state Hyperloop after the [20K study](../hyperloop/RESULTS.md).
 
 **Completed September 5:** all six runs and twelve full evaluations finished. Four states improved mean 1024 accuracy from 98.44% to 99.25%, but one final model fell to 29.33% at 4096. The confirmation criteria did not pass. See [results](RESULTS.md), [job records](jobs.json), and the [GPU check](results/preflight.json).
 
@@ -8,7 +8,7 @@ Six fresh 50K runs compared the one-state recipe with four-state Hyperloop after
 
 `baseline` and `gated_four` each use paired seeds 20260910, 20260911, and 20260912. These seeds are new, not selected from earlier results. Every run starts from fresh weights, not a completed 20K checkpoint whose learning-rate schedule has ended.
 
-The models and training calculations are unchanged: four shared transformer blocks, width 128, dropout 0.1; 796,937 parameters for baseline and 803,096 for Hyperloop. Both use the same 2.7M-puzzle pool, batch size 2048, AdamW at 2e-3, and 16-iteration averaged cross-entropy. On 20% of batches, advance 32/64/128/256/512 iterations without gradients before supervising the next 16. No extra losses, carried-state normalization, ES, damping, or inference search.
+The models retain the 20K study's architecture: four shared transformer blocks, width 128, dropout 0.1; 796,937 parameters for baseline and 803,096 for Hyperloop. Both use the same 2.7M-puzzle pool, batch size 2048, AdamW at 2e-3, and 16-iteration averaged cross-entropy. On 20% of batches, advance 32/64/128/256/512 iterations without gradients before supervising the next 16.
 
 The 50K schedule has 1,400 warmup updates followed by cosine decay. Sample ratings 51+ until 10K, 11+ until 20K, 1+ until 30K, then all ratings until 50K. These are the public recipe's effective pools: its older labels say 21+ and 6+, but whole-bucket selection produces 51+ and 11+. Puzzle/depth samplers and initial base weights match within each pair; different compiled graphs need not produce identical dropout or floating-point trajectories.
 
@@ -42,4 +42,4 @@ Use the file-path launcher above, not `modal run -m`. Module mode mounted anothe
 
 ## Follow-Up
 
-The next studies widened the ungated baseline to [160 and 192 dimensions at 20K](../width/RESULTS.md), then [confirmed width 160 at 50K](../width_50k/RESULTS.md). Those results do not isolate extra state storage from additional model capacity. Shorter schedules, smaller datasets, and release promotion remain separate decisions.
+The next studies widened the ungated baseline to [160 and 192 dimensions at 20K](../width/RESULTS.md), then [confirmed width 160 at 50K](../width_50k/RESULTS.md). Those results do not isolate extra state storage from additional model capacity.

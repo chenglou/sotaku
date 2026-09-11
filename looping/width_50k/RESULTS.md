@@ -1,6 +1,6 @@
 # Width 160: 50K Results
 
-All three fresh runs completed exactly 50K updates and both full 25K-puzzle evaluations. Results retrieved September 6, 2026. Configurations, all 57 source hashes, data identities, and exact paired puzzle/depth sampling were verified against the preflight and archived controls. All evaluations used ordinary FP32 inference, without damping, search, or ES; no nonfinite results were reported.
+All three fresh runs completed exactly 50K updates and both full 25K-puzzle evaluations. Results retrieved September 6, 2026. Configurations, all 57 source hashes, data identities, and exact paired puzzle/depth sampling were verified against the preflight and archived controls. All evaluations used FP32 inference; no nonfinite results were reported.
 
 ## Final Checkpoints
 
@@ -25,7 +25,7 @@ Paired 1024 changes were +0.944, +1.296, and -0.496 points; paired 4096 changes 
 
 **The predeclared confirmation passed:** mean 1024 improved by at least 0.5 points without reducing mean 4096, two 1024 pairs improved, and all three wider finals met the stability criterion. Each scored at least 98.5% at 4096, with drops of only 0.604, 0.360, and 0.232 points from 1024. The criterion itself required at least 90% at 1024, at least 85% at 4096, and a drop of at most five points.
 
-This supports width 160 as a more reliable candidate at additional cost, not a guarantee. The earlier 20K screen also had three stable width-160 finals, on different seeds. The schedules differ, so those six observations are not six repeats of one identical recipe. No release or default changes were made during this check.
+This supports width 160 as a more reliable candidate at additional cost, not a guarantee. The earlier 20K screen also had three stable width-160 finals, on different seeds. The schedules differ, so those six observations are not six repeats of one identical recipe.
 
 ## Selected Checkpoints
 

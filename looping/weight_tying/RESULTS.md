@@ -1,6 +1,6 @@
 # Weight Sharing: Results
 
-Completed September 3, 2026: 18 fresh training runs and 36 full evaluations. Each run used 20K optimizer updates, not the released model's 50K. The v2 checkpoint and inference defaults are unchanged.
+Completed September 3, 2026: 18 fresh training runs of 20K optimizer updates each, followed by 36 full evaluations.
 
 **Sharing weights helped solve harder puzzles under this training recipe. It did not always make correct answers last longer.** The same-width independent stages did worse on sudoku-extreme but often retained correct predictions better on the new, easier puzzles. The parameter-matched independent stages did much worse, though that comparison also makes their hidden state narrower.
 
@@ -14,7 +14,7 @@ Completed September 3, 2026: 18 fresh training runs and 36 full evaluations. Eac
 
 Both independent-stage models store 16 groups of four blocks, or 64 distinct transformer blocks. The same-width pair started with identical functions: the independent stages were separate copies of the shared blocks. The pair received identical puzzle batches, sampled training iterations, and nominal transformer matmul FLOPs. Actual runtime and optimizer work differ. The input encoder, prediction-feedback projection, and output head remain shared in every model.
 
-For each architecture, three paired seeds trained only on iterations 1-16, and three used the v2 recipe: 80% of batches train iterations 1-16; 20% advance 32/64/128/256/512 iterations without gradients before training the next 16. The loss is ordinary cross-entropy averaged across those 16 supervised iterations. There is no added normalization, auxiliary loss, ES, or inference damping.
+For each architecture, three paired seeds trained only on iterations 1-16, and three used the v2 recipe: 80% of batches train iterations 1-16; 20% advance 32/64/128/256/512 iterations without gradients before training the next 16. The loss is cross-entropy averaged across those 16 supervised iterations.
 
 An independent 16-stage stack ends at iteration 16. Beyond that, we repeat its stages. Those longer evaluations are repetition diagnostics for the early-trained models. With later-iteration training, the stages already repeat during training. This is not a comparison against thousands of independently trained layers.
 
@@ -86,4 +86,4 @@ Keep the released v2 recipe. This study does not establish that shared weights a
 - [Protocol and reproduction commands](README.md), [frozen test puzzles](test_data/README.md), and [data manifest](results/data_manifest.json).
 - [All scores and timings](results/report.json), [readable tables](results/report.md), and [training histories](results/learning_curves.json).
 - [Pre-evaluation audit](pre_evaluation_audit.json), [checkpoint-selection lock](cohort_lock.json), and [final artifact audit](results/artifact_audit.json).
-- [Training jobs](jobs.json) and [evaluation jobs](evaluation_jobs.json). Weights, resumable checkpoints, raw generator output, logs, environment records, and per-puzzle predictions remain on the `sudoku-outputs` Modal volume under `weight_tying_v1_20260902/`; these study checkpoints are not v2 release assets.
+- [Training jobs](jobs.json) and [evaluation jobs](evaluation_jobs.json). Weights, resumable checkpoints, raw generator output, logs, environment records, and per-puzzle predictions remain on the `sudoku-outputs` Modal volume under `weight_tying_v1_20260902/`.

@@ -2,13 +2,13 @@
 
 Three fresh width-160 runs tested the full 50K schedule after [the 20K screen](../width/RESULTS.md). They started from new weights, not the completed 20K checkpoints.
 
-**Completed September 6:** all three runs finished 50K updates and both full 25K-puzzle evaluations. Final models averaged 99.02% at 1024 and 98.62% at 4096, and all three met the stability criterion. The study passed its predeclared confirmation criteria. See [results](RESULTS.md) and [job records](jobs.json). The release and defaults remain unchanged.
+**Completed September 6:** all three runs finished 50K updates and both full 25K-puzzle evaluations. Final models averaged 99.02% at 1024 and 98.62% at 4096, and all three met the stability criterion. The study passed its predeclared confirmation criteria. See [results](RESULTS.md) and [job records](jobs.json).
 
 Compare seeds 20260910, 20260911, and 20260912 against all three completed width-128 controls from the 50K Hyperloop study. The controls averaged 98.44% at 1024 and 96.12% at 4096; two of three met the stability criterion. [Frozen reference records](reference.json) retain every control, including the unsuccessful one. These seeds were not used in the width-160 20K screen. Widening changes both recurrent storage and model capacity, not only working memory.
 
 ## Fixed Recipe
 
-The model stays at width 160, four shared transformer blocks, four heads, feedforward width 640, dropout 0.1, and 1,241,929 parameters. Use the same 2.7M training puzzles, batch 2048, AdamW at 0.002, and ordinary cross-entropy averaged over 16 iterations. On 20% of batches, first run 32/64/128/256/512 iterations without gradients. No extra losses, recurrent normalization, ES, damping, or inference search.
+The model stays at width 160, four shared transformer blocks, four heads, feedforward width 640, dropout 0.1, and 1,241,929 parameters. Use the same 2.7M training puzzles, batch 2048, AdamW at 0.002, and cross-entropy averaged over 16 iterations. On 20% of batches, first run 32/64/128/256/512 iterations without gradients.
 
 Start from fresh weights with 1,400 warmup updates and cosine decay over exactly 50K updates. Sample ratings 51+ through 10K, 11+ through 20K, 1+ through 30K, then all ratings. These are the same effective curriculum pools as the archived 50K controls. Exact puzzle/depth sampling and iteration counts must match each paired control; initial weights and dropout draws need not match across widths.
 

@@ -1,8 +1,8 @@
 # Shared-Gate Hyperloop Study
 
-Controlled 9x9 Sudoku experiments, specified before training. The question is whether learned loop-level gates improve the existing v2 recipe, and whether four parallel hidden states help beyond gates on a single state. The released checkpoint and default training path are unchanged.
+Controlled 9x9 Sudoku experiments, specified before training. The question is whether learned loop-level gates improve the existing v2 recipe, and whether four parallel hidden states help beyond gates on a single state.
 
-**Complete:** all nine 20K training runs and all 18 full evaluations. Four states improved mean final 1024 accuracy from 96.392% to 98.888%, but did not eliminate collapse at 4096. See [results and limitations](RESULTS.md); do not launch duplicate jobs.
+**Complete:** all nine 20K training runs and all 18 full evaluations. Four states improved mean final 1024 accuracy from 96.392% to 98.888%, but did not eliminate collapse at 4096. See [results and limitations](RESULTS.md).
 
 Follow-up: the [completed 50K confirmation](../hyperloop_50k/RESULTS.md) also improved average 1024 accuracy, but retained a severe failure at 4096.
 
@@ -33,7 +33,7 @@ Only the copy supplied to the gate network is normalized. The carried states are
 
 Our read gates use `2 / streams * sigmoid(...)`, rather than the paper's unscaled sigmoid, so their initial sum is near one for both one and four streams. Write gates use `2 * sigmoid(...)`; retention uses `sigmoid(...)`. Gate projections start with learned scale 0.01, read/write biases zero, and retention bias -8. This starts near the existing update instead of immediately adding a second large residual path. It is not an exact function-preserving initialization, and a negative result would not rule out other Hyperloop initializations. Small random gate projections allow the streams to diverge from their initially identical copies.
 
-Gate normalization and projection run in FP32; gate outputs are converted to the carried state's dtype. The rest retains BF16-autocast training. Inference uses the same equations in eager FP32. No damping, search, answer selection, extra loss, or early stopping is added.
+Gate normalization and projection run in FP32; gate outputs are converted to the carried state's dtype. The rest retains BF16-autocast training. Inference uses the same equations in eager FP32, scoring predictions at each specified iteration count.
 
 ## Matched Runs
 
@@ -58,7 +58,7 @@ All nine runs must finish with finite results. Four streams are promising relati
 - Mean final 1024 accuracy improves by at least 0.5 percentage points, 4096 accuracy does not decrease, and at least two of three seed pairs improve at 1024.
 - Mean final 4096 accuracy improves by at least five percentage points, 1024 loses no more than 0.5 points, and at least two seed pairs improve at 4096.
 
-Apply the same comparisons against the one-stream gated control before attributing gains to extra memory. Record every failed seed; three seeds do not establish a precise success probability. A reliable final run means at least 90% at 1024, at least 85% at 4096, and no more than a five-point decrease between them. Also report the mean/minimum 1024 monitoring accuracy from 12K onward and the complete learning curves. No release change follows without separately specified 50K confirmation.
+Apply the same comparisons against the one-stream gated control before attributing gains to extra memory. Record every failed seed; three seeds do not establish a precise success probability. A reliable final run means at least 90% at 1024, at least 85% at 4096, and no more than a five-point decrease between them. Also report the mean/minimum 1024 monitoring accuracy from 12K onward and the complete learning curves. Confirm promising results with a separately specified 50K study.
 
 State diagnostics measure magnitude, relative differences between streams, and gate values on the first evaluation batch. They distinguish effectively identical streams from genuinely different states; differences alone do not prove useful computation.
 
