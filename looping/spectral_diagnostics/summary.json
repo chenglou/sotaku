@@ -1,0 +1,189 @@
+{
+  "models": {
+    "old_collapsing": {
+      "1024": {
+        "historical_power_median": {
+          "fp32_high": 69.35395812988281,
+          "fp32_highest": 1.7229876518249512,
+          "fp64": 1.138927957791646
+        },
+        "points": 5,
+        "radius_max": 1.9421534310145654,
+        "radius_median": 1.309239246656414,
+        "radius_min": 1.106160326970514,
+        "solved": 0,
+        "validated": 4
+      },
+      "16": {
+        "historical_power_median": {
+          "fp32_high": 70.16484832763672,
+          "fp32_highest": 1.1759812831878662,
+          "fp64": 1.187525493874339
+        },
+        "points": 5,
+        "radius_max": 1.9643335715392487,
+        "radius_median": 1.0932493535403411,
+        "radius_min": 1.0727077240237863,
+        "solved": 2,
+        "validated": 5
+      },
+      "256": {
+        "historical_power_median": {
+          "fp32_high": 69.41219329833984,
+          "fp32_highest": 1.2897218465805054,
+          "fp64": 1.1827487235958944
+        },
+        "points": 5,
+        "radius_max": 1.6273245848573097,
+        "radius_median": 1.1919102856660158,
+        "radius_min": 1.065427889610976,
+        "solved": 1,
+        "validated": 5
+      },
+      "4096": {
+        "historical_power_median": {
+          "fp32_high": 58.23939514160156,
+          "fp32_highest": 1.9706332683563232,
+          "fp64": 1.0983818784997945
+        },
+        "points": 5,
+        "radius_max": 1.928862005276901,
+        "radius_median": 1.3288930747089729,
+        "radius_min": 1.0642301154814577,
+        "solved": 0,
+        "validated": 3
+      }
+    },
+    "old_stable": {
+      "1024": {
+        "historical_power_median": {
+          "fp32_high": 4.527324199676514,
+          "fp32_highest": 1.900810718536377,
+          "fp64": 0.998021199273481
+        },
+        "points": 5,
+        "radius_max": 1.0021257093652274,
+        "radius_median": 1.0021257093652274,
+        "radius_min": 1.0021257093652274,
+        "solved": 5,
+        "validated": 1
+      },
+      "16": {
+        "historical_power_median": {
+          "fp32_high": 53.042938232421875,
+          "fp32_highest": 1.133367657661438,
+          "fp64": 1.1120445479540084
+        },
+        "points": 5,
+        "radius_max": 1.3512199330940264,
+        "radius_median": 1.113910097865042,
+        "radius_min": 1.088957785167228,
+        "solved": 3,
+        "validated": 5
+      },
+      "256": {
+        "historical_power_median": {
+          "fp32_high": 12.26321029663086,
+          "fp32_highest": 1.45467209815979,
+          "fp64": 0.9993362474978005
+        },
+        "points": 5,
+        "radius_max": 1.0068475472330314,
+        "radius_median": 1.0068475472330314,
+        "radius_min": 1.0068475472330314,
+        "solved": 5,
+        "validated": 1
+      },
+      "4096": {
+        "historical_power_median": {
+          "fp32_high": 1.041890025138855,
+          "fp32_highest": 1.976190209388733,
+          "fp64": 0.9986274117895871
+        },
+        "points": 5,
+        "radius_max": null,
+        "radius_median": null,
+        "radius_min": null,
+        "solved": 5,
+        "validated": 0
+      }
+    },
+    "v2": {
+      "1024": {
+        "historical_power_median": {
+          "fp32_high": 40.013057708740234,
+          "fp32_highest": 1.4148370027542114,
+          "fp64": 1.0015836140801446
+        },
+        "points": 5,
+        "radius_max": 1.013230984046728,
+        "radius_median": 1.011976438436174,
+        "radius_min": 1.01072189282562,
+        "solved": 5,
+        "validated": 2
+      },
+      "16": {
+        "historical_power_median": {
+          "fp32_high": 59.716514587402344,
+          "fp32_highest": 1.119754433631897,
+          "fp64": 1.0797522760952654
+        },
+        "points": 5,
+        "radius_max": 1.3562650952467339,
+        "radius_median": 1.0845109050761996,
+        "radius_min": 1.0555061646096318,
+        "solved": 3,
+        "validated": 5
+      },
+      "256": {
+        "historical_power_median": {
+          "fp32_high": 41.3636474609375,
+          "fp32_highest": 1.2395285367965698,
+          "fp64": 1.0073410555611457
+        },
+        "points": 5,
+        "radius_max": 1.0322999387119653,
+        "radius_median": 1.022112302139939,
+        "radius_min": 1.008325495612201,
+        "solved": 5,
+        "validated": 5
+      },
+      "4096": {
+        "historical_power_median": {
+          "fp32_high": 42.8314323425293,
+          "fp32_highest": 1.979975938796997,
+          "fp64": 1.0003405036224182
+        },
+        "points": 5,
+        "radius_max": 1.010085384515852,
+        "radius_median": 1.0075403407196126,
+        "radius_min": 1.0049952969233735,
+        "solved": 5,
+        "validated": 2
+      }
+    }
+  },
+  "sample": {
+    "buckets": [
+      "0",
+      "1-2",
+      "3-10",
+      "11-50",
+      "51+"
+    ],
+    "indices": [
+      144160,
+      262886,
+      200383,
+      258580,
+      313666
+    ],
+    "rows": [
+      2866,
+      8768,
+      14600,
+      18032,
+      21091
+    ]
+  }
+}

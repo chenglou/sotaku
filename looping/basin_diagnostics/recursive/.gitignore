@@ -1,0 +1,5 @@
+results/*.log
+results/**/*.download
+results_1024/*.log
+results_1024/**/*.download
+results_1024/**/*.npz

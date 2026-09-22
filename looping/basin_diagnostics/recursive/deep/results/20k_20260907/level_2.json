@@ -1,0 +1,26 @@
+{
+  "center": [
+    0.14760937500000004,
+    -0.18246093749999998
+  ],
+  "confirmed": 1.0,
+  "distinct_confirmed_times": 254,
+  "final_correct": 1.0,
+  "horizon": 1024,
+  "last_change_max": 358,
+  "last_change_min": 52,
+  "level": 2,
+  "magnification": 256,
+  "next_zoom": {
+    "center": [
+      0.14848828125000002,
+      -0.18332226562499998
+    ],
+    "score": 18.41970297029703,
+    "selection": "largest mean neighboring settling-time difference",
+    "width": 0.00029296875
+  },
+  "resolution": 401,
+  "sha256": "ee772f7af3fb3e71058a69dc82881f84bbddac7156f2591197406c1b483f20c1",
+  "width": 0.001171875
+}

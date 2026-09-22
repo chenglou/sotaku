@@ -34,9 +34,10 @@ This file records the original `sudoku-extreme` iteration experiments. See the [
 - `eval_interventions.py` - Test-time interventions (damping, pred scaling, pre-norm)
 - `eval_state_rms_cap.py` - Test a direction-preserving limit on recurrent-state RMS
 - `modal_state_rms_cap.py` - Modal wrapper for state RMS limit sweeps
-- `eval_spectral_radius.py` - Jacobian spectral radius via power iteration
+- `eval_spectral_radius.py` - Historical finite-difference estimator; its spectral-radius results were invalidated by precision checks
 - `modal_eval_interventions.py` - Modal wrapper for intervention sweeps
-- `modal_spectral_stable.py` - Modal wrapper for spectral radius + stable model interventions
+- `modal_spectral_stable.py` - Historical finite-difference analysis and stable-model interventions
+- `../looping/spectral_diagnostics/` - FP64 automatic-derivative comparison of original and v2 checkpoints
 - `modal_eval.py` - Modal wrapper for running eval_more_iters on GPU
 
 ## Test-Time Iteration Scaling
@@ -157,7 +158,7 @@ The early successful checkpoints used the following settings. These comparisons 
 
 1. **Learning rate**: at width 128, the strongest tested runs used 1.5e-3 or 2e-3. The tested higher rates (2.5e-3 and 3e-3) and lower rate (1e-3) lost accuracy at larger inference iteration counts. This is an observed range, not a precise boundary between working and failing rates.
 2. **BS=2048** — BS=4096 collapses at 48 iters, while BS=1024 collapses at 256. Gradient noise or minimum geometry may explain the difference, but these experiments did not isolate the cause.
-3. **Small enough model** — d=128 scales to 1024+. d=192 collapses at every LR tested. d=96 peaks early and slowly degrades. The d=192 spectral radius rebounds near its collapse point, but that correlation does not by itself explain why width hurts.
+3. **Model width in the original recipe**: width 128 reached high accuracy through 1024 iterations. The tested width-192 runs lost accuracy at longer inference counts, while width 96 peaked earlier and degraded gradually. These results do not establish that wider models are intrinsically unstable; the current later-iteration recipe has a separate [width study](../looping/width/RESULTS.md).
 4. **Learning-rate schedule**: the successful runs used cosine decay to near zero. Stretching the schedule or redistributing curriculum phases reduced accuracy in the tested runs, but those comparisons do not isolate the cause.
 5. **16 supervised training iterations**: the 32-iteration runs did not match the strongest 16-iteration runs at large inference iteration counts. This comparison changes the differentiable training length, unlike later experiments that run initial iterations without gradients.
 6. **No added prediction-preservation loss**: all four tested modifications (preservation weighting, L2 toward target, self-consistency, and gradient masking) hurt. They modify prediction losses, not the hidden-state fixed-point condition.
@@ -289,24 +290,13 @@ This does not contradict the tables above: those apply `alpha >= 0.5` from the f
 
 ## Jacobian Spectral Radius Analysis
 
-Estimated the spectral radius (dominant eigenvalue magnitude) of the Jacobian df/dh at various operating points using power iteration with finite-difference JVP (100 power iterations, 50 puzzles, eps=1e-3). Script: `eval_spectral_radius.py`.
+The original finite-difference analysis was numerically unreliable. It used FP32 with reduced-precision matmul enabled and an absolute perturbation of `1e-3`, then divided differences between nearly identical evaluations by that small number. Precision errors dominated the derivative estimate. The reported radii of 14-88 and their supposed correlations with collapse are withdrawn.
 
-A fixed point is a state `h*` with `F(h*) = h*`; it does not require a zero Jacobian. The Jacobian measures how a small perturbation to the current state changes the next state. These checkpoints do not approach a finite hidden-state fixed point, so spectral radii measured along their growing trajectories are sensitivity measurements, not a fixed-point convergence test.
+The [replacement study](../looping/spectral_diagnostics/RESULTS.md) uses FP64 automatic derivatives and two independently seeded eigenvalue solves on the same five puzzles for the original successful, original failing, and released Sotaku 2 checkpoints. All 15 puzzle measurements at iteration 16 passed validation, with radii around 1-2 versus roughly 47-95 from the historical method.
 
-| Model | SR@16 | SR@32 | SR@64 | SR@128 | SR@256 | SR Trend |
-|---|---|---|---|---|---|---|
-| LR=2e-3 (stable) | 55.8 | 40.6 | 29.0 | 21.0 | 14.0 | Decreasing |
-| LR=3e-3 (collapse@64) | 73.0 | 64.0 | 59.9 | 63.0 | 65.1 | Flat/increasing |
-| LR=1e-3 (stagnation) | 35.5 | 28.8 | 27.8 | 26.9 | 26.2 | Flat (lowest) |
-| d=192 (collapse@128) | 88.0 | 69.8 | 67.1 | 76.9 | 79.2 | Decreasing then increasing |
+All three runs finished through iteration 4096. Of 60 operating states, 38 produced validated radii; the remaining 22 are unresolved. V2's five validated radii at iteration 256 range from 1.0083 to 1.0323. Only two v2 points each at 1024 and 4096 passed both solves, so their near-one values cannot be presented as a complete later-iteration comparison. The full table and precision controls are in the replacement study.
 
-Key findings:
-1. **All measured spectral radii are much greater than 1**, including the stable SOTA model at 14-56. The usual `SR < 1` fixed-point criterion cannot be applied because these measurements are taken along a moving, growing trajectory rather than at a hidden-state fixed point.
-2. **The trend correlates with stability in this small comparison.** The stable model's estimate decreases from 56 to 14, while two collapsing models flatten or rebound. The estimate remains much greater than 1, so "decreasing" does not mean that the map is approaching a contraction.
-3. **Magnitude is not sufficient.** LR=1e-3 has the lowest estimates, 26-36, but worse answers. A smaller spectral-radius estimate does not guarantee more accurate predictions.
-4. **The d=192 estimate rebounds near its collapse point.** This is a useful warning signal in that run, not proof that the rebound causes collapse.
-
-**Implication:** Treat the spectral-radius estimates as local sensitivity diagnostics. They do not show that the hidden state converges, enters a basin of attraction, or has a nearby fixed point. Direct trajectory and answer-margin measurements are more informative for the observed collapse.
+A fixed point satisfies `F(h*) = h*`; it does not require a zero Jacobian. These Jacobians describe one update at a moving state. Their eigenvalues alone do not prove convergence, divergence, or answer stability along the changing trajectory. The replacement study did not repeat the old width-192 or LR=1e-3 comparisons. The original raw logs remain on the Modal volume for provenance.
 
 ## Key Findings
 
@@ -314,5 +304,5 @@ Key findings:
 - **Correct predictions do not require an unchanged hidden state.** The answer-preservation and equilibrium tests measure different things; the original model keeps accumulating state updates even after solving a puzzle.
 - **More supervised iterations and the four prediction-preservation losses did not improve the strongest baseline.** These negative results concern those specific settings, not all forms of later-iteration training.
 - **State RMS limits and delayed damping improved some failing checkpoints without retraining.** Their settings depend on the checkpoint, and damping can reduce the score of an already accurate model.
-- **The Jacobian measurements are local diagnostics, not evidence of a hidden-state fixed point.** Their trend correlated with accuracy in a small comparison; a lower estimate alone did not identify better models.
+- **The original spectral-radius claims were invalidated by numerical checks.** The [FP64 replacement](../looping/spectral_diagnostics/RESULTS.md) finds much smaller values at validated points, with unresolved later solves recorded explicitly.
 - **For the current recipe, see [training on later iterations](../looping/EXPERIMENTS_LOOPING.md#training-on-later-iterations).** The tables above remain the record of the original experiments, not recommendations for v2.

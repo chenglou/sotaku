@@ -1,0 +1,10 @@
+{
+  "arrays_sha256": "7223e9431a851b81cf3ae6379d7aa95df4a6bde9fc99c686da2a15ad99076851",
+  "final_correct_fraction": 1.0,
+  "maximum_successful_time": 2,
+  "mean_successful_time": 2.0,
+  "minimum_successful_time": 2,
+  "nonfinite_count": 0,
+  "successful_fraction": 1.0,
+  "unsettled_fraction": 0.0
+}

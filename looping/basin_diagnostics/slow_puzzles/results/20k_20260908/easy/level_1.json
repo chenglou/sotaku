@@ -1,0 +1,26 @@
+{
+  "arrays_sha256": "acb861ed886d567104337a7fab5804a54212cd11de9dc84345f1fc35ff027e49",
+  "center": [
+    0.0,
+    0.0
+  ],
+  "final_correct_fraction": 1.0,
+  "level": 1,
+  "magnification": 4,
+  "maximum_successful_time": 2,
+  "mean_successful_time": 2.0,
+  "minimum_successful_time": 2,
+  "next_zoom": {
+    "center": [
+      0.0,
+      0.0
+    ],
+    "score": 0.0,
+    "selection": "center fallback: no varying window with sufficient confirmed pixels",
+    "width": 0.01875
+  },
+  "nonfinite_count": 0,
+  "successful_fraction": 1.0,
+  "unsettled_fraction": 0.0,
+  "width": 0.075
+}

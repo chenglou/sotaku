@@ -1,0 +1,11 @@
+{
+  "arrays_sha256": "9a4bb42d807994813d67ef145944b8e67ced35c570b7a7753f21b38052cfc11e",
+  "confirmed_answer": 1.0,
+  "ever_correct": 1.0,
+  "final_correct": 1.0,
+  "initial_correct": 0.98,
+  "nonfinite": 0,
+  "regressed": 0.0,
+  "zero_control_board_mismatches": 0,
+  "zero_control_max_hidden_error": 0.0
+}

@@ -1,0 +1,11 @@
+{
+  "all_starts_successful": 218,
+  "arrays_sha256": "3f5c0cc2de106262d6cb63ea132c1562cdbdc2a7fed63fd15388797e0fc4fb9e",
+  "horizon": 2048,
+  "nonfinite_starts": 0,
+  "puzzles": 250,
+  "seconds": 125.09963050100001,
+  "starts_per_puzzle": 9,
+  "unsettled_starts": 90,
+  "wrong_final_starts": 127
+}

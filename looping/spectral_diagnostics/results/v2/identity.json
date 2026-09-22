@@ -1,0 +1,92 @@
+{
+  "key": "v2",
+  "sample": {
+    "buckets": [
+      "0",
+      "1-2",
+      "3-10",
+      "11-50",
+      "51+"
+    ],
+    "indices": [
+      144160,
+      262886,
+      200383,
+      258580,
+      313666
+    ],
+    "rows": [
+      2866,
+      8768,
+      14600,
+      18032,
+      21091
+    ]
+  },
+  "settings": {
+    "arnoldi_maxiter": 80,
+    "arnoldi_ncv": 32,
+    "arnoldi_tolerance": 1e-08,
+    "data_path": "weight_tying_v1_20260902/data/development.npz",
+    "data_sha256": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+    "eigenvalues": 4,
+    "exclude_first_per_bucket": 200,
+    "finite_difference_epsilons": [
+      0.01,
+      0.001,
+      0.0001
+    ],
+    "historical_power_iterations": 100,
+    "interpretation": "Local Jacobians at moving states, not a fixed-point or indefinite trajectory stability test. Five paired puzzles are a diagnostic, not a benchmark or reliability estimate.",
+    "iterations": [
+      16,
+      256,
+      1024,
+      4096
+    ],
+    "models": {
+      "old_collapsing": {
+        "path": "model_baseline_lr3e3.pt",
+        "sha256": "0608d58143fda01a14dc3e01204d0defae1bc6c1dbd81ec3b7b0a4200a0e7dc8"
+      },
+      "old_stable": {
+        "path": "model_baseline_lr2e3.pt",
+        "sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e"
+      },
+      "v2": {
+        "path": "looping/model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt",
+        "sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"
+      }
+    },
+    "precision": "FP64 encoding, recurrence and torch.func.jvp; math SDPA; no autocast or compilation",
+    "puzzles_per_bucket": 1,
+    "random_directions": 3,
+    "residual_tolerance": 1e-06,
+    "seed": 20260915,
+    "seed_agreement_rtol": 0.001,
+    "solver_seeds": [
+      41,
+      73
+    ],
+    "study_id": "jacobian_fp64_v1_20260915"
+  },
+  "smoke": false,
+  "source_sha256": {
+    "checkpoint_utils.py": "4da6f990bcbdb300d0315810a9f9697e21212d21c116b882a73ed7e52aa46fa4",
+    "dataset_utils.py": "febe659b28be1458a52f669114f9193336b9e0834d087ea2b77841c434774020",
+    "iters/exp_baseline_lr2e3.py": "18988fae6e472d086b0663bfdba810a7c5008caae535741b9264e40779e758b7",
+    "iters/exp_baseline_lr3e3.py": "b6b989a90ecc9cdd2d089de955b86b62d9cc208fad0daea846de90168b849541",
+    "iters/state_norm.py": "27530930f85a597ed12a1afd0f8ea0903b6c3f00f3bffe2487dce8bc7b528589",
+    "looping/spectral_diagnostics/__init__.py": "deaf0638c7e7e78e5ad0b18b9dcf956bec0d2fba30edda053768256f2b5525d5",
+    "looping/spectral_diagnostics/core.py": "0b75c07a9518addbe710500163206ff7369463370bfa44289ed11b8ec90ea5e8",
+    "looping/spectral_diagnostics/modal_run.py": "d9a9b194d33ce484fb57efb578ff1fdfa9f7b0abae58ee85e77866e117047a54",
+    "looping/spectral_diagnostics/protocol.json": "a729ba8c23fcf5456a446af00bc0cc308ca2107f70efc6b37314b7202dbe9380",
+    "looping/spectral_diagnostics/run.py": "daf7304c379c766b22ef14d24159f1337947d63bba65e92e95233cbabfe2671e",
+    "looping/spectral_diagnostics/test_spectral.py": "be118a88e5e0ea22f66e0b798d10f0ed0055e4206703697264ef9fbf7ceb723c",
+    "model_io.py": "1058a9f7be7f99be212c0f7a9341c6ceb351cbc2b9ed2693da510ff7596e3f81",
+    "release/v2/model_late_state_ce.pt.json": "baa2ab7fb0056a3131aa4e2ef392487ae91ea990d226e4293fbb25f3f8c6c072",
+    "requirements-modal.txt": "3e64af621a201bdf7b11a3ca0e98cbbcb55cd720aeff9c6cd6e17e51aa146c71",
+    "runtime_utils.py": "c4d24a18d1544d588110d1d0f44b71fadcacdd07bf5b371a68fcff9f3e2fc776",
+    "stabilize/exp_testbed_20k.py": "90e627840f820e9248832ff277df9e9db312fa93505c522ac049bb110160e78a"
+  }
+}

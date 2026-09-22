@@ -1,0 +1,23 @@
+{
+  "study_id": "basin_deep_zoom_v1_20260911",
+  "parent_study_id": "basin_recursive_1024_v1_20260909",
+  "parent_prepared_sha256": "1c9e8ad2011a535d61b204f04540b28488b31e8a8d5b8367537f00a8137dc8d1",
+  "parent_completed_sha256": {
+    "20k_20260907": "9bd5666d06d8c0a74f43787a5ce95ce61ab5ee7cd3d44bfc7d6cefdbf0315a66",
+    "20k_20260908": "67cfab2e6eb8fd1ffbeee968b958beecdec4ffbcc5728e2cf270f474dc1e4273"
+  },
+  "models": ["20k_20260907", "20k_20260908"],
+  "parent_level": 2,
+  "plane_seed": 2701,
+  "start_iteration": 0,
+  "resolution": 401,
+  "levels": 4,
+  "zoom_factor": 4,
+  "horizon": 1024,
+  "confirmation_window": 128,
+  "chunk_rows": 8,
+  "audit_resolution": 21,
+  "precision": "fp32",
+  "precision_audit": "fp32 and fp64 on the same coordinates, using the original fp32 base state and plane directions; fp64 constructs offsets and runs recurrence in double precision",
+  "compiled": false
+}

@@ -1,0 +1,14 @@
+{
+  "study_id": "basin_diagnostics_v2_20260909",
+  "launched_date": "2026-09-09",
+  "timezone": "America/Los_Angeles",
+  "preflight": {"app_id": "ap-pEbtH1SHAwX9MLaloKMgwR", "call_id": "fc-01M22TCPVRSW3W78YQDM0V6MNE", "status": "passed"},
+  "analyses": {
+    "20k_20260907": {"app_id": "ap-y5LUKrsUAR9MHvnxGG87pD", "call_id": "fc-01M22TE1BP5ZF5WET6CFYAH9X5"},
+    "20k_20260908": {"app_id": "ap-G5uj9gMOUbSPXPfCQBnWXy", "call_id": "fc-01M22TEM9W8M3MZN2QV877M4Q2"},
+    "20k_20260909": {"app_id": "ap-7dVXzzqXY2J83e0XuskKjD", "call_id": "fc-01M22TETQPFBDXYS0E0ME762Y1"},
+    "50k_20260910": {"app_id": "ap-GTBpJiDxVKwkikIu5yJrNn", "call_id": "fc-01M22TF104Y27B9YJ4TJGD2H2P"},
+    "50k_20260911": {"app_id": "ap-uANaCxb2jM43GyscH4ucmm", "call_id": "fc-01M22TF5MCC4HQ7BKN8DA8NPZH"},
+    "50k_20260912": {"app_id": "ap-acaREQpSeHYbNgkr5M3LMF", "call_id": "fc-01M22TFAX66F044YV62TJANSAA"}
+  }
+}

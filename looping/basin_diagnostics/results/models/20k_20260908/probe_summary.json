@@ -1,0 +1,38 @@
+[
+  {
+    "harmed_fraction": 0.015,
+    "n_puzzles": 50,
+    "name": "probe_t128_r0.001",
+    "perturbed_final": 0.025,
+    "perturbed_regressed": 0.935,
+    "rescued_fraction": 0.0,
+    "zero_final": 0.04
+  },
+  {
+    "harmed_fraction": 0.02,
+    "n_puzzles": 50,
+    "name": "probe_t128_r0.03",
+    "perturbed_final": 0.02,
+    "perturbed_regressed": 0.91,
+    "rescued_fraction": 0.0,
+    "zero_final": 0.04
+  },
+  {
+    "harmed_fraction": 0.0,
+    "n_puzzles": 50,
+    "name": "probe_t1024_r0.001",
+    "perturbed_final": 0.04,
+    "perturbed_regressed": 0.9,
+    "rescued_fraction": 0.0,
+    "zero_final": 0.04
+  },
+  {
+    "harmed_fraction": 0.02,
+    "n_puzzles": 50,
+    "name": "probe_t1024_r0.03",
+    "perturbed_final": 0.03,
+    "perturbed_regressed": 0.78,
+    "rescued_fraction": 0.01,
+    "zero_final": 0.04
+  }
+]

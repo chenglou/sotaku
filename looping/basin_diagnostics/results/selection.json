@@ -1,0 +1,147 @@
+{
+  "data_sha256": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+  "discovery_rows": [
+    857,
+    255,
+    6523,
+    5434,
+    11756,
+    12795,
+    17565,
+    19664,
+    22594,
+    22546
+  ],
+  "evaluation_rows": [
+    4985,
+    625,
+    3852,
+    4390,
+    1476,
+    2428,
+    2991,
+    4213,
+    4008,
+    695,
+    8026,
+    8837,
+    6356,
+    7263,
+    7093,
+    8619,
+    8013,
+    7717,
+    8183,
+    7593,
+    10976,
+    10812,
+    11496,
+    14861,
+    12284,
+    14173,
+    12423,
+    13363,
+    11934,
+    10508,
+    16253,
+    17561,
+    16868,
+    15276,
+    16873,
+    19563,
+    17393,
+    16191,
+    18301,
+    17164,
+    24682,
+    20290,
+    22990,
+    23369,
+    22077,
+    24354,
+    21776,
+    20582,
+    23509,
+    23470
+  ],
+  "gallery": [
+    {
+      "difficulty": "0",
+      "index": 291480,
+      "reason": "late-collapse contrast",
+      "row": 857
+    },
+    {
+      "difficulty": "3-10",
+      "index": 225137,
+      "reason": "slow-solving example",
+      "row": 12795
+    }
+  ],
+  "settings": {
+    "anchors": [
+      128,
+      1024
+    ],
+    "confirmation_window": 128,
+    "data_directory": "/outputs/weight_tying_v1_20260902/data",
+    "data_sha256": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+    "discovery_per_bucket": 2,
+    "examples_per_bucket": 12,
+    "exclude_first_per_bucket": 200,
+    "horizon": 4096,
+    "measurement_interval": 16,
+    "models": {
+      "20k_20260907": {
+        "cohort": "20k",
+        "expected_status": "healthy",
+        "reference": "looping/width/reference.json",
+        "seed": 20260907
+      },
+      "20k_20260908": {
+        "cohort": "20k",
+        "expected_status": "severe late collapse",
+        "reference": "looping/width/reference.json",
+        "seed": 20260908
+      },
+      "20k_20260909": {
+        "cohort": "20k",
+        "expected_status": "healthy with some late decline",
+        "reference": "looping/width/reference.json",
+        "seed": 20260909
+      },
+      "50k_20260910": {
+        "cohort": "50k",
+        "expected_status": "moderate late decline",
+        "reference": "looping/width_50k/reference.json",
+        "seed": 20260910
+      },
+      "50k_20260911": {
+        "cohort": "50k",
+        "expected_status": "healthy",
+        "reference": "looping/width_50k/reference.json",
+        "seed": 20260911
+      },
+      "50k_20260912": {
+        "cohort": "50k",
+        "expected_status": "healthy",
+        "reference": "looping/width_50k/reference.json",
+        "seed": 20260912
+      }
+    },
+    "paper": "https://arxiv.org/abs/2609.04963",
+    "perturbation_rms_fractions": [
+      0.001,
+      0.03
+    ],
+    "plane_seeds": [
+      2701,
+      2702
+    ],
+    "resolution": 17,
+    "sample_seed": 20260909,
+    "snapshot_interval": 64,
+    "study_id": "basin_diagnostics_v2_20260909",
+    "upstream_inspected_commit": "fff8bf738663cd6ee7f62969b8e780e48c5a0db7"
+  }
+}

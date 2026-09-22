@@ -154,6 +154,8 @@ The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row
 - [Recurrent normalization](stabilize/EXPERIMENTS_STABILIZE.md): RMSNorm, state-magnitude limits, and other stabilization experiments.
 - [Evolution strategies](es/EXPERIMENTS_ES.md): fine-tuning existing checkpoints and training from scratch.
 - [Recurrent-state geometry](looping/trajectory_viz/study/README.md): visualization study, controls, and limitations.
+- [Jacobian precision check](looping/spectral_diagnostics/RESULTS.md): FP64 comparison of original and v2 checkpoints, correcting numerical errors in earlier spectral-radius estimates.
+- [Nearby-state and settling diagnostics](looping/basin_diagnostics/RESULTS.md): matched perturbation maps of healthy and failing width-128 checkpoints, following the fractal-basins paper.
 - [Weight-sharing study](looping/weight_tying/RESULTS.md): 18 paired training runs comparing shared and independent stages, with separate compute and parameter comparisons and a new 10K-puzzle test set.
 - [Training-window selection](looping/window_selection/RESULTS.md): nine matched 20K runs; confidence selection did not improve results, while always choosing the latest window traded a lower ceiling for greater long-iteration stability.
 - [Hyperloop study](looping/hyperloop/RESULTS.md) and [50K confirmation](looping/hyperloop_50k/RESULTS.md): four gated states improve average 1024-iteration accuracy, but do not eliminate long-iteration collapse.

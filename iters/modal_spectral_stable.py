@@ -1,5 +1,8 @@
 """
-Modal wrapper for spectral radius analysis + stable model interventions.
+Historical finite-difference analysis and stable-model interventions.
+
+The finite-difference gains are precision-sensitive and cannot be interpreted as
+spectral radii. See looping/spectral_diagnostics/RESULTS.md for the replacement.
 
 Usage:
     modal run --detach iters/modal_spectral_stable.py
@@ -43,9 +46,9 @@ def run_analysis():
         from iters.eval_spectral_radius import analyze_models
         from iters.eval_interventions import evaluate_all
 
-        # Part 1: Spectral radius analysis on all models
+        # Part 1: Reproduce the historical finite-difference calculation.
         print("=" * 80)
-        print("PART 1: SPECTRAL RADIUS ANALYSIS")
+        print("PART 1: HISTORICAL FINITE-DIFFERENCE GAINS (NOT VALIDATED RADII)")
         print("=" * 80)
 
         sr_configs = [

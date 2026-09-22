@@ -1,0 +1,54 @@
+{
+  "study_id": "basin_slow_fp64_v1_20260911",
+  "launched_local": "2026-09-11T15:58:00-07:00",
+  "preflight": {
+    "app_id": "ap-9K5LoO1Eb9zVy1kAFaIBCJ",
+    "call_id": "fc-01M29AZQRASAXCJJQ1QF503XC7",
+    "status": "passed",
+    "local_record": "gpu_preflight.json",
+    "unit_tests": 21,
+    "activation_dtypes": ["torch.float64"],
+    "full_row_batch": 1292,
+    "estimated_grid_hours_per_case": 1.2902482529066648
+  },
+  "jobs": {
+    "20k_20260907": {
+      "app_id": "ap-eC3wME0SzliohDq2lGbU0g",
+      "container_id": "ta-01M29B22KBTFR8FDXHRF2YQ45R",
+      "status": "complete",
+      "stage": "complete",
+      "seconds": 9824.233367705,
+      "local_completion": "results/20k_20260907/completed.json",
+      "downloaded_artifact_checksums_verified": 52,
+      "grid_summaries_verified": 14,
+      "screening_seconds": 119.66982589,
+      "eligible_puzzles": 240,
+      "slow_puzzle": 190019,
+      "easy_puzzle": 182525,
+      "preflight": "passed",
+      "live_configuration_verified": true,
+      "weights_sha256": "b71c7e2d5f8f62d2b13c078e302201c14f2eef7d9d8cfca0fe36871373160a94"
+    },
+    "20k_20260908": {
+      "app_id": "ap-me88Nx4ABQfurgv9wHvXNk",
+      "call_id": "fc-01M29B2C2Z2J7JY74B900R51G3",
+      "container_id": "ta-01M29B2CC63ABD5GH0ANNC62XR",
+      "status": "complete",
+      "stage": "complete",
+      "seconds": 10034.753712971,
+      "local_completion": "results/20k_20260908/completed.json",
+      "downloaded_artifact_checksums_verified": 52,
+      "grid_summaries_verified": 14,
+      "screening_seconds": 125.09963050100001,
+      "eligible_puzzles": 218,
+      "slow_puzzle": 172694,
+      "easy_puzzle": 102875,
+      "preflight": "passed",
+      "live_configuration_verified": true,
+      "weights_sha256": "3c7f631e55edd6f62133f446e28352acc5518fa930b0c180a973910975483d5f"
+    }
+  },
+  "local_tests": "49 diagnostic tests passed",
+  "paired_puzzle_indices_verified": true,
+  "source_hashes_verified": 58
+}

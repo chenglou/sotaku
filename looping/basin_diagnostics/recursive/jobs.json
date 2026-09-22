@@ -1,0 +1,10 @@
+{
+  "study_id": "basin_recursive_1024_v1_20260909",
+  "started_at": "2026-09-09T22:08:42-07:00",
+  "preflight": {"app_id": "ap-F2t7cJPpyfPfBzuNmiZYkw", "call_id": "fc-01M24VC0CE01199TYS4S12BGKH", "status": "passed"},
+  "maps": {
+    "20k_20260907": {"app_id": "ap-mJq3veMKA1fgsZFc10t8sc", "call_id": "fc-01M24VFJYEAC8E5YZR68JWYX44", "status": "complete", "download_checksums": "verified"},
+    "20k_20260908": {"app_id": "ap-mGAZM9jXnO7uWrx0uyi7RF", "call_id": "fc-01M24VFMJC6DF7ZEK7E7N7ERWM", "status": "complete", "download_checksums": "verified"}
+  },
+  "framing_only_previous_run": {"study_id": "basin_recursive_v1_20260909", "app_id": "ap-XWgpjgaschOjQoHzTSEwhk", "call_id": "fc-01M24V6FTRXDF5C05WAF47NJS2"}
+}

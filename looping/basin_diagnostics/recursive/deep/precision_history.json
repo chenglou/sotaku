@@ -1,0 +1,29 @@
+{
+  "checkpoint": "20k_20260907",
+  "parent_level": 2,
+  "parent_resolution": 201,
+  "parent_chunk_start": 96,
+  "chunk_rows_including_halos": 10,
+  "horizon": 1024,
+  "parent_environment_matmul_precision": "high",
+  "new_environment_matmul_precision": "highest",
+  "cause": "The original renderer selected highest before loading the model. Importing stabilize.exp_testbed_20k then reset matrix multiplication to high. The new worker imports the model through its tests before selecting highest; the live environment confirms highest.",
+  "replay": {
+    "high": {
+      "cuda_allow_tf32": true,
+      "cudnn_allow_tf32": true,
+      "last_change_match_to_parent_chunk": 1.0,
+      "last_change_match_to_new_same_coordinates": 0.13482587064676618
+    },
+    "highest": {
+      "cuda_allow_tf32": false,
+      "cudnn_allow_tf32": false,
+      "last_change_match_to_parent_chunk": 0.13482587064676618,
+      "last_change_match_to_new_same_coordinates": 1.0
+    },
+    "all_final_boards_agree": true,
+    "median_absolute_time_difference_between_settings": 10.0,
+    "p90_absolute_time_difference_between_settings": 57.100000000000136
+  },
+  "interpretation": "The cleaner structure is not only a resolution improvement. Precision-sensitive speckling in the earlier maps must not be treated as evidence of fractal structure. The new FP32/FP64 comparisons are reported separately at every zoom."
+}

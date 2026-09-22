@@ -1,7 +1,6 @@
-# Jacobian spectral radius estimation via power iteration.
-# Estimates the dominant eigenvalue magnitude of df/dh at various operating points.
-# SR > 1 implies local instability (perturbations grow → oscillatory divergence).
-# SR < 1 implies local contractivity (perturbations shrink → stable convergence).
+# Historical finite-difference diagnostic retained for numerical reproduction.
+# FP32-high precision errors invalidate its spectral-radius interpretation.
+# Use looping/spectral_diagnostics/ for FP64 automatic-derivative measurements.
 #
 # Method: finite-difference JVP with power iteration.
 # f(h) = layers(h + pred_proj(softmax(output_head(h))))
@@ -61,9 +60,9 @@ def iteration_step(model, h, rope_cos, rope_sin):
 
 def estimate_spectral_radius(model, exp_mod, h_star, device,
                               n_power_iters=100, eps=1e-3):
-    """Power iteration via finite-difference JVP.
+    """Historical power iteration via precision-sensitive finite differences.
 
-    Returns per-puzzle spectral radius estimates and convergence history.
+    Returns per-puzzle gain estimates and iteration history, not validated radii.
     """
     batch_size = h_star.size(0)
     rope_cos = exp_mod.ROPE_COS.to(device)
@@ -84,7 +83,7 @@ def estimate_spectral_radius(model, exp_mod, h_star, device,
         f_perturbed = iteration_step(model, h_star + eps * v, rope_cos, rope_sin)
         Jv = (f_perturbed - f_base) / eps
 
-        # Per-puzzle growth rate
+        # Per-puzzle finite-difference gain
         Jv_norms = Jv.reshape(batch_size, -1).norm(dim=-1)
         v_norms = v.reshape(batch_size, -1).norm(dim=-1)
         sigma = Jv_norms / v_norms
@@ -126,7 +125,8 @@ def analyze_models(model_configs, checkpoints=None,
     puzzles = [dataset[i]['question'] for i in indices]
     x = first_exp.encode_puzzles(puzzles).to(device)
 
-    log(f"Spectral Radius Analysis")
+    log("Historical finite-difference analysis: gains are not validated spectral radii")
+    log("See looping/spectral_diagnostics/RESULTS.md for the precision correction")
     log(f"Puzzles: {n_puzzles}, Power iters: {n_power_iters}, eps: 1e-3")
     log(f"Checkpoints (warmup iters): {checkpoints}")
     log("")
@@ -155,7 +155,7 @@ def analyze_models(model_configs, checkpoints=None,
         t_warmup = time.time() - t_start
         log(f"  Warmup ({max(checkpoints)} iters): {t_warmup:.1f}s")
 
-        log(f"  {'Iter':>6} | {'Mean SR':>8} | {'Std':>8} | {'Min':>8} | {'Max':>8} | SR>1")
+        log(f"  {'Iter':>6} | {'Mean gain':>9} | {'Std':>8} | {'Min':>8} | {'Max':>8} | Gain>1")
         log(f"  {'-'*62}")
 
         for cp in checkpoints:

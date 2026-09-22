@@ -1,0 +1,55 @@
+{
+  "study_id": "jacobian_fp64_v1_20260915",
+  "preflight": {
+    "app_id": "ap-xZYc0vsnjGk9O6SzhjFKeB",
+    "call_id": "fc-01M2J8Y0J6M37Q220RVR98Q7FC",
+    "status": "complete",
+    "unit_tests": 10,
+    "validated_points": 1,
+    "spectral_radius": 1.0970714811102056,
+    "historical_fp32_high_gain": 52.53053283691406,
+    "point_seconds_rounded": 26.8,
+    "source_hashes_verified": 16
+  },
+  "jobs": {
+    "old_stable": {
+      "app_id": "ap-f49sw9hT759a7zTGZNVC5h",
+      "call_id": "fc-01M2J910G1AJD8XQE3STHEW5RR",
+      "container_id": "ta-01M2J910RYQF5WJ09HFRXDKGTR",
+      "status": "complete",
+      "live_configuration_verified": true,
+      "measured_points": 20,
+      "validated_points": 7,
+      "unresolved_points": 13,
+      "seconds": 2307.052001905,
+      "artifact_checksums_verified": 22,
+      "local_completion": "results/old_stable/completed.json"
+    },
+    "old_collapsing": {
+      "app_id": "ap-T8kDmyBT2bNpLRA6O6wg82",
+      "call_id": "fc-01M2J917WR71JQR0TVM5QB4ZR8",
+      "container_id": "ta-01M2J918409561EA95A09HADZR",
+      "status": "complete",
+      "live_configuration_verified": true,
+      "measured_points": 20,
+      "validated_points": 17,
+      "unresolved_points": 3,
+      "seconds": 925.638440966,
+      "artifact_checksums_verified": 22,
+      "local_completion": "results/old_collapsing/completed.json"
+    },
+    "v2": {
+      "app_id": "ap-iYGy2x7U9ejgzLKkwGA1IF",
+      "call_id": "fc-01M2J91ET9PJTS0MP1WM9Z79FN",
+      "container_id": "ta-01M2J91F2RFHAMEMHG002F9ESR",
+      "status": "complete",
+      "live_configuration_verified": true,
+      "measured_points": 20,
+      "validated_points": 14,
+      "unresolved_points": 6,
+      "seconds": 1810.3681097879999,
+      "artifact_checksums_verified": 22,
+      "local_completion": "results/v2/completed.json"
+    }
+  }
+}

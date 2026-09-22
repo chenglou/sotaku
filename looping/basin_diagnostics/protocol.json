@@ -1,0 +1,27 @@
+{
+  "study_id": "basin_diagnostics_v2_20260909",
+  "paper": "https://arxiv.org/abs/2609.04963",
+  "upstream_inspected_commit": "fff8bf738663cd6ee7f62969b8e780e48c5a0db7",
+  "data_directory": "/outputs/weight_tying_v1_20260902/data",
+  "data_sha256": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+  "sample_seed": 20260909,
+  "examples_per_bucket": 12,
+  "discovery_per_bucket": 2,
+  "exclude_first_per_bucket": 200,
+  "horizon": 4096,
+  "anchors": [128, 1024],
+  "perturbation_rms_fractions": [0.001, 0.03],
+  "plane_seeds": [2701, 2702],
+  "resolution": 17,
+  "measurement_interval": 16,
+  "snapshot_interval": 64,
+  "confirmation_window": 128,
+  "models": {
+    "20k_20260907": {"cohort": "20k", "seed": 20260907, "reference": "looping/width/reference.json", "expected_status": "healthy"},
+    "20k_20260908": {"cohort": "20k", "seed": 20260908, "reference": "looping/width/reference.json", "expected_status": "severe late collapse"},
+    "20k_20260909": {"cohort": "20k", "seed": 20260909, "reference": "looping/width/reference.json", "expected_status": "healthy with some late decline"},
+    "50k_20260910": {"cohort": "50k", "seed": 20260910, "reference": "looping/width_50k/reference.json", "expected_status": "moderate late decline"},
+    "50k_20260911": {"cohort": "50k", "seed": 20260911, "reference": "looping/width_50k/reference.json", "expected_status": "healthy"},
+    "50k_20260912": {"cohort": "50k", "seed": 20260912, "reference": "looping/width_50k/reference.json", "expected_status": "healthy"}
+  }
+}

@@ -2,7 +2,7 @@
 
 ## Hypothesis
 
-A healthy recurrent Sudoku model should settle toward a fixed state, while a collapsed model should fail to settle. This analysis tests raw update size, update direction, relative acceleration, normalized-state movement, distance to a late state, and finite-difference contraction of the recurrent map.
+We tested whether accurate recurrent Sudoku models approach a fixed hidden state, and whether failure to settle distinguishes collapsed models. Measurements include raw update size, update direction, relative acceleration, normalized-state movement, distance to a late state, and one-step gains in sampled perturbation directions.
 
 ## Protocol
 
@@ -20,18 +20,18 @@ The collapsed checkpoint differs in how quickly its normalized state continues t
 
 The behavioral difference matches the drift difference. On final holdout puzzles, collapsed plain fell from 90% solved at iteration 128 to 10% at iteration 1024. Stable plain, later-iteration training, and the combined model were 100% solved at both horizons.
 
-Generic local contraction did not diagnose collapse. At iteration 1024, median gain for random perturbations was below one for every checkpoint, including 0.918 for collapsed plain. Gain along the model's own update direction was approximately one for every checkpoint: 0.99998 for stable plain, 1.00011 for collapsed plain, 1.00002 for later-iteration training, and 1.00003 for combined. Random directions in a 10,368-dimensional state can miss narrow unstable directions, while differences this close to one are sensitive to finite-difference scale and numerical precision.
+One-step gains in the sampled directions did not diagnose collapse. At iteration 1024, median gain for random perturbations was below one for every checkpoint, including 0.918 for collapsed plain. Gain along the model's own update direction was approximately one for every checkpoint: 0.99998 for stable plain, 1.00011 for collapsed plain, 1.00002 for later-iteration training, and 1.00003 for combined. Random directions in a 10,368-dimensional state can miss narrow expanding directions; shrinking random perturbations do not establish that the full map is contractive. Differences this close to one are also sensitive to finite-difference scale and numerical precision.
 
 ## Verdict
 
 In the accurate models, **state direction changes slowly at later iterations**, but the complete hidden state keeps moving. The decoded solution remains correct over the measured interval. The failing model also moves smoothly and almost straight, but its normalized state changes several times faster and its answers become incorrect. None of these observations proves convergence beyond iteration 1024.
 
-Update norm, visual smoothness, and average random-direction contraction did not distinguish the failure in this comparison. Later normalized-state movement, relative acceleration, and prediction changes did. These measurements do not establish whether penalizing normalized-state movement during training would prevent incorrect answers.
+Update norm, visual smoothness, and average random-direction gain did not distinguish the failure in this comparison. Later normalized-state movement, relative acceleration, and prediction changes did. These measurements do not establish whether penalizing normalized-state movement during training would prevent incorrect answers.
 
 ## Limitations
 
 - The iteration-1024 state is an observed endpoint, not a proven asymptote, and the analysis does not run beyond iteration 1024.
-- Finite differences sample random directions and the trajectory direction; they do not estimate the largest Jacobian singular value.
+- Finite differences sample random directions and the trajectory direction; they estimate neither the spectral radius nor the largest Jacobian singular value. Direct spectral measurements are reported in the separate [FP64 precision check](../../../spectral_diagnostics/RESULTS.md).
 - Each model condition is represented by one checkpoint. The final holdout has 20 puzzles, although discovery and validation reproduce the main ordering.
 - Normalizing the state intentionally removes magnitude. The result describes representational direction and output stability, not convergence of the complete hidden vector.
 

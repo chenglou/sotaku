@@ -1,0 +1,54 @@
+{
+  "anchor": 1024,
+  "arrays_sha256": "e68fe990310a7066c1cd3955bca431b16089bffb66385291841fedc53eb12f95",
+  "checks": {
+    "confirmed_answer": 0.852233676975945,
+    "ever_correct": 0.9312714776632303,
+    "final_correct": 0.6666666666666666,
+    "initial_correct": 0.15120274914089346,
+    "nonfinite": 0,
+    "regressed": 0.3127147766323024,
+    "zero_control_board_mismatches": 0,
+    "zero_control_max_hidden_error": 0.0
+  },
+  "confirmed_answer": 0.8512110726643599,
+  "ever_correct": 0.9307958477508651,
+  "final_correct": 0.6643598615916955,
+  "gallery": {
+    "difficulty": "3-10",
+    "index": 225137,
+    "reason": "slow-solving example",
+    "row": 12795
+  },
+  "horizon": 4096,
+  "outcomes": {
+    "lost_at_end": 77,
+    "never_correct": 20,
+    "recovered": 14,
+    "stayed_correct": 178
+  },
+  "plane_seed": 2702,
+  "regressed": 0.314878892733564,
+  "resolution": 17,
+  "rms_fraction": 0.03,
+  "settling_uncertainty": [
+    {
+      "different_fraction": 0.5388026607538803,
+      "pairs": 451,
+      "pixel_distance": 1,
+      "shuffled_fraction": 0.8980044345898004
+    },
+    {
+      "different_fraction": 0.7255369928400954,
+      "pairs": 419,
+      "pixel_distance": 2,
+      "shuffled_fraction": 0.8735083532219571
+    },
+    {
+      "different_fraction": 0.8450704225352113,
+      "pairs": 355,
+      "pixel_distance": 4,
+      "shuffled_fraction": 0.8704225352112676
+    }
+  ]
+}

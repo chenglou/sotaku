@@ -1,0 +1,26 @@
+{
+  "arrays_sha256": "ec8acab4dea3eaa91fc0e3802682a426da2b14649a1a5923bbe20dcece4bc80e",
+  "center": [
+    0.1078125,
+    0.0703125
+  ],
+  "final_correct_fraction": 0.9817919596178114,
+  "level": 1,
+  "magnification": 4,
+  "maximum_successful_time": 381,
+  "mean_successful_time": 167.60319500550864,
+  "minimum_successful_time": 41,
+  "next_zoom": {
+    "center": [
+      0.16171874999999997,
+      0.101953125
+    ],
+    "score": 84.05687693898656,
+    "selection": "largest mean neighboring settling-time difference",
+    "width": 0.01875
+  },
+  "nonfinite_count": 0,
+  "successful_fraction": 0.9817919596178114,
+  "unsettled_fraction": 0.01772730004206478,
+  "width": 0.075
+}

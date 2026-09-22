@@ -1,0 +1,26 @@
+{
+  "study_id": "jacobian_fp64_v1_20260915",
+  "seed": 20260915,
+  "models": {
+    "old_stable": {"path": "model_baseline_lr2e3.pt", "sha256": "4f2ee45da4296fc2ce860dcf953c466df907d3878d39c8d4fa0afa9ba28df69e"},
+    "old_collapsing": {"path": "model_baseline_lr3e3.pt", "sha256": "0608d58143fda01a14dc3e01204d0defae1bc6c1dbd81ec3b7b0a4200a0e7dc8"},
+    "v2": {"path": "looping/model_loop_health_standalone_v1_late_state_ce_50k_trial0.pt", "sha256": "a12508bd32263596b9d87cd5a2f315c0b2d6ded7e66b7f684a05e46397f51198"}
+  },
+  "data_path": "weight_tying_v1_20260902/data/development.npz",
+  "data_sha256": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+  "puzzles_per_bucket": 1,
+  "exclude_first_per_bucket": 200,
+  "iterations": [16, 256, 1024, 4096],
+  "eigenvalues": 4,
+  "arnoldi_ncv": 32,
+  "arnoldi_maxiter": 80,
+  "arnoldi_tolerance": 1e-8,
+  "residual_tolerance": 1e-6,
+  "solver_seeds": [41, 73],
+  "seed_agreement_rtol": 0.001,
+  "random_directions": 3,
+  "finite_difference_epsilons": [0.01, 0.001, 0.0001],
+  "historical_power_iterations": 100,
+  "precision": "FP64 encoding, recurrence and torch.func.jvp; math SDPA; no autocast or compilation",
+  "interpretation": "Local Jacobians at moving states, not a fixed-point or indefinite trajectory stability test. Five paired puzzles are a diagnostic, not a benchmark or reliability estimate."
+}

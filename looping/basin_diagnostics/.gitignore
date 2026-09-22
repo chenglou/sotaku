@@ -1,0 +1,3 @@
+# Re-download raw arrays from the recorded Modal volume when needed.
+results/**/*.npz
+results/models/*/analysis.log

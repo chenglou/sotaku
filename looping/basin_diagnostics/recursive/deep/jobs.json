@@ -1,0 +1,26 @@
+{
+  "study_id": "basin_deep_zoom_v1_20260911",
+  "launched_local": "2026-09-11T12:43:00-07:00",
+  "jobs": {
+    "20k_20260907": {
+      "app_id": "ap-EUXUjkCGXV8KYEyMJGP7RN",
+      "call_id": "fc-01M28ZY0TX9AEW781Q8D73BJ32",
+      "container_id": "ta-01M28ZY147G1WE88XRJJ9324HR",
+      "status": "complete",
+      "artifact_checksums_verified": true,
+      "completed_levels": 4,
+      "seconds": 7035.158977995,
+      "preflight": "28 tests and real-checkpoint FP32/FP64 GPU traces passed"
+    },
+    "20k_20260908": {
+      "app_id": "ap-1kHZrukyKlm1n5kAYEeCFR",
+      "call_id": "fc-01M28ZYK6AG7K2RNC400CNHKBS",
+      "container_id": "ta-01M28ZYKDZ9CV78GTZ5BHE891R",
+      "status": "complete",
+      "artifact_checksums_verified": true,
+      "completed_levels": 4,
+      "seconds": 6986.420995779,
+      "preflight": "28 tests and real-checkpoint FP32/FP64 GPU traces passed"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "exact_original_recurrence": true,
+  "gpu_fp32_and_fp64_smoke": true,
+  "status": "passed",
+  "unit_tests": 28
+}

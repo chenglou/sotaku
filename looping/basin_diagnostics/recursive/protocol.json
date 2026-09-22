@@ -1,0 +1,20 @@
+{
+  "study_id": "basin_recursive_1024_v1_20260909",
+  "models": ["20k_20260907", "20k_20260908"],
+  "data_directory": "/outputs/weight_tying_v1_20260902/data",
+  "data_sha256": "86a4c154399dd806db8a5c32685ca0a0097ff80e658819b5cbc14161c8b8f153",
+  "selection": "First rating-51+ puzzle outside monitoring rows that both models solve at 512 but not 16, healthy model retains at 4096, and failing model loses at 4096",
+  "plane_seed": 2701,
+  "start_iteration": 0,
+  "resolution": 201,
+  "levels": 3,
+  "zoom_factor": 4,
+  "horizon": 1024,
+  "confirmation_window": 128,
+  "chunk_rows": 8,
+  "preview_resolution": 33,
+  "preview_horizon": 512,
+  "preview_rms_fractions": [0.03, 0.1, 0.3, 1.0],
+  "precision": "fp32",
+  "compiled": false
+}

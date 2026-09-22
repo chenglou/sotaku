@@ -1,10 +1,10 @@
 """
-Modal wrapper: spectral radius comparison for the Viridian recreated-trainer checkpoint.
+Historical finite-difference comparison for the Viridian checkpoint.
 
-Compares the collapsed Viridian-trained checkpoint (step 50,000, 5.76% at 1024 test
-iterations) against the canonical stable model and the two documented failure modes
-(oscillatory divergence at LR=3e-3, stagnation at LR=1e-3), to classify which side of
-the stability band the Viridian run landed on.
+Compares the Viridian-trained checkpoint (step 50,000, 5.76% at 1024 test iterations)
+against the original LR=2e-3, LR=3e-3, and LR=1e-3 checkpoints. Precision errors
+invalidate the spectral-radius interpretation and any stability-band classification.
+See looping/spectral_diagnostics/RESULTS.md for the FP64 replacement study.
 
 Usage:
     modal run --detach modal_spectral_viridian.py
@@ -54,7 +54,7 @@ def run_analysis():
         configs = [
             ('Viridian recreated (step 50k, collapse@1024)', '/outputs/model_viridian_recreated_step50000.pt', 'iters.exp_baseline_lr2e3'),
             ('LR=2e-3 canonical (stable)', '/outputs/model_baseline_lr2e3.pt', 'iters.exp_baseline_lr2e3'),
-            ('LR=3e-3 (oscillatory collapse@64)', '/outputs/model_baseline_lr3e3.pt', 'iters.exp_baseline_lr3e3'),
+            ('LR=3e-3 (collapse@64)', '/outputs/model_baseline_lr3e3.pt', 'iters.exp_baseline_lr3e3'),
             ('LR=1e-3 (stagnation)', '/outputs/model_baseline_lr1e3.pt', 'iters.exp_baseline_lr1e3'),
         ]
 
