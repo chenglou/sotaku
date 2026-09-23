@@ -82,7 +82,9 @@ def trace_initial(model, initial, puzzle, resolution, horizon, confirmation_wind
         last_change = torch.where((decoded != board).any(-1), step, last_change)
         board = decoded
         separation = torch.maximum(separation, neighbor_distance(board[:-2], resolution, resolution))
-    if bool(invalid) or not torch.equal(hidden[-1], hidden[-2]):
+    # CPU FP64 kernels can round identical batch rows differently; GPU checks remain exact.
+    tolerance = 1e-12 if hidden.device.type == "cpu" and hidden.dtype == torch.float64 else 0.0
+    if bool(invalid) or not torch.allclose(hidden[-1], hidden[-2], rtol=tolerance, atol=tolerance):
         raise ValueError("Precision audit found nonfinite states or inconsistent duplicate controls")
     return {"last_change": last_change[:-2].reshape(resolution, resolution).cpu().numpy(),
             "confirmed": ((horizon - last_change[:-2]) >= confirmation_window).reshape(resolution, resolution).cpu().numpy(),

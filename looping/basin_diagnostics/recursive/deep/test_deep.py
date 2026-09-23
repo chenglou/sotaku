@@ -47,6 +47,38 @@ class DeepTests(unittest.TestCase):
         result = trace_initial(copy.deepcopy(model).double(), initial, puzzle, 1, 4, 2)
         self.assertEqual(result["last_change"].shape, (1, 1))
 
+    def test_duplicate_controls_allow_only_cpu_fp64_roundoff(self):
+        class DriftingModel:
+            def __init__(self, drift, different_answer=False):
+                self.drift = drift
+                self.different_answer = different_answer
+
+            def step(self, hidden, predictions):
+                hidden = hidden.clone()
+                hidden[-1, 0, 0] += self.drift
+                logits = hidden.new_zeros(len(hidden), 81, 9)
+                logits[..., 0] = 1
+                if self.different_answer:
+                    logits[-1, :, 1] = 2
+                return hidden, logits.softmax(-1), logits
+
+        puzzle = {"targets": [0] * 81}
+        for dtype, drift, different_answer, should_pass in (
+            (torch.float64, 1e-14, False, True),
+            (torch.float64, 1e-8, False, False),
+            (torch.float64, 0., True, False),
+            (torch.float64, float("nan"), False, False),
+            (torch.float32, 1e-6, False, False),
+        ):
+            with self.subTest(dtype=dtype, drift=drift, different_answer=different_answer):
+                model = DriftingModel(drift, different_answer)
+                hidden = torch.zeros(3, 81, 128, dtype=dtype)
+                if should_pass:
+                    trace_initial(model, hidden, puzzle, 1, 2, 1)
+                else:
+                    with self.assertRaisesRegex(ValueError, "duplicate controls"):
+                        trace_initial(model, hidden, puzzle, 1, 2, 1)
+
     def test_comparison_preserves_constant_case_without_nan(self):
         first = {"last_change": np.ones((3, 3)), "confirmed": np.ones((3, 3), dtype=bool),
                  "final_board": np.zeros((3, 3, 81))}

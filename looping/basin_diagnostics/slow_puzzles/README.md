@@ -24,6 +24,8 @@ The plots color the last change in the raw 81-digit prediction. Unsettled or non
 
 The GPU preflight runs focused unit tests, checks real-model FP64 activation dtypes, and tests duplicated starts and overlapping grid rows. Workers verify checkpoint and dataset checksums, record source hashes, and reject resumes with changed identities. Each batch or grid chunk is saved atomically and committed to the Volume. Older study sources and results are retained as recorded.
 
+The completed study used the sources in commit `83050da`. A later portability fix allows `rtol=atol=1e-12` for duplicate FP64 hidden states and probabilities on CPU; decoded answers and GPU controls still require exact agreement. Saved measurements are unchanged, and source checks prevent resuming old runs with modified code.
+
 ```sh
 source venv/bin/activate
 MPLCONFIGDIR=/tmp/sotaku-matplotlib python -m unittest looping.basin_diagnostics.slow_puzzles.test_slow_puzzles -v

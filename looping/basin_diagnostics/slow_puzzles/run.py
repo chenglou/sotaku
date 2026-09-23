@@ -101,6 +101,8 @@ def trace_states(model, hidden, targets, horizon, confirmation_window, *, pairs=
     tracker = OutcomeTracker(board, targets, finite, 0, horizon)
     pairs = torch.as_tensor(pairs, device=hidden.device, dtype=torch.long).reshape(-1, 2)
     mismatch = torch.zeros((), device=hidden.device, dtype=torch.bool)
+    # CPU FP64 kernels can round identical batch rows differently; GPU checks remain exact.
+    tolerance = 1e-12 if hidden.device.type == "cpu" and dtype == torch.float64 else 0.0
     separation = torch.zeros(grid_shape, device=hidden.device) if grid_shape else None
     for step in range(1, horizon + 1):
         hidden, predictions, logits = model.step(hidden, predictions)
@@ -113,8 +115,10 @@ def trace_states(model, hidden, targets, horizon, confirmation_window, *, pairs=
         if len(pairs):
             mismatch |= (board[pairs[:, 0]] != board[pairs[:, 1]]).any()
             if step % 64 == 0 or step == horizon:
-                mismatch |= (hidden[pairs[:, 0]] != hidden[pairs[:, 1]]).any()
-                mismatch |= (predictions[pairs[:, 0]] != predictions[pairs[:, 1]]).any()
+                mismatch |= ~torch.isclose(hidden[pairs[:, 0]], hidden[pairs[:, 1]],
+                                          rtol=tolerance, atol=tolerance).all()
+                mismatch |= ~torch.isclose(predictions[pairs[:, 0]], predictions[pairs[:, 1]],
+                                          rtol=tolerance, atol=tolerance).all()
         if grid_shape:
             separation = torch.maximum(separation, neighbor_distance(board[:int(np.prod(grid_shape))], *grid_shape))
     if bool(mismatch):

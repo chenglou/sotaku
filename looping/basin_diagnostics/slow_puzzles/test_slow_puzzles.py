@@ -102,6 +102,40 @@ class SlowPuzzleTests(unittest.TestCase):
         result = trace_states(model, hidden, np.zeros((1, 81)), 4, 1, pairs=[(0, 1), (1, 2)])
         np.testing.assert_array_equal(result["final_board"], logits.argmax(-1).numpy())
 
+    def test_duplicate_controls_allow_only_cpu_fp64_roundoff(self):
+        class DriftingModel(ScriptedModel):
+            def __init__(self, hidden_drift=0., prediction_drift=0., different_answer=False):
+                super().__init__([0, 0])
+                self.hidden_drift = hidden_drift
+                self.prediction_drift = prediction_drift
+                self.different_answer = different_answer
+
+            def step(self, hidden, predictions):
+                hidden, predictions, logits = super().step(hidden, predictions)
+                hidden = hidden.clone()
+                hidden[-1, 0, 0] += self.hidden_drift
+                predictions[-1, 0, 0] += self.prediction_drift
+                if self.different_answer:
+                    logits[-1, :, 1] = 2
+                return hidden, predictions, logits
+
+        for dtype, arguments, should_pass in (
+            (torch.float64, {"hidden_drift": 1e-14, "prediction_drift": 1e-14}, True),
+            (torch.float64, {"hidden_drift": 1e-8}, False),
+            (torch.float64, {"prediction_drift": 1e-8}, False),
+            (torch.float64, {"different_answer": True}, False),
+            (torch.float64, {"hidden_drift": float("nan")}, False),
+            (torch.float32, {"hidden_drift": 1e-6}, False),
+        ):
+            with self.subTest(dtype=dtype, arguments=arguments):
+                model = DriftingModel(**arguments)
+                hidden = torch.zeros(2, 81, 128, dtype=dtype)
+                if should_pass:
+                    trace_states(model, hidden, np.zeros((1, 81)), 2, 1, pairs=[(0, 1)])
+                else:
+                    with self.assertRaisesRegex(ValueError, "controls diverged"):
+                        trace_states(model, hidden, np.zeros((1, 81)), 2, 1, pairs=[(0, 1)])
+
     def test_returning_solution_uses_last_change_and_counts_regression(self):
         result = trace_states(ScriptedModel([0, 1, 0, 0, 0]), torch.zeros(1, 81, 128, dtype=torch.float64),
                               np.zeros((1, 81)), 5, 2)

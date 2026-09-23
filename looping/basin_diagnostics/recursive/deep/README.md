@@ -35,6 +35,8 @@ At every zoom, a 21x21 subset is rerun in FP32 and FP64. Both retain the same fu
 
 The earlier source files and artifacts are checksum-verified and remain untouched. New source hashes, checkpoint identities, chunk checksums, repeated row halos, and duplicate unperturbed controls are checked. Each model runs in its own detached Modal invocation with resumable chunks. A completed result is accepted only after its artifact checksums pass.
 
+The completed study used the sources in commit `83050da`. A later portability fix allows `rtol=atol=1e-12` for duplicate FP64 hidden states on CPU; decoded answers and GPU controls still require exact agreement. Saved measurements are unchanged, and source checks prevent resuming old runs with modified code.
+
 ```sh
 source venv/bin/activate
 python -m unittest looping.basin_diagnostics.recursive.deep.test_deep looping.basin_diagnostics.recursive.test_recursive -v
