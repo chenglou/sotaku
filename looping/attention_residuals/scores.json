@@ -1,0 +1,362 @@
+{
+ "baseline_seed20261123": {
+  "16": {
+   "accuracy_percent": 77.8,
+   "solved": 19450,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 94.056,
+   "solved": 23514,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 4064
+  },
+  "1024": {
+   "accuracy_percent": 96.132,
+   "solved": 24033,
+   "total": 25000,
+   "lost_since_previous": 43,
+   "gained_since_previous": 562
+  },
+  "4096": {
+   "accuracy_percent": 95.0,
+   "solved": 23750,
+   "total": 25000,
+   "lost_since_previous": 292,
+   "gained_since_previous": 9
+  }
+ },
+ "baseline_seed20261124": {
+  "16": {
+   "accuracy_percent": 77.924,
+   "solved": 19481,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 93.956,
+   "solved": 23489,
+   "total": 25000,
+   "lost_since_previous": 2,
+   "gained_since_previous": 4010
+  },
+  "1024": {
+   "accuracy_percent": 92.64,
+   "solved": 23160,
+   "total": 25000,
+   "lost_since_previous": 622,
+   "gained_since_previous": 293
+  },
+  "4096": {
+   "accuracy_percent": 87.088,
+   "solved": 21772,
+   "total": 25000,
+   "lost_since_previous": 1418,
+   "gained_since_previous": 30
+  }
+ },
+ "baseline_seed20261125": {
+  "16": {
+   "accuracy_percent": 78.2,
+   "solved": 19550,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 94.784,
+   "solved": 23696,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 4146
+  },
+  "1024": {
+   "accuracy_percent": 96.744,
+   "solved": 24186,
+   "total": 25000,
+   "lost_since_previous": 84,
+   "gained_since_previous": 574
+  },
+  "4096": {
+   "accuracy_percent": 93.46,
+   "solved": 23365,
+   "total": 25000,
+   "lost_since_previous": 831,
+   "gained_since_previous": 10
+  }
+ },
+ "attnres_seed20261123": {
+  "16": {
+   "accuracy_percent": 76.372,
+   "solved": 19093,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 86.812,
+   "solved": 21703,
+   "total": 25000,
+   "lost_since_previous": 3,
+   "gained_since_previous": 2613
+  },
+  "1024": {
+   "accuracy_percent": 72.38,
+   "solved": 18095,
+   "total": 25000,
+   "lost_since_previous": 3685,
+   "gained_since_previous": 77
+  },
+  "4096": {
+   "accuracy_percent": 37.356,
+   "solved": 9339,
+   "total": 25000,
+   "lost_since_previous": 8759,
+   "gained_since_previous": 3
+  }
+ },
+ "attnres_seed20261124": {
+  "16": {
+   "accuracy_percent": 76.556,
+   "solved": 19139,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 86.668,
+   "solved": 21667,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 2528
+  },
+  "1024": {
+   "accuracy_percent": 86.768,
+   "solved": 21692,
+   "total": 25000,
+   "lost_since_previous": 73,
+   "gained_since_previous": 98
+  },
+  "4096": {
+   "accuracy_percent": 83.124,
+   "solved": 20781,
+   "total": 25000,
+   "lost_since_previous": 916,
+   "gained_since_previous": 5
+  }
+ },
+ "attnres_seed20261125": {
+  "16": {
+   "accuracy_percent": 76.736,
+   "solved": 19184,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 86.824,
+   "solved": 21706,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 2522
+  },
+  "1024": {
+   "accuracy_percent": 87.136,
+   "solved": 21784,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 78
+  },
+  "4096": {
+   "accuracy_percent": 87.124,
+   "solved": 21781,
+   "total": 25000,
+   "lost_since_previous": 4,
+   "gained_since_previous": 1
+  }
+ },
+ "message_seed20261123": {
+  "16": {
+   "accuracy_percent": 77.764,
+   "solved": 19441,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 82.692,
+   "solved": 20673,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 1232
+  },
+  "1024": {
+   "accuracy_percent": 82.816,
+   "solved": 20704,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 31
+  },
+  "4096": {
+   "accuracy_percent": 82.828,
+   "solved": 20707,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 3
+  }
+ },
+ "message_seed20261124": {
+  "16": {
+   "accuracy_percent": 76.388,
+   "solved": 19097,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 81.852,
+   "solved": 20463,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 1366
+  },
+  "1024": {
+   "accuracy_percent": 82.208,
+   "solved": 20552,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 89
+  },
+  "4096": {
+   "accuracy_percent": 82.288,
+   "solved": 20572,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 20
+  }
+ },
+ "message_seed20261125": {
+  "16": {
+   "accuracy_percent": 77.564,
+   "solved": 19391,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 84.6,
+   "solved": 21150,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 1759
+  },
+  "1024": {
+   "accuracy_percent": 85.236,
+   "solved": 21309,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 159
+  },
+  "4096": {
+   "accuracy_percent": 85.484,
+   "solved": 21371,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 62
+  }
+ },
+ "attnres_message_seed20261123": {
+  "16": {
+   "accuracy_percent": 76.632,
+   "solved": 19158,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 82.184,
+   "solved": 20546,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 1388
+  },
+  "1024": {
+   "accuracy_percent": 82.62,
+   "solved": 20655,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 109
+  },
+  "4096": {
+   "accuracy_percent": 82.724,
+   "solved": 20681,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 26
+  }
+ },
+ "attnres_message_seed20261124": {
+  "16": {
+   "accuracy_percent": 77.188,
+   "solved": 19297,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 81.984,
+   "solved": 20496,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 1199
+  },
+  "1024": {
+   "accuracy_percent": 82.216,
+   "solved": 20554,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 58
+  },
+  "4096": {
+   "accuracy_percent": 82.296,
+   "solved": 20574,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 20
+  }
+ },
+ "attnres_message_seed20261125": {
+  "16": {
+   "accuracy_percent": 76.316,
+   "solved": 19079,
+   "total": 25000,
+   "lost_since_previous": null,
+   "gained_since_previous": null
+  },
+  "128": {
+   "accuracy_percent": 85.268,
+   "solved": 21317,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 2238
+  },
+  "1024": {
+   "accuracy_percent": 86.752,
+   "solved": 21688,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 371
+  },
+  "4096": {
+   "accuracy_percent": 87.32,
+   "solved": 21830,
+   "total": 25000,
+   "lost_since_previous": 0,
+   "gained_since_previous": 142
+  }
+ }
+}
