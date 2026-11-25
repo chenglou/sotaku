@@ -1,33 +1,33 @@
 # Sotaku
 
-Sotaku v2 solves **99.12%** of a 25,000-puzzle Sudoku benchmark with an **800K-parameter looped transformer** trained from scratch. The recipe is simple: train on later iterations, then use ordinary FP32 inference.
+A plain **800K-parameter looped transformer** trained from scratch that solves **99.12%** of a 25,000-puzzle Sudoku-Extreme benchmark and **98.94%** of the full 422,786-puzzle test split. No halting head, no energy function, no row/column/box embeddings: just standard pre-norm blocks, 2D RoPE, one training trick for long-horizon stability, and FP32 inference.
 
-## Current Status
+**Paper:** [Sotaku: A Plain Looped Transformer Baseline Saturates Sudoku (PDF)](paper/sotaku_short.pdf) ([build & source notes](paper/README.md))
 
-- **Recommended default:** training on later iterations with cross-entropy loss and FP32 inference
-- **Benchmark:** [frozen 25K-puzzle sample](release/benchmark_25k.json) from the `sapientinc/sudoku-extreme` test split
-- **Recommended checkpoint result:** **99.12%** at 1024 and **98.63%** at 4096 with FP32 inference
-- **Checkpoint:** [v2.0.0 weights, model manifest, and validation records](https://github.com/chenglou/sotaku/releases/tag/v2.0.0)
-- **Architecture:** 4-layer shared-weight transformer, 2D RoPE, ~800K params
-- **Training setup:** 2.7M-puzzle pool, BS=2048, LR=2e-3, 16 supervised iterations, 50K optimizer steps, cosine decay, reverse curriculum
+## Overview
 
-Sotaku's 796,937-parameter looped transformer is trained through 16 differentiable iterations at a time but can continue improving for more than 1,000 iterations at inference. On 20% of batches, it first runs without gradients to iteration 32, 64, 128, 256, or 512, detaches that state, and applies the usual 16-iteration averaged cross-entropy from there. The other 80% of batches use the ordinary iterations 1-16. Training therefore reaches iteration 528, with gradients spanning only the final 16 iterations of each sampled trajectory.
+- **Method:** later-iteration cross-entropy training + FP32 inference
+- **Checkpoint:** [v2.0.0 weights, manifest, and validation records](https://github.com/chenglou/sotaku/releases/tag/v2.0.0)
+- **Results (v2, FP32):** **99.12%** at 1024 iterations and **98.63%** at 4096 on the [25K benchmark](release/benchmark_25k.json); **98.94%** at 1024 on the full 422,786-puzzle `sapientinc/sudoku-extreme` test split
+- **Model:** 4 shared-weight transformer blocks (width 128, 4 heads, MLP 512, 2D RoPE), 796,937 parameters
+- **Training:** 2.7M puzzles, batch size 2048, peak LR `2e-3`, cosine decay, 50K steps, hard-to-easy curriculum
 
-Experiments with additional supervised windows and margin penalties are documented in the [training-method comparisons](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty).
+The model backpropagates through 16 iterations at a time, yet keeps improving past 1,000 iterations at inference. Under standard 16-iteration training, most runs eventually collapse if you unroll them that far. The fix is simple: on 20% of training batches, roll forward without gradients for `s ∈ {32, 64, 128, 256, 512}` iterations, detach the state, and apply the same 16-iteration cross-entropy loss from there. The other 80% of batches supervise iterations 1–16 as usual. That lets training reach iteration 528 while backpropagation never spans more than 16 steps.
 
-### Training And Data Budget
+See [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md#additional-training-window-and-margin-penalty) for ablations with extra supervised windows and margin penalties.
 
-The 50K reference recipe uses the first 2.7M puzzles from the `sudoku-extreme` training split. Batches sample from progressively broader rating pools: rating 51+ through step 10K, 11+ through 20K, 1+ through 30K, then all ratings through 50K. At batch size 2048, a 50K run processes 102.4M sampled puzzle presentations. The learning rate starts with a 1,400-step warmup, then follows cosine decay from 2e-3.
+### Training & Evaluation Notes
 
-Use 20K steps for routine comparisons and 50K to confirm promising results; important changes may still appear after 20K. The 10K preliminary experiments did not preserve the later ranking. Both schedules draw from the same 2.7M-puzzle pool; a smaller training dataset has not been tested with the current recipe.
-
-Reported full evaluations use 25,000 test puzzles: 5,000 from each rating bucket, 0, 1-2, 3-10, 11-50, and 51+. Monitoring and final reporting reuse the official test split, with some overlap between their samples. These benchmark results informed model selection; they are not an untouched final holdout.
+- **Curriculum & budget:** Reference 50K runs draw from the first 2.7M puzzles of the `sudoku-extreme` training split, widening the difficulty pool over time: rating 51+ to step 10K, 11+ to 20K, 1+ to 30K, then all ratings to 50K (102.4M puzzle presentations at BS=2048, with a 1,400-step warmup and cosine decay from `2e-3`).
+- **Screening length:** Use 20K steps for routine comparisons and 50K to confirm; 10K runs do not preserve final rankings.
+- **1,000-puzzle regime:** This repo focuses on the full training split; results in the 1,000-puzzle symmetry-augmented setting (46%–57% at 1024 iterations with a 10K mixed-difficulty schedule) are reported in Appendix K of [the paper](paper/sotaku_short.pdf).
+- **Benchmark caveat:** The 25K benchmark samples 5,000 puzzles from each of five rating buckets (`0`, `1-2`, `3-10`, `11-50`, `51+`) out of the official test split. Because it guided model selection across the project, treat it as a dev set.
 
 ## Setup
 
-Reference training used Linux, Python 3.11, an NVIDIA H200, and PyTorch 2.10.0 with CUDA 12.8. Training requires a CUDA GPU and substantial memory at batch size 2048; gradient accumulation is not yet supported for training on later iterations. Training uses BF16 autocast. Inference defaults to FP32 with TF32 matmul disabled because reduced precision can substantially degrade very long trajectories. CPU inference is supported; reported benchmark scores use CUDA.
+Reference runs used Linux, Python 3.11, an NVIDIA H200, and PyTorch 2.10.0 + CUDA 12.8. Training requires a CUDA GPU with enough memory for batch size 2048 (gradient accumulation isn't implemented for later-iteration training) and runs in BF16 autocast. Inference defaults to FP32 with TF32 disabled because BF16 rounding degrades very long rollouts; CPU inference works too.
 
-For the reference CUDA build, following the [PyTorch installation instructions](https://pytorch.org/get-started/previous-versions/#v2100):
+Install the CUDA 12.8 build (see [PyTorch previous versions](https://pytorch.org/get-started/previous-versions/#v2100) for CPU-only):
 
 ```sh
 python3.11 -m venv venv
@@ -36,105 +36,98 @@ pip install torch==2.10.0 --index-url https://download.pytorch.org/whl/cu128
 pip install -r requirements.txt
 ```
 
-For CPU-only inference, install the CPU build from the linked instructions instead. `requirements.txt` pins the core packages; `requirements-modal.txt` also selects the CUDA 12.8 build. Optional tests and plotting dependencies are in `requirements-dev.txt`. The old Linux environment snapshot is preserved as `requirements-legacy.txt`. Evaluations record the complete installed environment, including transitive dependencies and the GPU driver.
+`requirements.txt` pins the core dependencies, `requirements-modal.txt` adds the CUDA 12.8 index, `requirements-dev.txt` adds tests/plotting, and `requirements-legacy.txt` preserves an earlier Linux snapshot.
 
-## Train And Evaluate
+## Train & Evaluate
 
-The released checkpoint used the 50K preset for training on later iterations, with random seed `20260730`. The following command uses that preset and seed; independent retraining is not guaranteed to match its exact score.
+To reproduce the 50K reference recipe (same preset and seed `20260730` as the released checkpoint):
 
 ```sh
 python train.py --preset reference --seed 20260730 --run-name late_ce_50k
 
-python -m iters.eval_more_iters runs/training/model_late_ce_50k.pt \
-  --benchmark release/benchmark_25k.json --precision fp32 --iters 128 1024 2048 4096
+python -m iters.eval_more_iters runs/training/model_late_ce_50k.pt   --benchmark release/benchmark_25k.json --precision fp32 --iters 128 1024 2048 4096
 ```
 
-For a 20K development run, use `python train.py --run-name late_ce_20k`; `development` is the default preset. Reusing a run name resumes its saved optimizer and schedule. Use a new name for an independent run.
+For a faster 20K dev run, omit `--preset` (`development` is the default): `python train.py --run-name late_ce_20k`. Reusing a `--run-name` resumes from its saved checkpoint, so pick a fresh name for a new run.
 
-Inference weights have an adjacent `.pt.json` manifest with the exact model settings and checksum. Keep both files together. The evaluator uses the same recurrence as training and saves per-puzzle results in a new directory under `runs/`.
+Each `.pt` checkpoint ships with a matching `.pt.json` manifest (architecture config + checksum); keep the pair together. Evaluation outputs land in a new directory under `runs/`.
 
 ## Published Checkpoint
 
-Download the v2 weights and their manifest without retraining:
+Download the v2 weights and manifest directly:
 
 ```sh
 gh release download v2.0.0 --repo chenglou/sotaku --pattern 'model_late_state_ce.pt*'
 
-python -m iters.eval_more_iters model_late_state_ce.pt \
-  --benchmark release/benchmark_25k.json --precision fp32 --device cuda \
-  --batch-size 256 --iters 128 1024 2048 4096
+python -m iters.eval_more_iters model_late_state_ce.pt   --benchmark release/benchmark_25k.json --precision fp32 --device cuda   --batch-size 256 --iters 128 1024 2048 4096
 ```
 
-The reference evaluation solves `24779/25000` puzzles at 1024 iterations (99.116%). It uses PyTorch 2.10.0+cu128 on H200, eager FP32 execution, and batch size 256. The release also includes checksums and per-puzzle validation records; see [the asset details](release/v2/README.md).
+That solves `24,779 / 25,000` puzzles at 1024 iterations (99.12%) in ~16.5 minutes on an H200 (eager FP32, BS=256). Checksums and per-puzzle records are in [release/v2/README.md](release/v2/README.md).
 
-For one puzzle, without downloading the dataset:
+To solve a single puzzle without downloading any dataset:
 
 ```sh
-python solve.py model_late_state_ce.pt \
-  '53..7.... 6..195... .98....6. 8...6...3 4..8.3..1 7...2...6 .6....28. ...419..5 ....8..79'
+python solve.py model_late_state_ce.pt   '53..7.... 6..195... .98....6. 8...6...3 4..8.3..1 7...2...6 .6....28. ...419..5 ....8..79'
 ```
-
-The output is the model's proposed completion, with the given digits preserved.
 
 ## Modal (Optional)
 
-The core training code is provider-agnostic. This launcher uses the reference 50K preset and seed `20260730`:
+If you want to launch runs on Modal:
 
 ```sh
 pip install modal==1.2.6
 modal token new
 
-# Reference 50K training on later iterations
+# Reference 50K later-iteration training
 modal run --detach looping/modal_health_methods.py --arm late-state-ce --seed 20260730 --name late_ce_50k
 
-# Inspect outputs on the volume
+# Fetch weights from the Modal volume
 modal volume ls sudoku-outputs
 model=looping/model_late_ce_50k.pt
 modal volume get sudoku-outputs "$model" .
 modal volume get sudoku-outputs "$model.json" .
 
-# Evaluate the saved model
+# Evaluate
 modal run --detach modal_eval.py --model "$model" --precision fp32 --iters 128,1024,2048,4096
 ```
 
-For 20K development on Modal, use `modal run --detach looping/modal_stay_solved.py --arm late-state-ce --seed 20260730 --name late_ce_20k`. The launcher now defaults to 20K; the older 10K preliminary experiment requires `--screen`. Launch each independent job in its own detached invocation. Evaluation outputs use unique directories under `evaluations/` on the volume.
+For 20K dev runs on Modal, use `modal run --detach looping/modal_stay_solved.py --arm late-state-ce --seed 20260730 --name late_ce_20k` (pass `--screen` for the older 10K screen). Launch each independent job in its own detached invocation.
 
 ## Visualizations
-
-Using the published checkpoint:
 
 ```sh
 pip install matplotlib
 python -m viz.visualize model_late_state_ce.pt --device cuda --n-iters 32
 ```
 
-Outputs go to `viz/output/`.
+Outputs are written to `viz/output/`.
 
 ## Tests
 
-Install `requirements-dev.txt`, then run the core tests and the research tests:
+Install `requirements-dev.txt`, then run both test suites (also run in CI):
 
 ```sh
 python -m unittest discover -v
 python scripts/run_research_tests.py
 ```
 
-CI runs both suites. Research study directories run in separate processes because some use different local modules with the same name.
+Research study tests run in isolated subprocesses because a few study folders share local module names.
 
 ## Key Files
 
+- [paper/sotaku_short.pdf](paper/sotaku_short.pdf) & [paper/README.md](paper/README.md): paper draft and rebuild instructions.
 - [stabilize/exp_testbed_20k.py](stabilize/exp_testbed_20k.py): shared model and training implementation.
-- [looping/exp_health_methods.py](looping/exp_health_methods.py): 50K reference preset and matched training-method comparisons.
-- [looping/exp_stay_solved.py](looping/exp_stay_solved.py): 20K development preset and optional second-window experiments.
-- [train.py](train.py), [solve.py](solve.py): short entrypoints for the recommended training recipe and single-puzzle inference.
-- [model_io.py](model_io.py), [inference.py](inference.py): checksum-verified inference artifacts and the shared recurrent inference path.
-- [iters/eval_more_iters.py](iters/eval_more_iters.py): iteration-scaling evaluation, frozen benchmark indices, and per-puzzle records.
-- [checkpoint_utils.py](checkpoint_utils.py): checkpoint saving and resumption.
-- [looping/modal_health_methods.py](looping/modal_health_methods.py), [looping/modal_stay_solved.py](looping/modal_stay_solved.py), and [modal_eval.py](modal_eval.py): optional Modal wrappers.
+- [looping/exp_health_methods.py](looping/exp_health_methods.py): 50K reference preset and matched recipe comparisons.
+- [looping/exp_stay_solved.py](looping/exp_stay_solved.py): 20K dev preset and second-window experiments.
+- [train.py](train.py), [solve.py](solve.py): CLI entrypoints for training and single-puzzle inference.
+- [model_io.py](model_io.py), [inference.py](inference.py): checksum-verified model loading and shared recurrent inference loop.
+- [iters/eval_more_iters.py](iters/eval_more_iters.py): iteration-scaling evaluation and per-puzzle logging.
+- [checkpoint_utils.py](checkpoint_utils.py): checkpoint save/resume helpers.
+- [looping/modal_health_methods.py](looping/modal_health_methods.py), [looping/modal_stay_solved.py](looping/modal_stay_solved.py), [modal_eval.py](modal_eval.py): optional Modal wrappers.
 
 ## Results
 
-The v2 checkpoint was evaluated on 2026-09-02 using the frozen 25K-puzzle benchmark, eager FP32 execution on H200, and batch size 256.
+v2 checkpoint on the frozen 25K benchmark (eager FP32 on H200, batch size 256, evaluated 2026-09-02):
 
 | Inference iterations | Solved puzzles | Accuracy |
 |---:|---:|---:|
@@ -143,35 +136,35 @@ The v2 checkpoint was evaluated on 2026-09-02 using the frozen 25K-puzzle benchm
 | 2048 | 24,762 / 25,000 | 99.05% |
 | 4096 | 24,658 / 25,000 | 98.63% |
 
-The full evaluation took about 16.5 minutes on H200. Other precision and compilation settings can substantially change very long trajectories; see the [numerical checks](release/PRECISION_RESULTS.md).
+On the full 422,786-puzzle test split in FP32, v2 solves **98.94%** at 1024 iterations (see [the paper](paper/sotaku_short.pdf)). Precision and compilation choices matter a lot at high iteration counts; see [release/PRECISION_RESULTS.md](release/PRECISION_RESULTS.md).
 
-The model is sudoku-agnostic in the sense that it only assumes a 2D grid: no row, column, or box constraint embedding, just 2D RoPE in attention. Full scaling tables, stability analysis, interventions, and ablations live in [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md) and [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
+The architecture is Sudoku-agnostic beyond knowing the board is a 2D grid (2D RoPE only, no row/column/box embeddings). Full scaling tables, stability diagnostics, and ablations are in [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md) and [iters/EXPERIMENTS_ITERS.md](iters/EXPERIMENTS_ITERS.md).
 
 ## Research Notes
 
-- [Training on later iterations](looping/EXPERIMENTS_LOOPING.md): repeated training runs, second supervised windows, margin penalties, damping, and fewer training iterations.
-- [Iteration scaling](iters/EXPERIMENTS_ITERS.md): experiments on behavior at large inference iteration counts.
-- [Recurrent normalization](stabilize/EXPERIMENTS_STABILIZE.md): RMSNorm, state-magnitude limits, and other stabilization experiments.
-- [Evolution strategies](es/EXPERIMENTS_ES.md): fine-tuning existing checkpoints and training from scratch.
-- [Recurrent-state geometry](looping/trajectory_viz/study/README.md): visualization study, controls, and limitations.
-- [Jacobian precision check](looping/spectral_diagnostics/RESULTS.md): FP64 comparison of original and v2 checkpoints, correcting numerical errors in earlier spectral-radius estimates.
-- [Nearby-state and settling diagnostics](looping/basin_diagnostics/RESULTS.md): matched perturbation maps of healthy and failing width-128 checkpoints, following the fractal-basins paper.
-- [Weight-sharing study](looping/weight_tying/RESULTS.md): 18 paired training runs comparing shared and independent stages, with separate compute and parameter comparisons and a new 10K-puzzle test set.
-- [Training-window selection](looping/window_selection/RESULTS.md): nine matched 20K runs; confidence selection did not improve results, while always choosing the latest window traded a lower ceiling for greater long-iteration stability.
-- [Hyperloop study](looping/hyperloop/RESULTS.md) and [50K confirmation](looping/hyperloop_50k/RESULTS.md): four gated states improve average 1024-iteration accuracy, but do not eliminate long-iteration collapse.
-- [Attention residuals and a gated message between iterations](looping/attention_residuals/RESULTS.md): the loop design of Inkling 2 Mini, adapted to Sotaku in 12 matched 20K runs. No variant improved on the baseline; the gated message never loses a solved puzzle but stops near 83%.
-- [Baseline width](looping/width/README.md): controlled 20K comparisons of widths 160 and 192 against the existing width-128 runs, followed by a [width-160 50K confirmation](looping/width_50k/README.md).
-- [Release verification](V2_RELEASE_AUDIT.md): artifact provenance and release checks.
-- [Numerical sensitivity](release/PRECISION_RESULTS.md) and [burn-in dropout](looping/BURNIN_DROPOUT.md): fixed-checkpoint checks and matched continuation experiments.
+- [Training on later iterations](looping/EXPERIMENTS_LOOPING.md): repeated runs, second supervised windows, margin penalties, damping, and shorter training rollouts.
+- [Iteration scaling](iters/EXPERIMENTS_ITERS.md): behavior at large inference iteration counts.
+- [Recurrent normalization](stabilize/EXPERIMENTS_STABILIZE.md): RMSNorm, state-norm limits, and other stabilization attempts.
+- [Evolution strategies](es/EXPERIMENTS_ES.md): ES fine-tuning of failed checkpoints and training from scratch.
+- [Recurrent-state geometry](looping/trajectory_viz/study/README.md): PCA/projection study, adversarial controls, and why we stopped trusting trajectory plots.
+- [Jacobian precision check](looping/spectral_diagnostics/RESULTS.md): FP64 autograd Jacobian check correcting the earlier low-precision finite-difference error.
+- [Nearby-state and settling diagnostics](looping/basin_diagnostics/RESULTS.md): perturbation maps of healthy vs. failing width-128 checkpoints.
+- [Weight-sharing study](looping/weight_tying/RESULTS.md): 18 paired runs comparing shared vs. independent weights, plus a fresh 10K-puzzle test set.
+- [Training-window selection](looping/window_selection/RESULTS.md): 9 matched 20K runs comparing random offsets, confidence selection, and fixed offset 512.
+- [Hyperloop study](looping/hyperloop/RESULTS.md) & [50K confirmation](looping/hyperloop_50k/RESULTS.md): four gated states raise mean 1024-iteration accuracy but don't eliminate collapse.
+- [Attention residuals & gated message](looping/attention_residuals/RESULTS.md): Inkling 2 Mini loop design tested across 12 matched 20K runs; gated message never loses a solved puzzle but caps near 83–84%.
+- [Baseline width](looping/width/README.md) & [width-160 50K confirmation](looping/width_50k/README.md): controlled comparisons of widths 160 and 192 against width 128.
+- [Release verification](V2_RELEASE_AUDIT.md): v2 artifact provenance and audit.
+- [Numerical sensitivity](release/PRECISION_RESULTS.md) & [burn-in dropout](looping/BURNIN_DROPOUT.md): inference precision checks and continuation ablations.
 
 ## Historical / Archived Code
 
-Older Kaggle and pre-`sudoku-extreme` experiments are preserved for reference, but they are not the current public path:
+Older Kaggle and pre-`sudoku-extreme` experiments kept for reference:
 
-- `STALE_EXPERIMENTS_DOC.md` - archived chronological experiment log
-- `arch/`, `recur/`, `curriculum/`, `misc/` - older experiment families
-- `pos_embedding/EXPERIMENTS_POS.md` - 2D RoPE introduction and positional-encoding ablations
+- `STALE_EXPERIMENTS_DOC.md` - chronological early experiment log (~200 runs)
+- `arch/`, `recur/`, `curriculum/`, `misc/` - early architecture and curriculum experiments
+- `pos_embedding/EXPERIMENTS_POS.md` - 2D RoPE and positional-encoding ablations
 - `muon/EXPERIMENTS_MUON.md` - Muon optimizer experiments
-- `rrn/RRN_EXPERIMENTS.md` - RRN experiments
+- `rrn/RRN_EXPERIMENTS.md` - recurrent relational network baseline
 
-Earlier helper scripts are available in [the v2.0.0 tag](https://github.com/chenglou/sotaku/tree/v2.0.0).
+Earlier helper scripts are preserved at the [v2.0.0 tag](https://github.com/chenglou/sotaku/tree/v2.0.0).
