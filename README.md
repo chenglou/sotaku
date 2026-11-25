@@ -20,7 +20,7 @@ See [looping/EXPERIMENTS_LOOPING.md](looping/EXPERIMENTS_LOOPING.md#additional-t
 
 - **Curriculum & budget:** Reference 50K runs draw from the first 2.7M puzzles of the `sudoku-extreme` training split, widening the difficulty pool over time: rating 51+ to step 10K, 11+ to 20K, 1+ to 30K, then all ratings to 50K (102.4M puzzle presentations at BS=2048, with a 1,400-step warmup and cosine decay from `2e-3`).
 - **Screening length:** Use 20K steps for routine comparisons and 50K to confirm; 10K runs do not preserve final rankings.
-- **1,000-puzzle regime:** This repo focuses on the full training split; results in the 1,000-puzzle symmetry-augmented setting (46%–57% at 1024 iterations with a 10K mixed-difficulty schedule) are reported in Appendix K of [the paper](paper/sotaku_short.pdf).
+- **1,000-puzzle regime:** This repo focuses on the full training split; results in the 1,000-puzzle symmetry-augmented setting (46%–57% at 1024 iterations with a 10K mixed-difficulty schedule) are reported in Appendix J of [the paper](paper/sotaku_short.pdf).
 - **Benchmark caveat:** The 25K benchmark samples 5,000 puzzles from each of five rating buckets (`0`, `1-2`, `3-10`, `11-50`, `51+`) out of the official test split. Because it guided model selection across the project, treat it as a dev set.
 
 ## Setup

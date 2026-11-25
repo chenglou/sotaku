@@ -56,6 +56,7 @@ Note that we train on the full training split, whereas most recent work on Sudok
 \end{figure}
 
 \section{Model, training and evaluation}
+\label{sec:model}
 
 Each of the 81 cells is a token, with one-hot input $x$ over ``empty'' and the nine digits. The model maintains a latent state $h_t\in\mathbb{R}^{81\times128}$ and reads out digit probabilities $p_t$ at each iteration $t$:
 \begin{align*}

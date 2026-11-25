@@ -57,6 +57,19 @@ Observe every iteration through 4096 in eager execution at batch size 256. A reg
 
 All four observation passes reproduced their corresponding eager endpoint predictions exactly, including the unscored given cells. FP32 sharply reduces regressions in this 1K sample, but the model trained on later iterations still loses some correct solutions. The full 25K tables above record endpoint gains and losses, not every intermediate event.
 
+## BF16 Arithmetic With The State Stored In FP32
+
+Added November 2026 for the paper. On the same 1K puzzles, `paper/scripts/precision_state.py` runs the transformer layers under BF16 autocast as before, but keeps the state that is carried from one iteration to the next in FP32. Accuracy then matches full FP32, so the BF16 failure at large iteration counts comes from rounding in the stored state, not from the arithmetic inside the layers.
+
+| Weights | Arithmetic | Carried state | 128 | 1024 | 2048 | 4096 |
+|---|---|---|---:|---:|---:|---:|
+| Later-iteration training | FP32 | FP32 | 95.5% | 99.0% | 98.7% | 97.9% |
+| Later-iteration training | BF16 | BF16 | 96.1% | 98.1% | 93.3% | 42.2% |
+| Later-iteration training | BF16 | FP32 | 96.2% | 98.5% | 98.5% | 98.3% |
+| Published v1 | FP32 | FP32 | 95.5% | 99.0% | 99.0% | 99.0% |
+| Published v1 | BF16 | BF16 | 95.0% | 98.7% | 98.6% | 85.2% |
+| Published v1 | BF16 | FP32 | 95.4% | 99.0% | 99.1% | 99.1% |
+
 ## Interpretation And Records
 
 PyTorch documents that batching and arithmetic order can change floating-point results. Its Inductor 2.10 implementation also explains that fusion can retain FP32 intermediates where eager BF16 would round between operations. Those are plausible contributors, not an isolated explanation of which operation causes Sotaku's difference; changing precision can also change kernel selection. See [PyTorch numerical accuracy](https://docs.pytorch.org/docs/2.10/notes/numerical_accuracy.html) and [the versioned Inductor configuration](https://github.com/pytorch/pytorch/blob/v2.10.0/torch/_inductor/config.py).

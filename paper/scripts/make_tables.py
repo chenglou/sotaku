@@ -23,15 +23,6 @@ HORIZONS = (16, 128, 1024, 2048, 4096)
 CONTROLS_50K = {20260910: (81.076, 96.060, 98.244, 97.720, 91.688),
                 20260911: (81.180, 96.276, 97.848, 97.432, 97.236),
                 20260912: (80.764, 96.432, 99.228, 99.368, 99.436)}
-# release/PRECISION_RESULTS.md, full 25K benchmark, accuracy at 128/1024/2048/4096.
-PRECISION_25K = [
-    ("Released checkpoint", "FP32", (96.288, 99.116, 99.048, 98.632)),
-    ("Released checkpoint", "BF16", (96.472, 98.796, 92.976, 43.704)),
-    ("Released checkpoint", "BF16, compiled in 16-iteration chunks", (96.372, 98.952, 97.600, 92.512)),
-    ("Original recipe, accurate run", "FP32", (95.704, 98.888, 99.028, 99.020)),
-    ("Original recipe, accurate run", "BF16", (95.256, 98.876, 98.844, 84.888)),
-    ("Original recipe, accurate run", "BF16, compiled in 16-iteration chunks", (95.572, 98.744, 98.784, 98.748)),
-]
 
 
 def write(name, text):
@@ -143,42 +134,6 @@ def table_late():
     return pending
 
 
-def table_precision():
-    lines = [
-        "\\begin{table}[h]", "\\centering", "\\small",
-        "\\caption{The effect of inference precision on the same weights, accuracy (\\%) by inference "
-        "iterations. \\emph{Top:} the 25,000-puzzle benchmark. \\emph{Bottom:} 1,000 of those puzzles, "
-        "separating the precision of the arithmetic from the precision in which the carried state is stored.}",
-        "\\label{tab:precision}",
-        "\\begin{tabular}{@{}llrrrr@{}}", "\\toprule",
-        "Checkpoint & Inference & 128 & 1024 & 2048 & 4096 \\\\", "\\midrule",
-    ]
-    previous = None
-    for checkpoint, setting, values in PRECISION_25K:
-        if previous is not None and checkpoint != previous:
-            lines.append("\\addlinespace")
-        lines.append(f"{checkpoint if checkpoint != previous else ''} & {setting} & "
-                     + " & ".join(fmt(value) for value in values) + " \\\\")
-        previous = checkpoint
-    labels = {"fp32": "FP32", "bf16": "BF16 arithmetic, BF16 state",
-              "bf16_fp32_state": "BF16 arithmetic, FP32 state"}
-    names = {"v2": "Released checkpoint", "v1": "Original recipe, accurate run"}
-    if all((DATA / "precision" / f"{name}.json").exists() for name in names):
-        lines.append("\\midrule")
-        for name, checkpoint in names.items():
-            variants = json.loads((DATA / "precision" / f"{name}.json").read_text())["variants"]
-            for index, (variant, label) in enumerate(labels.items()):
-                values = [100 * variants[variant][str(h)]["solved"] / variants[variant][str(h)]["total"]
-                          for h in (128, 1024, 2048, 4096)]
-                lines.append(f"{checkpoint if index == 0 else ''} & {label} & "
-                             + " & ".join(fmt(value) for value in values) + " \\\\")
-            lines.append("\\addlinespace")
-        lines.pop()
-    lines += ["\\bottomrule", "\\end{tabular}", "\\end{table}"]
-    write("table_precision", "\n".join(lines))
-
-
 if __name__ == "__main__":
     table_scaling()
     table_late()
-    table_precision()
