@@ -134,10 +134,6 @@ The original recipe only ever supervises the first 16 states of a rollout. Our f
 
 \paragraph{Results.} All seven 50K-step runs trained this way finish between 97.5\% and 99.2\% at 1024 iterations (\tabref{tab:late}). The bottom six rows are three seed-matched pairs trained specifically for this paper (\appref{app:cohort}): the original recipe finishes at 2.5\%, 78.0\%, and 0.6\%, while later-iteration training finishes at 98.7\%, 97.5\%, and 98.5\%. The later windows cost up to 1.7 points at 16 iterations. The released checkpoint comes from an earlier five-recipe comparison with the same pattern (\tabref{tab:matched} in \appref{app:ablations}).
 
-\ifshort\else
-\input{generated/table_late}
-\fi
-
 \paragraph{What changes in the model.} The model becomes much better at holding onto answers it has already found. In one run where we enabled later-iteration training mid-run, within 1,000 steps the fraction of puzzles solved at iteration 1024 that remained solved 16 iterations later jumped from 92.7\% to 99.8\%, lifting 1024-iteration accuracy from 62.0\% to 94.5\%.
 
 \paragraph{Which parts matter.} These ablations use one to three seeds each, so only large gaps are meaningful (\appref{app:ablations}). The starting offsets need to span a \emph{range}: always starting from one fixed offset stalled models near 90\%. They also need to \emph{reach far enough}: in a related variant, runs that never trained past iteration 192 finished below 60\% at 1024 iterations. Pushing further didn't pay off consistently, though: applying later windows to half the batches, or extending offsets up to 1024, cost more compute without reliable gains.

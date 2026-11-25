@@ -11,6 +11,8 @@ python -m paper.scripts.make_figures    # writes paper/figures/*.pdf
 cd paper && pdflatex sotaku_short && bibtex sotaku_short && pdflatex sotaku_short && pdflatex sotaku_short
 ```
 
+For arXiv, build the paper and then run `python -m paper.scripts.make_arxiv_bundle` from the repository root. The script writes `paper/arxiv_upload.tar.gz`, which holds the `.tex` files, the built `sotaku_short.bbl` (arXiv does not run bibtex), the generated tables and only the figures the paper uses.
+
 On this machine `pdflatex` needs `PATH=/opt/homebrew/Cellar/texlive/20260301/bin:$PATH`; the `/opt/homebrew/bin` symlinks fail to find their support files.
 
 Both scripts read the new results from `runs/paper/`, which is not in Git. `make_figures.py` also reads the perturbation-map arrays under `looping/basin_diagnostics/slow_puzzles/results/`, which are not in Git either. A figure whose inputs are missing is skipped.
@@ -65,3 +67,4 @@ modal volume get cheng-sotaku-outputs analysis/v2 runs/paper/analysis/
 - `scripts/precision_state.py`: FP32 against BF16 against BF16 arithmetic with the carried state stored in FP32.
 - `scripts/checkpoint_curve.py`: re-scores every saved training checkpoint of a run in FP32.
 - `scripts/make_tables.py`, `scripts/make_figures.py`: build the LaTeX fragments and figures.
+- `scripts/make_arxiv_bundle.py`: writes the source bundle for arXiv.

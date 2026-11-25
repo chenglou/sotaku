@@ -1,3 +1,4 @@
+\pdfoutput=1 % tells arXiv to build with pdflatex
 % The paper: three pages of main text, with the full account (body.tex, then appendix.tex) as its appendix.
 \documentclass[10pt]{article}
 \usepackage[margin=1in]{geometry}
@@ -26,8 +27,6 @@
 \newcommand{\appref}[1]{\autoref{#1}}
 \newcommand{\lr}[1]{$#1\times10^{-3}$}
 \graphicspath{{figures/}}
-\newif\ifshort
-\shorttrue
 
 \title{Sotaku: A Plain Looped Transformer Baseline Saturates Sudoku}
 % Affiliation and contact are left for the author to fill in.
@@ -84,7 +83,7 @@ Training minimizes cross-entropy on the empty cells, averaged across 16 consecut
 \section{Limits and conclusion}
 \label{sec:conclusion}
 
-Everything here is on one task and one family of tiny models, measured on a benchmark we reused throughout development, with several comparisons backed by only one to three runs. We also still don't know why the original recipe holds at long horizons in some runs and collapses in others. Even so, the main takeaway is hard to miss: on the full training split, standard training choices took a plain looped transformer from 32\% to 99\% with zero task-specific tricks, and making it reliable only required evaluating the same loss on later iterations. Any paper proposing heavier machinery for this benchmark should compare against a plain loop given the same tuning budget.
+Everything here is on one task and one family of tiny models, measured on a benchmark we reused throughout development, with several comparisons backed by only one to three runs. We also still don't know why the original recipe holds at long horizons in some runs and collapses in others. Even so, the main takeaway is hard to miss: on the full training split, standard training choices took a plain looped transformer from 32\% to 99\% with zero task-specific tricks, and making it reliable only required applying the same loss to later iterations. Any paper proposing heavier machinery for this benchmark should compare against a plain loop given the same tuning budget.
 
 \paragraph{Acknowledgments.} AI coding assistants ran much of the experimentation, analysis code, and drafting under the author's direction. The author takes responsibility for the content.
 

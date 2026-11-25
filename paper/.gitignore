@@ -8,3 +8,6 @@
 # Previews written by scripts/make_figures.py; the paper uses the PDFs
 figures/*.png
 !figures/repo_*.png
+
+# Built by scripts/make_arxiv_bundle.py
+arxiv_upload.tar.gz
