@@ -64,12 +64,12 @@ Original recipe & 20261121 & 62.8 & 3K & 0.8 & 24,676 \\
 
 \paragraph{Checkpoint selection.} Selecting each original-recipe run's best checkpoint would yield 97.3\%, 99.1\%, and 62.8\%, against 2.6\%, 80.5\%, and 0.8\% for the final ones. With later-iteration training, the best checkpoint is within 1.3 points of the final one in every run.
 
-\paragraph{The run that fades at 4096 iterations.} Later-iteration seed 20261120 drops from 97.5\% at 1024 iterations to 83.9\% at 4096, losing 11\% to 15\% of puzzles in every difficulty bucket including the easiest. Its state stays much smaller than in its sibling runs: at iteration 1024, median state RMS is 97 compared to 415 and 736. Meanwhile, the median margin in a puzzle's weakest cell erodes steadily from 15.5 logits at iteration 16 to 5.5 at 1024 and 2.0 at 4096, whereas the other two runs hold between 9 and 11. This looks like the same drift analyzed in \secref{sec:analysis}, just moving more slowly. Since we only observed one run like this, we haven't tested whether sampling wider starting offsets prevents it.
+\paragraph{The run that fades at 4096 iterations.} Later-iteration seed 20261120 drops from 97.5\% at 1024 iterations to 83.9\% at 4096, losing 11\% to 15\% of puzzles in every difficulty bucket including the easiest. Its state stays much smaller than in its sibling runs: at iteration 1024, median state RMS is 97 compared to 415 and 736. Meanwhile, the median margin in a puzzle's weakest cell erodes steadily from 15.5 logits at iteration 16 to 5.5 at 1024 and 2.0 at 4096, whereas the other two runs hold between 9 and 11. This looks like the drift analyzed in \secref{sec:analysis}, moving more slowly. We saw one such run and haven't tested whether wider starting offsets prevent it.
 
 \section{Training on 1,000 puzzles}
 \label{app:small}
 
-HRM and TRM train on 1,000 puzzles expanded into 1,000 symmetry-augmented copies each, reporting 55.0\% and 87.4\% on the full test split \citep{wang2025hierarchical,jolicoeur2025less}. We ran our model in this regime on 21 November 2026 using 1,000 random training puzzles with 1,000 augmented copies each (relabeled digits, row and column permutations within and across bands, and random board transposes).
+HRM and TRM train on 1,000 puzzles expanded into 1,000 symmetry-augmented copies each, reporting 55.0\% and 87.4\% on the full test split \citep{wang2025hierarchical,jolicoeur2025less}. We ran our model in this regime, with relabeled digits, row and column permutations within and across bands, and random transposes as the augmentations.
 
 \begin{table}[h]
 \centering
@@ -95,15 +95,14 @@ All from the start & 10K & Later-iteration & 0.3 & 3 & 47.4--51.4 & 52.4--57.1 &
 \end{tabular}
 \end{table}
 
-Left unmodified, both recipes memorize the 1,000 puzzles (\tabref{tab:small}). Two changes recover most of the gap: sampling all difficulties from step 0, and cutting the schedule from 50,000 to 10,000 steps, a length we picked by inspecting test accuracy. With both, later-iteration training solves 46\% to 57\% at 1024 iterations across seven runs, matching HRM while trailing TRM by a wide margin.
+Left unmodified, both recipes memorize the 1,000 puzzles (\tabref{tab:small}). Sampling all difficulties from step 0 and cutting the schedule to 10,000 steps (a length we picked by inspecting test accuracy) recover most of the gap: later-iteration training then solves 46\% to 57\% at 1024 iterations across seven runs, matching HRM while trailing TRM by a wide margin.
 
-\clearpage
 \section{Additional figures}
 \label{app:gallery}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.82\linewidth]{cell_timeline}
+\includegraphics[width=0.76\linewidth]{cell_timeline}
 \caption{The puzzle from \figref{fig:board} in two checkpoints. Each row is an empty cell, shaded orange on iterations where its prediction is wrong. \emph{Top:} the released checkpoint flips cells back and forth before solving the puzzle at iteration 130 and holding it. \emph{Bottom:} a failing original-recipe checkpoint solves the puzzle at iteration 15 and holds it until iteration 407, after which cells peel off one by one.}
 \label{fig:timeline}
 \end{figure}
