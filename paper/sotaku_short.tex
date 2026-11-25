@@ -1,0 +1,98 @@
+\pdfoutput=1 % tells arXiv to build with pdflatex
+% The paper: three pages of main text, with the full account (body.tex, then appendix.tex) as its appendix.
+\documentclass[10pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{enumitem}
+\usepackage[numbers,sort&compress]{natbib}
+\usepackage[colorlinks=true,linkcolor=black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+
+\captionsetup{font=small,labelfont=bf}
+\setlist{itemsep=1pt,topsep=3pt,leftmargin=1.4em}
+\newcommand{\figref}[1]{Figure~\ref{#1}}
+\newcommand{\tabref}[1]{Table~\ref{#1}}
+% In this version most section references point into the appendix, so let hyperref choose the word.
+\renewcommand{\sectionautorefname}{Section}
+\renewcommand{\appendixautorefname}{Appendix}
+\newcommand{\secref}[1]{\autoref{#1}}
+\newcommand{\appref}[1]{\autoref{#1}}
+\newcommand{\lr}[1]{$#1\times10^{-3}$}
+\graphicspath{{figures/}}
+
+\title{Sotaku: A Plain Looped Transformer Baseline Saturates Sudoku}
+% Affiliation and contact are left for the author to fill in.
+\author{Cheng Lou}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A hand-written Sudoku solver takes a few dozen lines of code, which makes Sudoku a clean testbed for seeing what a neural solver learns to do instead. We show that a well-tuned plain looped transformer with one training trick saturates Sudoku-Extreme on the full training split, using 800K parameters and none of the extra machinery recent neural solvers add. Code and weights are public.
+\end{abstract}
+
+\section{Introduction}
+
+A short program combining constraint propagation and backtracking solves any Sudoku almost instantly. That is what makes Sudoku a useful sandbox for neural networks: because we already know how a hand-written solver works, we can compare it directly against what a network learns from examples. A looped model feeds a network's output back into itself repeatedly, letting you scale test-time compute by running more iterations. Recent neural puzzle solvers build on this idea with heavier machinery: coupled modules with learned halting \citep{wang2025hierarchical}, nested recursions with weight averaging \citep{jolicoeur2025less}, learned energy functions \citep{chen2026ebr}, or fixed-point solvers \citep{bai2019deep,huang2026eqr}. When a plain looped transformer appears in these papers, it is usually a weak baseline: on the full Sudoku-Extreme training split, reported accuracies range from 2.5\% to around 81\% (\tabref{tab:baselines} in \autoref{sec:setup}).
+
+We wanted to see how far the plain model goes if you give it the tuning effort normally reserved for the proposed method. With 800K parameters, standard transformer blocks, cross-entropy, and AdamW, it reaches 99.1\% on a balanced 25,000-puzzle benchmark and 98.94\% on the full 422,786-puzzle test split (\figref{fig:scaling}). Most of that gain came from basic training choices and from unrolling the trained model for far more iterations at inference than it saw during training. Under the standard loss, however, only some training runs survive those extra iterations, and the training loss gives no hint which ones will. Supervising later iterations with the same loss makes long-horizon unrolling reliable.
+
+Note that we train on the full training split, whereas most recent work on Sudoku-Extreme trains on 1,000 puzzles (\autoref{sec:related}). The appendix walks through the full story: how we landed on this model and recipe, what the loop does internally, the measurement mistakes we caught along the way, and how this relates to prior work. Code, weights, and experiment notes are at \url{https://github.com/chenglou/sotaku} (\appref{app:repo}).
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.92\linewidth]{iteration_scaling}
+\caption{Accuracy vs.\ inference iterations (FP32). \emph{Left:} four checkpoints with the same architecture on the same 1,000 puzzles. All four were trained with backpropagation over at most 16 iterations and solve about 81\% at iteration 16. Two keep improving into the thousands of iterations; the other two, which differ from the successful baseline run only in learning rate, collapse almost completely. \emph{Right:} the released checkpoint on the 25,000-puzzle benchmark, broken down by difficulty rating.}
+\label{fig:scaling}
+\end{figure}
+
+\section{Model, training and evaluation}
+
+Each of the 81 cells is a token, with one-hot input $x$ over ``empty'' and the nine digits. The model maintains a latent state $h_t\in\mathbb{R}^{81\times128}$ and reads out digit probabilities $p_t$ at each iteration $t$:
+\begin{align*}
+h_0 = W_{\text{in}}\,x, \qquad p_0 = 0, \qquad
+h_t = F\!\left(h_{t-1} + W_{\text{fb}}\,p_{t-1}\right), \qquad p_t = \operatorname{softmax}\!\left(W_{\text{out}}\,h_t\right).
+\end{align*}
+Here $F$ is a stack of four pre-norm transformer blocks (width 128, four heads, MLP width 512), totaling 796,937 parameters. The only positional encoding is a 2D rotary embedding \citep{su2021roformer}: the model knows the 2D grid coordinates, with no explicit hints about rows, columns, or 3$\times$3 boxes. The input puzzle is injected once into $h_0$, and the carried state is never normalized between iterations.
+
+Training minimizes cross-entropy on the empty cells, averaged across 16 consecutive iterations. We train with AdamW (peak learning rate \lr{2}, 1,400-step warmup, cosine decay to 1\% of peak), batch size 2048, and 50,000 steps in BF16 mixed precision on 2.7M puzzles from the Sudoku-Extreme training split \citep{wang2025hierarchical}, using a hard-to-easy curriculum that starts on the hardest puzzles and mixes in easier ones over time. We call this the \emph{original recipe}. A puzzle counts as solved only if every empty cell is right. Unless noted, we evaluate in FP32 on a 25,000-puzzle test benchmark (5,000 from each of five difficulty buckets); since this slice guided months of iteration, treat it as a dev set (\autoref{sec:setup}).
+
+\section{Results}
+
+\paragraph{Basic training choices did the heavy lifting.} At 16 iterations, moving from easier Kaggle puzzles onto the actual target dataset, scaling up data and batch size, and adding learning-rate warmup with cosine decay lifted accuracy from 32\% to 84\% (\autoref{sec:history}). None of the fancier ideas we tried held up once those basics were in place. Sharpness-aware minimization \citep{foret2021sharpness} looked like our biggest single win early on (672 to 948 of 1,000 puzzles), but once we fixed the learning-rate schedule it shrank to a 0.4-point gain. Components from the Tiny Recursive Model, learned halting, the Muon optimizer, and a network explicitly given Sudoku's constraint graph didn't help either. What did help was simply running the same weights for more iterations at inference: the released checkpoint solves 81\% at 16 iterations, 96\% at 128, and 99.1\% at 1024.
+
+\paragraph{With the baseline loss, long unrolls are hit-or-miss.} Our first four models all held up at 1024 iterations. When we reran the two best configurations twelve times, however, only two stayed above 90\% while nine crashed below 6\%, despite matching on training loss and hitting the same 81\% at 16 iterations (\autoref{sec:fragile}). The three fresh original-recipe runs trained for this paper finished at 78.0\%, 2.5\%, and 0.6\% (\tabref{tab:late}). Backpropagating through more iterations, weight averaging, adding noise to the fed-back predictions, and auxiliary losses that reward keeping correct cells fixed none of this.
+
+\paragraph{Supervising later iterations fixes reliability.} On 20\% of training batches, we first roll the model forward for $s$ gradient-free iterations with $s$ sampled uniformly from $\{32, 64, 128, 256, 512\}$, detach the state, and apply the same 16-iteration cross-entropy loss to iterations $s{+}1$ through $s{+}16$. This is close to the progressive loss of \citet{bansal2022end}, with a much longer detached prefix. All seven 50K-step runs trained this way finish between 97.5\% and 99.2\% at 1024 iterations (\tabref{tab:late}), at roughly 1.9$\times$ the training time. It isn't bulletproof: two of the seven runs still drop more than six points between 1024 and 4096 iterations (\autoref{sec:late}).
+
+\input{generated/table_late}
+
+\paragraph{The state never converges to a fixed point.} The state norm grows linearly with the iteration count for as far as we have run it. On the released checkpoint, median state RMS reaches 393 at iteration 1024 and 1,730 at 4096, while the step update stays near 0.45. Predictions depend almost entirely on the state's direction: a model that keeps its answer locks onto a direction and stops rotating, whereas a failing model keeps drifting until a wrong digit overtakes the right one in some cell (\autoref{sec:analysis}).
+
+\paragraph{Precision and measurement traps.} Evaluating in BF16 (matching training) drops the released checkpoint from 98.6\% to 43.7\% at 4096 iterations: once the state grows large, the small per-step updates get rounded away in 16-bit precision. Keeping only the carried state in FP32 recovers full FP32 accuracy. Along the way we also had to retract a Jacobian stability analysis that was off by 50$\times$, and found that 10K-step screening runs ranked recipes in the opposite order from 20K-step runs (\autoref{sec:pitfalls}).
+
+\section{Limits and conclusion}
+\label{sec:conclusion}
+
+Everything here is on one task and one family of tiny models, measured on a benchmark we reused throughout development, with several comparisons backed by only one to three runs. We also still don't know why the original recipe holds at long horizons in some runs and collapses in others. Even so, the main takeaway is hard to miss: on the full training split, standard training choices took a plain looped transformer from 32\% to 99\% with zero task-specific tricks, and making it reliable only required applying the same loss to later iterations. Any paper proposing heavier machinery for this benchmark should compare against a plain loop given the same tuning budget.
+
+\paragraph{Acknowledgments.} AI coding assistants ran much of the experimentation, analysis code, and drafting under the author's direction. The author takes responsibility for the content.
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\clearpage
+\appendix
+\input{body}
+\input{appendix}
+
+\end{document}

@@ -1,0 +1,21 @@
+{
+  "workspace": "coreauto",
+  "app": "cheng-sotaku-paper",
+  "output_volume": "cheng-sotaku-outputs",
+  "launched_utc": "2026-11-19T13:46:00Z",
+  "gpu": "NVIDIA H200, driver 620.70.06, torch 2.10.0+cu128",
+  "training_calls": {
+    "paper_late_state_ce_seed20261119": "fc-01M7T0XZSD3GWDY3ZEPEQWESNJ",
+    "paper_vanilla_seed20261119": "fc-01M7T11C6MX1RD5MD38X3GWRB6",
+    "paper_late_state_ce_seed20261120": "fc-01M7T11WAWBXJAVAKNSGD7M1ET",
+    "paper_vanilla_seed20261120": "fc-01M7T12BQYNWHWREC02D0X1GQ8",
+    "paper_late_state_ce_seed20261121": "fc-01M7T12WADTASJ3QPJHMWRPYVR",
+    "paper_vanilla_seed20261121": "fc-01M7T13CD5YX3F879MV0R6ZNKB"
+  },
+  "evaluation_calls": {
+    "v2_fp32": "fc-01M7T18T4FSNNDWTAS527QGC5X",
+    "v1_fp32": "fc-01M7T19A1EB9QT123JXZM8EMWC",
+    "v2_fp32_full_test": "fc-01M7T1F5X63H04D5K8W549V52G",
+    "v1_fp32_full_test": "fc-01M7T1FPFGNFKNDBCK5EFK1YYK"
+  }
+}

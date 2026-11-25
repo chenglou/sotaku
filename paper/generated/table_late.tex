@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\small
+\caption{Final checkpoints of 50K-step runs on the 25,000-puzzle benchmark, FP32 inference, accuracy (\%) by inference iterations. No checkpoint selection. The runs marked ``new'' were trained for this paper in a fresh environment, in pairs that share a seed.}
+\label{tab:late}
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+Recipe & Seed & 16 & 128 & 1024 & 2048 & 4096 \\
+\midrule
+Later-iteration training (released) & 20260730 & 81.0 & 96.3 & 99.1 & 99.0 & 98.6 \\
+Later-iteration training & 20260910 & 81.1 & 96.1 & 98.2 & 97.7 & 91.7 \\
+Later-iteration training & 20260911 & 81.2 & 96.3 & 97.8 & 97.4 & 97.2 \\
+Later-iteration training & 20260912 & 80.8 & 96.4 & 99.2 & 99.4 & 99.4 \\
+\midrule
+Later-iteration training (new) & 20261119 & 80.2 & 96.1 & 98.7 & 98.8 & 98.8 \\
+Later-iteration training (new) & 20261120 & 81.2 & 96.0 & 97.5 & 95.2 & 83.9 \\
+Later-iteration training (new) & 20261121 & 81.1 & 96.3 & 98.5 & 97.4 & 95.6 \\
+\midrule
+Original recipe (new) & 20261119 & 81.9 & 93.3 & 2.5 & 1.1 & 0.4 \\
+Original recipe (new) & 20261120 & 81.6 & 94.1 & 78.0 & 73.0 & 68.4 \\
+Original recipe (new) & 20261121 & 81.9 & 26.2 & 0.6 & 0.4 & 0.3 \\
+\bottomrule
+\end{tabular}
+\end{table}%
