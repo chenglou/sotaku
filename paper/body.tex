@@ -1,0 +1,201 @@
+% The full account. sotaku_short.tex includes this file as the first part of its appendix.
+\section{Setup}
+\label{sec:setup}
+
+\begin{table}[t]
+\centering
+\small
+\caption{Reported results for looped transformers trained on the full Sudoku-Extreme training split, plus a feed-forward transformer for reference. Values marked $\approx$ were read off a plot. The setups differ in more than the model, so this is not a controlled comparison.}
+\label{tab:baselines}
+\begin{tabular}{@{}p{8.6cm}rrr@{}}
+\toprule
+Model & Parameters & Training puzzles & Solved (\%) \\
+\midrule
+Feed-forward transformer, 8 layers \citep{wang2025hierarchical} & 27M & 3.83M & 16.9 \\
+``Recurrent Transformer'' baseline, best depth \citep{wang2025hierarchical} & not stated & 3.83M & $\approx$81 \\
+Universal Transformer, one block, learned halting \citep{sapunov2026utmemory} & 3.2M & 3.83M & 2.5 \\
+\quad with 8--32 added memory tokens & 3.2M & 3.83M & 57.4 \\
+Looped denoiser, diffusion objective, attention limited to a cell's row, column and box \citep{drozdova2026diffusioncurriculum} & not checked & 3.83M & 99.9 \\
+\quad the same model run without injected noise & & & 49.4 \\
+Hierarchical Reasoning Model, deepest setting \citep{wang2025hierarchical} & 27M & 3.83M & $\approx$99 \\
+\midrule
+Sotaku (this paper), full test split, 1024 iterations & 0.8M & 2.7M & \input{generated/full_test_1024} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Data and evaluation.} We use Sudoku-Extreme \citep{wang2025hierarchical}, where each puzzle is rated by the number of times a reference solver had to backtrack, and train on the first 2.7M puzzles of its training split. A puzzle counts as solved only if every empty cell is correct. Accuracy is the percentage of puzzles solved on a fixed benchmark of 25,000 test puzzles, 5,000 from each of five rating buckets (0, 1--2, 3--10, 11--50 and 51+), with inference in 32-bit floats (FP32). This benchmark guided our decisions for months, so it is really a development set. We also report the released checkpoint on all 422,786 test puzzles.
+
+\paragraph{Model.} Each of the 81 cells is a token, and the input $x$ is one-hot over ``empty'' and the nine digits. The model keeps a state $h_t$, a vector of 128 numbers per cell, and after each iteration $t$ it reads digit probabilities $p_t$ off the state:
+\begin{align*}
+h_0 = W_{\text{in}}\,x, \qquad p_0 = 0, \qquad
+h_t = F\!\left(h_{t-1} + W_{\text{fb}}\,p_{t-1}\right), \qquad p_t = \operatorname{softmax}\!\left(W_{\text{out}}\,h_t\right).
+\end{align*}
+$F$ is a stack of four ordinary pre-norm transformer blocks (width 128, four heads, 796,937 parameters in total), and one \emph{iteration} is one pass through $F$. The only position information is a 2D rotary embedding \citep{su2021roformer}, so the model knows where each cell is on the grid and is not told which cells constrain each other. The puzzle goes in once, into $h_0$, and nothing normalizes the state between iterations.
+
+\paragraph{Training.} The loss is cross-entropy on the empty cells, averaged over the predictions of 16 consecutive iterations. We use AdamW \citep{loshchilov2019decoupled} with learning rate \lr{2}, warmup, cosine decay \citep{loshchilov2017sgdr}, batch size 2048 and 50,000 steps, in 16-bit mixed precision (BF16). Training starts on the hardest puzzles and adds easier ones as it goes. We call this the \emph{original recipe}, and \appref{app:hyper} has every setting. \emph{Later-iteration training} (\secref{sec:late}) only changes which 16 iterations get the loss on some batches. A run takes 3 to 5.5 hours on one NVIDIA H200.
+
+\section{How we got to this model and recipe}
+\label{sec:history}
+
+The design came out of about two hundred small experiments, mostly single runs. The repository has the complete list (\appref{app:repo}), and \figref{fig:waterfall} shows the changes we kept.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.86\linewidth]{where_accuracy_came_from}
+\caption{Accuracy on Sudoku-Extreme after each change we kept, in order. Each bar is a single run with all earlier changes in place. The last three bars use the two published checkpoints.}
+\label{fig:waterfall}
+\end{figure}
+
+\paragraph{Architecture.} The loop matters, and so does putting the loss on every iteration. On easy Kaggle puzzles \citep{radcliffe2020sudoku}, a model with 16 iterations solved 643 of 1,000 test puzzles, against none with one iteration and 428 with the loss on the last iteration only. Separate weights for each iteration did worse (581) with 16 times the parameters. The biggest architectural gain came from passing the hidden state from one iteration to the next along with the predicted probabilities. We started with learned row, column and box embeddings, which tell the model which cells constrain each other. Replacing them with 2D rotary embeddings cost only 0.3 points, and the model now works out rows, columns and boxes by itself (\secref{sec:analysis}).
+
+\paragraph{Optimization.} A handful of ordinary changes took accuracy at 16 iterations from 32\% to 84\%: training on Sudoku-Extreme itself, more data, a larger batch, learning-rate warmup and cosine decay. Sharpness-aware minimization \citep{foret2021sharpness} is the result we would warn others about. Early on it looked essential, raising solved puzzles from 672 to 948 of 1,000. Once cosine decay was in, it was worth 0.4 points at twice the training cost, and we took it out.
+
+\paragraph{Hard puzzles first.} Before cosine decay, the order in which the model saw difficulties mattered a lot: easy-to-hard solved 71.6\% of a mixed test set, uniform mixing 77.2\%, and hard-to-easy 79.8\%. With cosine decay, hard-to-easy and mixing ended up 0.2 points apart. We kept hard-to-easy.
+
+\paragraph{What didn't help.} We tried most of the ingredients of the Tiny Recursive Model \citep{jolicoeur2025less,nanotrm}, the Muon optimizer \citep{jordan2024muon} and a learned halting signal. None improved on the plain model in our large-data setting. A recurrent relational network \citep{palm2018recurrent}, which is handed the graph of cells that constrain each other, did much worse. Nothing in \figref{fig:waterfall} is specific to Sudoku or to looped models.
+
+\section{More iterations at inference, and why they only sometimes worked}
+\label{sec:fragile}
+
+So far every model was evaluated at the 16 iterations it was trained with. Running the same weights for longer costs only inference time, and accuracy kept climbing: our first published checkpoint improves at every doubling up to 1024 iterations and then holds (\tabref{tab:scaling}). Most puzzles don't need the extra iterations. Half of each rating bucket is solved within 9, while one in a hundred of the puzzles rated 3--50 needs more than 500. The rating also isn't quite what the model finds hard, since it solves puzzles rated 51+ faster than those rated 3--50. And progress on a hard puzzle isn't steady: in \figref{fig:board} the number of wrong cells goes down, back up, and down again.
+
+\input{generated/table_scaling}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.72\linewidth]{board_evolution}
+\caption{The released checkpoint's predictions for one puzzle rated 53. Grey cells are given and orange cells are wrong. The board has 15 wrong cells at iteration 8 and 28 at iteration 32. It is solved at iteration 130 and stays solved.}
+\label{fig:board}
+\end{figure}
+
+\paragraph{The same recipe usually fails.} The four models we trained in February 2026 all kept their accuracy at 1024 iterations. In July, someone outside the project tried to reproduce the result and couldn't. We then reran the two best configurations twelve times. Two runs stayed above 90\% at 1024 iterations and nine fell below 6\%, although all twelve scored about 81\% at 16 iterations (\tabref{tab:repro}). We don't know why the first four runs all worked.
+
+\begin{table}[t]
+\centering
+\small
+\caption{Final checkpoints of every group of original-recipe runs. ``Kept'' counts runs with at least 90\% at 1024 iterations (80\% for the 20K-step monitoring group). The groups differ in schedule and inference precision, so the fractions shouldn't be pooled into one rate.}
+\label{tab:repro}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{6.7cm}p{7.2cm}c@{}}
+\toprule
+Runs & Accuracy at 1024 iterations (\%) & Kept \\
+\midrule
+February, four configurations & 98.9, 98.1, 97.3, 95.9 & 4 of 4 \\
+July, two best configurations rerun & 96.0, 92.3, 31.2, 5.8, 5.4, 3.0, 1.2, 0.2, 0.1, 0.1, 0.0, 0.0 & 2 of 12 \\
+July, three-phase 40K-step variant & 24.6, 1.4, 0.3 & 0 of 3 \\
+July, uniform difficulty mixing & 95.5, 88.8, 72.1 & 1 of 3 \\
+July, eight more runs of the best configuration & 98.1, 97.1, and six lower & 2 of 8 \\
+20K-step schedule, 1,000 monitoring puzzles & (threshold 80) & 2 of 7 \\
+20K-step schedule, FP32 & 97.6, 11.0, 0.1 & 1 of 3 \\
+50K steps, three new runs, FP32 (\secref{sec:late}) & 78.0, 2.5, 0.6 & 0 of 3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Accuracy at 1024 iterations swings during training.} With the original recipe, three checkpoints saved 1,000 steps apart in one run score 12.9\%, 97.3\% and 8.7\% at 1024 iterations, while the training loss and the 16-iteration accuracy change smoothly (\figref{fig:curves}). Picking the best checkpoint helps but isn't a fix.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{training_curves}
+\caption{Accuracy at 1024 inference iterations during training, scored every 1,000 steps on 1,000 puzzles. Each line is one training run, and paired runs share a random seed.}
+\label{fig:curves}
+\end{figure}
+
+\paragraph{What we tried that didn't change the odds.} Backpropagating through more iterations, with and without the residual scaling analyzed by \citet{wang2026loopmup}, averaging the weights, adding noise to the fed-back predictions, and adding losses that reward keeping a correct cell all left the failure as frequent or made it worse.
+
+\section{Training on later iterations}
+\label{sec:late}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=1cm,y=1cm,font=\footnotesize]
+\definecolor{sup}{HTML}{2a78d6}
+\definecolor{free}{HTML}{dddcd6}
+\node[anchor=east] at (-0.15,1.45) {80\% of batches};
+\draw[fill=sup!30,draw=sup] (0,1.2) rectangle (2.6,1.7);
+\node at (1.3,1.45) {iterations 1--16};
+\node[anchor=west] at (2.8,1.45) {loss after each iteration; gradients flow through all 16};
+\node[anchor=east] at (-0.15,0.25) {20\% of batches};
+\draw[fill=free,draw=black!45] (0,0) rectangle (7.4,0.5);
+\node at (3.7,0.25) {$s$ iterations without gradients};
+\draw[fill=sup!30,draw=sup] (7.4,0) rectangle (10.8,0.5);
+\node at (9.1,0.25) {iterations $s{+}1$ to $s{+}16$};
+\node[anchor=west] at (11.0,0.25) {same loss};
+\draw[-{latex}] (7.4,-0.08) -- (7.4,-0.42);
+\node[anchor=north] at (7.4,-0.42) {state detached here};
+\node[anchor=north] at (3.7,-0.08) {$s$ drawn from $\{32, 64, 128, 256, 512\}$};
+\end{tikzpicture}
+\caption{Later-iteration training. On a random fifth of the batches, the 16 iterations that get the loss start from the state the model reaches after $s$ gradient-free iterations. Nothing else changes from the original recipe.}
+\label{fig:method}
+\end{figure}
+
+The original recipe only ever puts the loss on the first 16 states of a trajectory. Our fix is to put it on later states too, without paying to backpropagate through the iterations that lead there (\figref{fig:method}). On 20\% of batches we draw $s$ from $\{32, 64, 128, 256, 512\}$, run $s$ iterations without gradients, detach the state, and apply the same 16-iteration loss to iterations $s{+}1$ through $s{+}16$. The other batches train as before. Training now reaches iteration 528 while gradients never span more than 16, and it takes about 1.9 times as long. This is a form of truncated backpropagation through time, close to the progressive loss of \citet{bansal2022end}. Ours uses a much longer gradient-free prefix and applies it to a minority of batches.
+
+\paragraph{Results.} All seven 50K-step runs trained this way finish between 97.5\% and 99.2\% at 1024 iterations (\tabref{tab:late}). The last six rows of the table are three seed-matched pairs trained for this paper (\appref{app:cohort}). The original recipe ends at 2.5\%, 78.0\% and 0.6\%, and later-iteration training at 98.7\%, 97.5\% and 98.5\%. The later windows cost up to 1.7 points at 16 iterations. The released checkpoint comes from an earlier five-recipe comparison that agrees (\tabref{tab:matched} in \appref{app:ablations}).
+
+\ifshort\else
+\input{generated/table_late}
+\fi
+
+\paragraph{What changes in the model.} The model gets better at keeping answers it already has. In one run we switched later-iteration training on partway through. Within a thousand training steps, the share of puzzles solved at iteration 1024 that were still solved 16 iterations later went from 92.7\% to 99.8\%, and accuracy at 1024 iterations went from 62.0\% to 94.5\%.
+
+\paragraph{Which parts matter.} We ran these variations with one to three seeds each, so only the big effects should be trusted (\appref{app:ablations}). The starting points need to cover a \emph{range}: always starting at one fixed iteration gave models that stopped near 90\%. They also have to \emph{reach far enough}: in a related variant, runs whose training never went past iteration 192 ended below 60\% at 1024 iterations. More isn't better, though. Later windows on half of the batches, or starting points up to 1024, cost more and didn't help consistently.
+
+\paragraph{What it doesn't fix.} Two of the seven runs lose more than six points between 1024 and 4096 iterations (\appref{app:cohort}), and accuracy at 1024 iterations still dips until late in training (\figref{fig:curves}). A wider model helped: with width 160, all three runs stayed above 98.5\% at 4096 iterations.
+
+\paragraph{Other things we tried.} Dividing each cell's state by its root mean square after every iteration made the original recipe dependable, but its accuracy stopped at about 92\%. The loop design of the Inkling 2 Mini language model \citep{inkling2mini,goodfire2026inkling} had the same effect. There, each iteration starts again from the puzzle and reads a gated summary of the previous iteration, and layers inside an iteration are connected by attention residuals \citep{kimi2026attnres}. In 20K-step runs, models built this way never lost a puzzle they had solved, but they stopped at about 84\%, against 95\% at 1024 iterations for the plain model trained the same way. Fine-tuning with evolution strategies \citep{salimans2017evolution}, which only need forward passes, repaired some failed checkpoints (e.g.\ from 5.4\% to 96.2\% at 1024 iterations) and did nothing for others. We also checked that the failures aren't a side effect of reusing the benchmark: on 10,000 newly generated puzzles from a different generator \citep{ostermiller_qqwing}, three original-recipe models scored 99.96\%, 3.8\% and 0.0\%.
+
+\section{What the loop is doing}
+\label{sec:analysis}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{state_dynamics}
+\caption{The state over 4,096 iterations for the four checkpoints of \figref{fig:scaling} (medians over 1,000 puzzles). \emph{Left:} the state's root mean square grows linearly in every model. \emph{Middle:} the size of one iteration's update levels off and doesn't shrink toward zero. \emph{Right:} for each puzzle we take the empty cell with the smallest gap between the correct digit's logit and the largest other logit, then show the 10th percentile across puzzles. Negative values mean a wrong digit is ahead in at least one cell.}
+\label{fig:dynamics}
+\end{figure}
+
+\paragraph{There is no fixed point.} You might expect a model that holds its answer for thousands of iterations to have settled into a fixed point, where one more iteration changes nothing. That isn't what happens (\figref{fig:dynamics}). In every checkpoint we looked at, accurate or failing, the state's magnitude grows roughly linearly with the iteration count, and the size of each update levels off at a constant. Root-finding didn't find a useful solution of $F(h)=h$ either, so the model can't be treated as a deep equilibrium model \citep{bai2019deep} after the fact.
+
+\paragraph{The answer is in the direction.} If we scale the state to length 1 and drop the output bias before reading the digits, accuracy stays within 0.3 points. So the answer is carried by the state's direction. An accurate model keeps pushing its state outward along a direction that has stopped changing: between iterations 896 and 1024 the direction moves by 0.006 in an accurate checkpoint and by 0.10 in a failing one.
+
+\paragraph{Losing the answer is a slow drift.} In a failing checkpoint, the gap between the correct digit and its strongest competitor shrinks over hundreds of iterations until, in some cell, the competitor overtakes it (\figref{fig:dynamics}, right, and \figref{fig:timeline} in \appref{app:gallery}). The model has usually found the answer before that. In one failing model, 48 of 50 puzzles were solved at some iteration and only 2 were still solved at iteration 4096, and half of them ended on a wrong board that then stopped changing. The damage comes from the part of each update that is perpendicular to the state. Shrinking only that part to a quarter after iteration 128 brought three failing checkpoints back to about 95\% at 1024 iterations. This is only a diagnostic, and the released model runs unmodified.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.95\linewidth]{attention_heads}
+\caption{Attention in the released checkpoint at iteration 16, averaged over 1,000 puzzles. \emph{Left:} for each of the 16 heads, how attention from a cell is divided among the other cells of its row, of its column, the cells that share only its box, itself, and the remaining 60 cells. \emph{Right:} average attention from the outlined cell for four heads. The model is given row and column coordinates only, so it learned by itself to attend within the 3$\times$3 box.}
+\label{fig:attention}
+\end{figure}
+
+\paragraph{Attention finds rows, columns and boxes.} The model gets each cell's row and column index and is told nothing about boxes. Most attention heads still specialize (\figref{fig:attention}, and \figref{fig:allheads} for all heads). Several put more than 80\% of their attention on the cell's row or on its column, and one puts 93\% inside the cell's 3$\times$3 box.
+
+\paragraph{Nearby starts settle at different times.} Following \citet{lai2026fractal}, we nudged the starting state of a slowly solved puzzle along two random directions. The time it takes to settle changes in fine bands, down to nudges a thousand times smaller than the first ones (\figref{fig:maps}).
+
+\paragraph{Compared with a hand-written solver.} A hand-written solver keeps a list of candidate digits for each cell and removes the candidates that clash with a filled cell in the same row, column or box. When that stalls, it guesses a digit and backtracks if the guess leads to a contradiction. It stops when the board is full, and its answer is correct by construction. The network has the first part: its attention heads read the same rows, columns and boxes that the elimination step reads, and a linear readout of its state recovers how many digits are still possible for a cell. The rest looks different. We see nothing like one guess being made and undone: on a hard puzzle many cells change in the same iteration, and the number of wrong cells goes up and down (\figref{fig:board}). The network finds different puzzles hard: the rating counts a solver's backtracks, yet the network solves the highest-rated puzzles faster than the middle ones. And it has no notion of being done. It never halts and nothing checks the board, so a failing model can settle on a wrong board and a correct board can be lost by running longer.
+
+\section{Mistakes in measurement}
+\label{sec:pitfalls}
+
+\paragraph{Inference precision.} For most of the project, evaluation ran in BF16 mixed precision, the same as training. For the released checkpoint that lowers accuracy at 4096 iterations from 98.6\% to 43.7\% (\figref{fig:precision}, and \tabref{tab:precision} in \appref{app:precision}). A BF16 number keeps 8 significant bits. Once the state has grown to a few hundred while each update is still around 0.4, adding the update often rounds straight back to the old value. The fix is cheap: keep the BF16 arithmetic and store only the state passed between iterations in FP32. Precision doesn't explain the original recipe's failures, which also show up under FP32, but much of what we first believed about accuracy beyond 1024 iterations was really about rounding.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\linewidth]{precision}
+\caption{The same weights and the same 1,000 puzzles under three numerical settings. With BF16 arithmetic and a BF16 state, a growing share of state elements is left bit-for-bit unchanged by an iteration (\emph{right}), and accuracy at large iteration counts falls. With the same BF16 arithmetic and the state stored in FP32, accuracy matches full FP32.}
+\label{fig:precision}
+\end{figure}
+
+\paragraph{A Jacobian that was off by fifty.} Our first stability analysis estimated the Jacobian of one iteration by finite differences in low precision. It reported spectral radii, a rough measure of whether small changes to the state grow, of 14 to 88, and we built explanations on top of it. Recomputed with automatic differentiation in FP64, the radius at the same state is 1.097, where the old method gave 52.5. We had been subtracting two nearly equal low-precision numbers and dividing by a small one. The corrected radius is about 1.1 in accurate and failing checkpoints alike, so it doesn't predict failure.
+
+\paragraph{Shapes in projections.} Plot a state trajectory in its first principal components and you get clean lines, arcs and the occasional spiral (\figref{fig:pca} and \figref{fig:gallery} in \appref{app:gallery}). Number representations in language models are known to form helices \citep{kantamneni2025trigonometry}, so we went looking for one. The shapes changed with the projection and didn't repeat across puzzles, and random smooth paths with no Sudoku in them produced similar shapes once we picked the projection that maximized a helix score. A projection chosen after looking at the data isn't evidence of geometry.
+
+\paragraph{Short runs and too few runs.} To save time we compared training variants with 10K-step runs. One variant finished far behind its control at 10K steps (20.5\% against 54.4\% at 1024 iterations) and ahead of it at 20K (94.8\% against 89.4\%). We now screen at 20K steps and confirm at 50K. The run-to-run variation of \secref{sec:fragile} went unnoticed for five months because the first four runs happened to succeed.
+
+\section{Relation to prior work}
+\label{sec:related}
+
+\paragraph{What the project used.} We use the Sudoku-Extreme dataset released with the Hierarchical Reasoning Model \citep{wang2025hierarchical} and tested the ingredients of the Tiny Recursive Model \citep{jolicoeur2025less}. Both put the loss on several consecutive segments of a trajectory with the state detached between them, which is another way of training on later states. We also tried the residual scaling of \citet{wang2026loopmup} and the extra state of \citet{zeitoun2026hyperloop}, and neither removed the failure in our model. \citet{geiping2025scaling} train a looped language model with a truncation similar to ours.
+
+\paragraph{What we found afterwards.} We searched the literature after the experiments were finished and haven't studied it in depth. The closest earlier method is the progressive loss of \citet{bansal2022end}, who also named the loss of accuracy at long iteration counts ``overthinking''. Their networks feed the input back in at every iteration and ours doesn't. The closest earlier architecture we know of is the recurrent transformer of \citet{yang2023learning}. Most later work on Sudoku-Extreme keeps the 1,000-puzzle setting, and several methods now report more than 99\% there \citep{huang2026eqr,chen2026ebr,hoover2026cram}, against about 50\% for our model (\appref{app:small}). \citet{chen2026ebr} report that their accuracy falls to 60\% when the energy-gradient update is replaced by a directly learned transition, while our result says that with the full training split a directly learned transition is enough. \citet{hoover2026cram} reach their accuracy with a classical energy trained in milliseconds and conclude that Sudoku shouldn't be used to test whether looped methods scale. We haven't reproduced these numbers.

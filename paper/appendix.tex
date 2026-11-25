@@ -1,0 +1,207 @@
+\section{Hyperparameters}
+\label{app:hyper}
+
+\begin{table}[h]
+\centering
+\small
+\caption{The released recipe. The original recipe is the same without the ``later-iteration training'' block.}
+\begin{tabular}{@{}p{4.6cm}p{10.9cm}@{}}
+\toprule
+\multicolumn{2}{@{}l}{\emph{Model}} \\
+Tokens & 81 cells; input one-hot over 10 symbols; output 9 logits per cell \\
+Blocks per iteration & 4, pre-norm, weights shared across iterations \\
+Width, heads, feed-forward width & 128, 4, 512 (ReLU) \\
+Position & 2D rotary embedding on queries and keys, 16 dimensions per axis, base 10 \\
+Dropout & 0.1 (attention, residual branches, feed-forward) \\
+State between iterations & previous state plus a linear map of the predicted probabilities; no normalization \\
+Parameters & 796,937 \\
+\midrule
+\multicolumn{2}{@{}l}{\emph{Optimization}} \\
+Loss & cross-entropy on empty cells, averaged over 16 iterations \\
+Optimizer & AdamW, $\beta=(0.9, 0.95)$, weight decay 0.01, no gradient clipping \\
+Learning rate & \lr{2} peak, 1,400-step linear warmup, cosine decay to 1\% of peak \\
+Batch size, steps & 2048, 50,000 (20,000 with a 560-step warmup for the short schedule) \\
+Precision & BF16 autocast with compiled model during training \\
+Training pool & first 2.7M puzzles of the Sudoku-Extreme training split \\
+Pool by step & rated 51+ (281K puzzles) to 10K; 11+ (1.64M) to 20K; 1+ (2.31M) to 30K; all to 50K \\
+\midrule
+\multicolumn{2}{@{}l}{\emph{Later-iteration training}} \\
+Share of batches & 20\%, chosen independently per batch \\
+Gradient-free iterations & drawn uniformly from $\{32, 64, 128, 256, 512\}$; dropout on \\
+Loss & on the 16 iterations that follow, same loss; replaces the ordinary 16 on those batches \\
+\midrule
+\multicolumn{2}{@{}l}{\emph{Inference}} \\
+Precision & FP32, TensorFloat-32 disabled, batch size 256 \\
+Iterations & 1024 unless stated; no early stopping, damping or answer selection \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{More on later-iteration training}
+\label{app:ablations}
+
+These are the two tables behind ``Results'' and ``Which parts matter'' in \secref{sec:late}. The 20K-step runs, the second-window variants, and the tests of dropout in the gradient-free prefix and of starting points up to 1024 are written up in the repository (\appref{app:repo}).
+
+\begin{table}[h]
+\centering
+\small
+\caption{Five recipes trained for 50K steps from the same random seed, scored on 1,000 monitoring puzzles with BF16 inference. Each of the last three rows changes 20\% of batches. In the last two, the ordinary loss stays on every batch and the added term only looks at a later window: ``consistency'' penalizes a change in the predicted distribution of cells that were correct, and ``margin'' penalizes a small gap between the correct digit's logit and the best wrong one in puzzles that were solved.}
+\label{tab:matched}
+\begin{tabular}{@{}lcccc@{}}
+\toprule
+ & \multicolumn{2}{c}{Final checkpoint} & \multicolumn{2}{c}{At 1024, steps 30K--50K} \\
+\cmidrule(lr){2-3}\cmidrule(l){4-5}
+Recipe & 128 iter. & 1024 iter. & Mean & Minimum \\
+\midrule
+Original (loss on iterations 1--16 only) & 10.6 & 0.4 & 0.6 & 0.0 \\
+Original + RMS normalization of the state & 88.2 & 89.3 & 88.7 & 85.6 \\
+Later-iteration training & 97.1 & 98.9 & 96.3 & 89.1 \\
+Consistency term on later iterations, no later cross-entropy & 92.5 & 88.2 & 83.2 & 58.3 \\
+Margin term on later iterations, no later cross-entropy & 96.4 & 98.7 & 97.1 & 81.9 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Three ways to choose where the later window starts (20K steps, three seeds per row, final checkpoints, FP32, full benchmark). This study used a separate trainer, so its ``random'' row is a matched control and not a rerun of the released recipe.}
+\label{tab:window}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Starting point & 128 iter. & 1024 iter. & 2048 iter. & 4096 iter. \\
+\midrule
+Random among \{32, 64, 128, 256, 512\} & 93.3 & 88.1 & 82.4 & 67.5 \\
+\quad individual seeds at 1024 iterations & \multicolumn{4}{l}{71.1, 97.6, 95.6} \\
+The candidate with the highest mean confidence & 88.0 & 77.7 & 55.0 & 37.2 \\
+\quad individual seeds at 1024 iterations & \multicolumn{4}{l}{88.2, 57.0, 87.9} \\
+Always 512 & 88.1 & 88.2 & 88.2 & 88.2 \\
+\quad individual seeds at 1024 iterations & \multicolumn{4}{l}{85.9, 88.2, 90.6} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{The six new training runs}
+\label{app:cohort}
+
+The six runs marked ``new'' in \tabref{tab:late} were trained on 19 November 2026, each on one H200 GPU with PyTorch 2.10, from the repository's unmodified code. We fixed the three seeds beforehand and report every run we started.
+
+\begin{table}[h]
+\centering
+\small
+\caption{The six new runs. ``Best checkpoint'' and ``final'' are accuracy (\%) at 1024 iterations on 1,000 benchmark puzzles, FP32 inference, over the 50 checkpoints saved 1,000 steps apart. The last column counts, among the 25,000 benchmark puzzles, those that the final checkpoint solves at some iteration up to 4096 and gets wrong at a later one.}
+\label{tab:cohort}
+\begin{tabular}{@{}llrrrr@{}}
+\toprule
+Recipe & Seed & Best checkpoint & at step & Final & Solved, then lost \\
+\midrule
+Later-iteration training & 20261119 & 98.7 & 45K & 98.6 & 166 \\
+Later-iteration training & 20261120 & 98.2 & 37K & 97.4 & 4,155 \\
+Later-iteration training & 20261121 & 98.5 & 42K & 97.2 & 950 \\
+\midrule
+Original recipe & 20261119 & 97.3 & 25K & 2.6 & 24,584 \\
+Original recipe & 20261120 & 99.1 & 35K & 80.5 & 8,109 \\
+Original recipe & 20261121 & 62.8 & 3K & 0.8 & 24,676 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{The original recipe.} All three runs reach about 81\% at 16 iterations. Seed 20261121 loses its accuracy early: from step 5K on it is below 10\% at 1024 iterations. Seed 20261119 has four checkpoints above 80\% between steps 16K and 25K, with checkpoints below 10\% in between, and stays below 10\% from step 26K on. Seed 20261120 scores 93\% or higher at every checkpoint from step 27K to step 46K and then ends at 78.0\% of the benchmark. Picking each run's best checkpoint would give 97.3\%, 99.1\% and 62.8\%.
+
+\paragraph{Later-iteration training.} Here picking a checkpoint changes little: the best one is within 1.3 points of the final one in each run.
+
+\paragraph{The run that fades at 4096 iterations.} The later-iteration run with seed 20261120 falls from 97.5\% at 1024 iterations to 83.9\% at 4096. It loses 11\% to 15\% of the puzzles in every rating bucket, the easiest included. Its state is much smaller than in the other two runs: at iteration 1024 the median state RMS is 97, against 415 and 736. The correct digit's lead in a puzzle's weakest cell shrinks steadily, from a median of 15.5 logits at iteration 16 to 5.5 at iteration 1024 and 2.0 at iteration 4096, while in the other two runs it stays between 9 and 11. This looks like the drift of \secref{sec:analysis} at a much lower speed. We have one run like this and haven't tested whether a wider set of starting points would prevent it.
+
+\section{Training on 1,000 puzzles}
+\label{app:small}
+
+HRM and TRM train on 1,000 puzzles, each expanded into 1,000 copies with Sudoku's symmetries, and report 55.0\% and 87.4\% of the full test split \citep{wang2025hierarchical,jolicoeur2025less}. We ran our model in that setting on 21 November 2026, with 1,000 random training puzzles and 1,000 copies of each (digits relabeled, rows and columns permuted within and across bands, and sometimes the board transposed).
+
+\begin{table}[h]
+\centering
+\small
+\caption{Our model trained on 1,000 puzzles: puzzles solved (\%) on the full test split with FP32 inference. Rows with several runs give the lowest and highest run. The four runs in the second-to-last row are three seeds and a second random set of 1,000 puzzles.}
+\label{tab:small}
+\begin{tabular}{@{}lrlrrrrr@{}}
+\toprule
+ & & & & & \multicolumn{3}{c}{Inference iterations} \\
+\cmidrule(l){6-8}
+Difficulty sampling & Steps & Recipe & Weight decay & Runs & 16 & 128 & 1024 \\
+\midrule
+Hardest first & 50K & Original & 0.01 & 1 & 9.4 & 2.8 & 0.0 \\
+Hardest first & 50K & Later-iteration & 0.01 & 1 & 13.0 & 14.1 & 10.6 \\
+All from the start & 50K & Original & 0.01 & 1 & 20.9 & 16.4 & 0.0 \\
+All from the start & 50K & Later-iteration & 0.01 & 1 & 22.7 & 22.0 & 18.9 \\
+\midrule
+All from the start & 10K & Original & 0.01 & 1 & 45.3 & 42.6 & 0.3 \\
+All from the start & 10K & Original & 1.0 & 1 & 42.8 & 52.7 & 44.8 \\
+All from the start & 10K & Later-iteration & 0.01 & 4 & 47.2--48.9 & 50.1--51.7 & 46.3--51.6 \\
+All from the start & 10K & Later-iteration & 0.3 & 3 & 47.4--51.4 & 52.4--57.1 & 52.3--57.1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Used unchanged, both recipes memorize the 1,000 puzzles and solve few test puzzles (\tabref{tab:small}). Two changes fix most of that. The first is to sample all difficulties from the first step, because the hardest-first curriculum otherwise spends its first 10,000 steps on the 81 hardest training puzzles. The second is to shorten the schedule from 50,000 to 10,000 steps: in the 50,000-step runs, accuracy on test puzzles peaks between steps 3,000 and 9,000 and then falls as the model keeps memorizing. We chose the schedule length by looking at test puzzles.
+
+With both changes, later-iteration training solves 46\% to 57\% at 1024 iterations over seven runs. That is about HRM's level and far below TRM's. The two recipes differ as they do with the full training split: between 128 and 1024 iterations the original recipe loses all of its accuracy with weight decay 0.01 and 8 points with 1.0, and later-iteration training loses at most 5 points. Later-iteration training did a little better with weight decay 0.3 than with 0.01, fell to 16\% with 0.5, and didn't learn at all with 0.7 or 1.0.
+
+\section{Inference precision}
+\label{app:precision}
+
+\input{generated/table_precision}
+
+\ifshort\clearpage\fi
+\section{More pictures}
+\label{app:gallery}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.82\linewidth]{cell_timeline}
+\caption{The puzzle of \figref{fig:board} in two models. Each row is an empty cell, orange at the iterations where its predicted digit is wrong. \emph{Top:} the released checkpoint flips cells between right and wrong for a long time, solves the puzzle at iteration 130, and keeps the answer. \emph{Bottom:} a failing original-recipe checkpoint solves it at iteration 15 and holds it until iteration 407, after which cells go wrong one at a time.}
+\label{fig:timeline}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{attention_all_heads}
+\caption{All 16 attention heads of the released checkpoint at iterations 1, 16 and 1024. Each small board shows the average attention from the outlined cell over 1,000 puzzles, and each board has its own color scale. At iteration 1 several heads look at a row or column that isn't the cell's own. By iteration 16 the row, column and box heads of \figref{fig:attention} have formed, and they look much the same at iteration 1024.}
+\label{fig:allheads}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.88\linewidth]{perturbation_maps}
+\caption{Nearby starting states can take very different amounts of time to settle. We take a puzzle that an accurate 20K-step model solves slowly, shift its initial state along two random directions, and run 2,048 iterations from each of $129\times129$ shifted starts in FP64. Color is the iteration at which the predicted board last changed, and grey marks the 2--6\% of starts that didn't end on the correct board. Each panel magnifies the white box of the one before it, and the bands are still there at 1,024 times magnification. For a puzzle solved in two iterations the map is a single flat color.}
+\label{fig:maps}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\linewidth]{repo_state_pca}
+\caption{State trajectories of five puzzles over 1,024 iterations in one shared PCA basis, colored from early (purple) to late (yellow), for a model trained with later-iteration training. Each puzzle moves along its own nearly straight line, which is the growth in magnitude of \secref{sec:analysis}.}
+\label{fig:pca}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.78\linewidth]{repo_adversarial_gallery}
+\caption{Why we stopped trusting trajectory plots. \emph{Top row:} random smooth paths with no Sudoku in them, each in the projection that maximizes an arc, loop or helix score. \emph{Other rows:} real trajectories, scaled to length 1, in a projection fitted across puzzles and in one fitted per puzzle. The labels are the repository's internal names: \texttt{stable\_plain} is an accurate original-recipe checkpoint, \texttt{collapsed\_plain} a failing one, \texttt{late\_state\_ce} a checkpoint trained with later-iteration training, and \texttt{combined\_margin} one that adds a second window and a margin term late in training.}
+\label{fig:gallery}
+\end{figure}
+
+\section{Where to find the rest}
+\label{app:repo}
+
+The repository, \url{https://github.com/chenglou/sotaku}, has the full notes for everything this paper mentions without a table. Its README has an index under ``Research Notes''. The main files:
+
+\begin{itemize}
+\raggedright
+\item \path{STALE_EXPERIMENTS_DOC.md}: the early design history in the order it happened, about two hundred experiments. \path{pos_embedding/EXPERIMENTS_POS.md}, \path{cosine/EXPERIMENTS_COSINE.md}, \path{muon/EXPERIMENTS_MUON.md} and \path{rrn/RRN_EXPERIMENTS.md} cover position encodings, the learning-rate schedule, Muon and the recurrent relational network.
+\item \path{iters/EXPERIMENTS_ITERS.md}: accuracy at large iteration counts, the February and July runs, and the single runs with other learning rates, batch sizes and widths.
+\item \path{looping/EXPERIMENTS_LOOPING.md}: later-iteration training, including the 20K-step runs, second windows, margin terms and damping at inference.
+\item \path{stabilize/EXPERIMENTS_STABILIZE.md}: normalizing the state and the other attempts to stabilize the original recipe.
+\item \path{es/EXPERIMENTS_ES.md}: evolution strategies, plus the pixel-input and maze variants of the task.
+\item \path{looping/weight_tying/RESULTS.md}, \path{looping/window_selection/RESULTS.md}, \path{looping/width_50k/README.md}, \path{looping/hyperloop_50k/RESULTS.md} and \path{looping/attention_residuals/RESULTS.md}: shared against separate weights with the fresh puzzle set, the choice of starting points, width 160, the extra gated states, and the Inkling 2 Mini loop design.
+\item \path{looping/trajectory_viz/study/README.md}, \path{looping/spectral_diagnostics/RESULTS.md} and \path{looping/basin_diagnostics/RESULTS.md}: the readout study and projection controls, the corrected Jacobian analysis, and the perturbation maps.
+\item \path{release/PRECISION_RESULTS.md}: inference precision. \path{paper/README.md}: how to rebuild this paper's tables and figures.
+\end{itemize}

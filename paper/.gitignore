@@ -1,0 +1,10 @@
+# LaTeX build products
+*.aux
+*.bbl
+*.blg
+*.out
+*.log
+
+# Previews written by scripts/make_figures.py; the paper uses the PDFs
+figures/*.png
+!figures/repo_*.png
